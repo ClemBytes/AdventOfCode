@@ -49,4 +49,5 @@ fn get_floor(instructions: &String) -> i32 {
         }
     }
     floor
+    // We can do easier by counting number of '(', number of ')' and substract…
 }
