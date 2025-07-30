@@ -15,3 +15,23 @@ fn day02_part1(_input: &String) {
 fn day02_part2(_input: &String) {
     
 }
+
+struct Box {
+    length: u32,
+    width: u32,
+    height: u32,
+}
+
+impl Box {
+    fn get_side_areas(&self) -> Vec<u32> {
+        vec![
+            &self.length * &self.width,
+            &self.length * &self.height,
+            &self.width  * &self.height,
+        ]
+    }
+    
+    fn smallest_side_area(&self) -> u32 {
+        &self.get_side_areas().iter().min().unwrap()
+    }
+}
