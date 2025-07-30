@@ -8,45 +8,34 @@ pub fn run() {
     day01_part2(&input);
 }
 
-fn day01_part1(input: &String) {
+fn day01_part1(input: &str) {
     // Exemple tests
-    let test = String::from("(())");
-    assert_eq!(get_floor(&test), 0);
-    let test = String::from("()()");
-    assert_eq!(get_floor(&test), 0);
-    let test = String::from("(((");
-    assert_eq!(get_floor(&test), 3);
-    let test = String::from("(()(()(");
-    assert_eq!(get_floor(&test), 3);
-    let test = String::from("))(((((");
-    assert_eq!(get_floor(&test), 3);
-    let test = String::from("())");
-    assert_eq!(get_floor(&test), -1);
-    let test = String::from("))(");
-    assert_eq!(get_floor(&test), -1);
-    let test = String::from(")))");
-    assert_eq!(get_floor(&test), -3);
-    let test = String::from(")())())");
-    assert_eq!(get_floor(&test), -3);
+    assert_eq!(get_floor("(())"), 0);
+    assert_eq!(get_floor("()()"), 0);
+    assert_eq!(get_floor("((("), 3);
+    assert_eq!(get_floor("(()(()("), 3);
+    assert_eq!(get_floor("))((((("), 3);
+    assert_eq!(get_floor("())"), -1);
+    assert_eq!(get_floor("))("), -1);
+    assert_eq!(get_floor(")))"), -3);
+    assert_eq!(get_floor(")())())"), -3);
 
     // Solve puzzle
     assert_eq!(get_floor(&input), 138);
     println!("> DAY01 - part 1: OK!");
 }
 
-fn day01_part2(input: &String) {
+fn day01_part2(input: &str) {
     // Exemple tests
-    let test = String::from(")");
-    assert_eq!(basement_when(&test), 1);
-    let test = String::from("()())");
-    assert_eq!(basement_when(&test), 5);
+    assert_eq!(basement_when(")"), 1);
+    assert_eq!(basement_when("()())"), 5);
 
     // Solve puzzle
     assert_eq!(basement_when(&input), 1771);
     println!("> DAY01 - part 2: OK!");
 }
 
-fn get_floor(instructions: &String) -> i32 {
+fn get_floor(instructions: &str) -> i32 {
     // Part 1
     let mut floor = 0;
     for parenthesis in instructions.chars() {
@@ -60,7 +49,7 @@ fn get_floor(instructions: &String) -> i32 {
     // We can do easier by counting number of '(', number of ')' and substract…
 }
 
-fn basement_when(instructions: &String) -> u32 {
+fn basement_when(instructions: &str) -> u32 {
     // Part 2
     let mut floor = 0;
     let mut position = 1;
