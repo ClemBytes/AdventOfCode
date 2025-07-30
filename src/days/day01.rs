@@ -64,6 +64,5 @@ fn basement_when(instructions: &str) -> u32 {
         }
         position += 1;
     }
-    println!("Never found basement!");
-    position
+    unreachable!("Never found basement!");
 }
