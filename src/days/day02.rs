@@ -41,7 +41,6 @@ fn day02_part2(_input: &Vec<Box>) {
     println!("TODO - part 2");
 }
 
-#[derive(Debug)]
 struct Box {
     length: u32,
     width: u32,
