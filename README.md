@@ -5,7 +5,7 @@ This repository contains my solutions to [Advent of Code 2015](https://adventofc
 ## ✨ About
 
 Each day consists of two related puzzles that require problem-solving, algorithmic thinking, and some creative coding.  
-This project is written in **Rust**, mainly for learning and fun.
+This project is written in **Rust**, mainly for learning and fun.  
 I plan to do some puzzles also in **Python** and then compare how fast they are.
 
 ## 📦 Requirements
@@ -30,7 +30,8 @@ You can try to run directly in release mode as I try to compile for release when
 
 ## 🚧 Status
 
-I'm solving the problems at my own pace and may refactor as I go.
-Progress so far:
-⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
+I'm solving the problems at my own pace and may refactor as I go.  
+Progress so far:  
+⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
+⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
 **10 / 50 stars**
