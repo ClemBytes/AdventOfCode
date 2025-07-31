@@ -1,26 +1,39 @@
+// DAY05: https://adventofcode.com/2015/day/5
+
+use std::fs::File;
+use std::io::{self, BufRead};
+
 pub fn run() {
     println!("------- DAY05 -------");
-    let _input = read_input("inputs/input_day05");
-    day05_part1();
-    day05_part2();
+    let path = "inputs/input_day05";
+    day05_part1(path);
+    day05_part2(path);
 }
 
-fn read_input(_path: &str) {
-
-}
-
-fn day05_part1() {
-    println!("TODO - part1");
+fn day05_part1(path: &str) {
     // Exemple tests
-    // assert_eq!(, 0);
+    assert!(is_nice("ugknbfddgicrmopn"));
+    assert!(!is_nice("haegwjzuvuyypxyu"));
+    assert!(!is_nice("dvszwmarrgswjxmb"));
+    assert!(!is_nice("jchzalrnumimnmhp"));
 
     // Solve puzzle
-    // println!("Result part 1: {}");
-    // assert_eq!(, );
-    // println!("> DAY05 - part 1: OK!");
+    let mut counter = 0;
+    if let Ok(file) = File::open(path) {
+        let reader = io::BufReader::new(file);
+
+        for line in reader.lines() {
+            if is_nice(&line.unwrap()) {
+                counter += 1;
+            }
+        }
+    }
+    // println!("Result part 1: {counter}");
+    assert_eq!(counter, 236);
+    println!("> DAY05 - part 1: OK!");
 }
 
-fn day05_part2() {
+fn day05_part2(_path: &str) {
     println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);
@@ -29,4 +42,35 @@ fn day05_part2() {
     // println!("Result part 2: {}");
     // assert_eq!(, );
     // println!("> DAY05 - part 2: OK!");
+}
+
+fn is_nice(s: &str) -> bool {
+    // Check forbidden substrings
+    let forbidden_substrings = vec!["ab", "cd", "pq", "xy"];
+    for forbidden in forbidden_substrings {
+        if s.contains(forbidden) {
+            return false;
+        }
+    }
+
+    // Check at least 3 vowels
+    let vowels = "aeiou";
+    let mut nb_vowels = 0;
+    for ch in s.chars() {
+        if vowels.contains(ch) {
+            nb_vowels += 1;
+        }
+    }
+    if nb_vowels < 3 {
+        return false;
+    }
+
+    // Check double letter
+    let chars: Vec<char> = s.chars().collect();
+    for i in 1..chars.len() {
+        if chars[i] == chars[i - 1] {
+            return true;
+        }
+    }
+    false
 }
