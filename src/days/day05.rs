@@ -33,13 +33,25 @@ fn day05_part1(path: &str) {
     println!("> DAY05 - part 1: OK!");
 }
 
-fn day05_part2(_path: &str) {
-    println!("TODO - part2");
+fn day05_part2(path: &str) {
     // Exemple tests
-    // assert_eq!(, 0);
+    assert!(new_is_nice("qjhvhtzxzqqjkmpb"));
+    assert!(new_is_nice("xxyxx"));
+    assert!(!new_is_nice("uurcxstgmygtbstg"));
+    assert!(!new_is_nice("ieodomkazucvgmuy"));
 
     // Solve puzzle
-    // println!("Result part 2: {}");
+    let mut counter = 0;
+    if let Ok(file) = File::open(path) {
+        let reader = io::BufReader::new(file);
+
+        for line in reader.lines() {
+            if new_is_nice(&line.unwrap()) {
+                counter += 1;
+            }
+        }
+    }
+    println!("Result part 2: {counter}");
     // assert_eq!(, );
     // println!("> DAY05 - part 2: OK!");
 }
@@ -73,4 +85,8 @@ fn is_nice(s: &str) -> bool {
         }
     }
     false
+}
+
+fn new_is_nice(s: &str) -> bool {
+    true
 }
