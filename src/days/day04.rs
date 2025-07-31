@@ -6,31 +6,41 @@ pub fn run() {
 }
 
 fn day04_part1(input: &str) {
-    let start = "00000";
     // Exemple tests
-    assert_eq!(find_suffix("abcdef", start), 609043);
-    assert_eq!(find_suffix("pqrstuv", start), 1048970);
+    assert_eq!(find_suffix_5zeroes("abcdef"), 609043);
+    assert_eq!(find_suffix_5zeroes("pqrstuv"), 1048970);
 
     // Solve puzzle
-    // println!("Result part 1: {}", find_suffix(input, start));
-    assert_eq!(find_suffix(input, start), 254575);
+    // println!("Result part 1: {}", find_suffix_5zeroes(input));
+    assert_eq!(find_suffix_5zeroes(input), 254575);
     println!("> DAY04 - part 1: OK!");
 }
 
 fn day04_part2(input: &str) {
-    let start = "000000";
     // Solve puzzle
-    // println!("Result part 2: {}", find_suffix(input, start));
-    assert_eq!(find_suffix(input, start), 1038736);
+    // println!("Result part 2: {}", find_suffix_6zeroes(input));
+    assert_eq!(find_suffix_6zeroes(input), 1038736);
     println!("> DAY04 - part 2: OK!");
 }
 
-fn find_suffix(secret_key: &str, start: &str) -> u32 {
+fn find_suffix_5zeroes(secret_key: &str) -> u32 {
     let mut i = 1;
     loop {
         let s = format!("{secret_key}{i}");
-        let hash = format!("{:x}", md5::compute(s));
-        if hash.starts_with(start) {
+        let hash = md5::compute(s);
+        if hash[0] == 0 && hash[1] == 0 && hash[2] & 0xF0 == 0 {
+            return i;
+        }
+        i += 1;
+    }
+}
+
+fn find_suffix_6zeroes(secret_key: &str) -> u32 {
+    let mut i = 1;
+    loop {
+        let s = format!("{secret_key}{i}");
+        let hash = md5::compute(s);
+        if hash[0] == 0 && hash[1] == 0 && hash[2] == 0 {
             return i;
         }
         i += 1;
