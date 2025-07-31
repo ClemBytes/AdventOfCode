@@ -4,8 +4,7 @@ use std::fs;
 
 pub fn run() {
     println!("------- DAY01 -------");
-    let input = fs::read_to_string("inputs/input_day01")
-        .expect("Unable to read input!");
+    let input = fs::read_to_string("inputs/input_day01").expect("Unable to read input!");
     day01_part1(&input);
     day01_part2(&input);
 }
@@ -42,9 +41,9 @@ fn get_floor(instructions: &str) -> i32 {
     let mut floor = 0;
     for parenthesis in instructions.chars() {
         match parenthesis {
-            '(' => { floor += 1; },
-            ')' => { floor -= 1; },
-            _   => { println!("Unkwnow character {parenthesis}! Should be ( or )."); },
+            '(' => floor += 1,
+            ')' => floor -= 1,
+            _ => println!("Unkwnow character {parenthesis}! Should be ( or )."),
         }
     }
     floor
@@ -57,9 +56,9 @@ fn basement_when(instructions: &str) -> u32 {
     let mut position = 1;
     for parenthesis in instructions.chars() {
         match parenthesis {
-            '(' => { floor += 1; },
-            ')' => { floor -= 1; },
-            _   => { println!("Unkwnow character {parenthesis}! Should be ( or )."); },
+            '(' => floor += 1,
+            ')' => floor -= 1,
+            _ => println!("Unkwnow character {parenthesis}! Should be ( or )."),
         }
         if floor == -1 {
             return position;

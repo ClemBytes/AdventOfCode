@@ -68,19 +68,19 @@ impl Box {
         let dims: Vec<&str> = dimensions.split('x').collect();
         Box {
             length: dims[0].parse().unwrap(),
-            width:  dims[1].parse().unwrap(),
+            width: dims[1].parse().unwrap(),
             height: dims[2].parse().unwrap(),
         }
     }
-    
+
     fn get_side_areas(&self) -> Vec<u32> {
         vec![
             &self.length * &self.width,
             &self.length * &self.height,
-            &self.width  * &self.height,
+            &self.width * &self.height,
         ]
     }
-    
+
     fn smallest_side_area(&self) -> u32 {
         self.get_side_areas().iter().copied().min().unwrap()
     }
@@ -96,16 +96,16 @@ impl Box {
 
     fn get_side_perimeters(&self) -> Vec<u32> {
         vec![
-            &self.length * 2 + &self.width  * 2,
+            &self.length * 2 + &self.width * 2,
             &self.length * 2 + &self.height * 2,
-            &self.width  * 2 + &self.height * 2,
+            &self.width * 2 + &self.height * 2,
         ]
     }
 
     fn smallest_side_perimeter(&self) -> u32 {
         self.get_side_perimeters().iter().copied().min().unwrap()
     }
-    
+
     fn ribbon(&self) -> u32 {
         self.smallest_side_perimeter() + self.cubic()
     }
