@@ -75,9 +75,9 @@ impl Box {
 
     fn get_side_areas(&self) -> Vec<u32> {
         vec![
-            &self.length * &self.width,
-            &self.length * &self.height,
-            &self.width * &self.height,
+            self.length * self.width,
+            self.length * self.height,
+            self.width * self.height,
         ]
     }
 
@@ -91,14 +91,14 @@ impl Box {
     }
 
     fn cubic(&self) -> u32 {
-        &self.length * &self.width * &self.height
+        self.length * self.width * self.height
     }
 
     fn get_side_perimeters(&self) -> Vec<u32> {
         vec![
-            &self.length * 2 + &self.width * 2,
-            &self.length * 2 + &self.height * 2,
-            &self.width * 2 + &self.height * 2,
+            self.length * 2 + self.width * 2,
+            self.length * 2 + self.height * 2,
+            self.width * 2 + self.height * 2,
         ]
     }
 

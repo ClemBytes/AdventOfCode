@@ -22,7 +22,7 @@ fn day03_part1(input: &str) {
     //     "Result part 1: {}",
     //     get_visited_houses(&input)
     // );
-    assert_eq!(get_visited_houses(&input), 2081);
+    assert_eq!(get_visited_houses(input), 2081);
     println!("> DAY03 - part 1: OK!");
 }
 
@@ -37,7 +37,7 @@ fn day03_part2(input: &str) {
     //     "Result part 2: {}",
     //     get_visited_houses_with_robot(&input)
     // );
-    assert_eq!(get_visited_houses_with_robot(&input), 2341);
+    assert_eq!(get_visited_houses_with_robot(input), 2341);
     println!("> DAY03 - part 2: OK!");
 }
 

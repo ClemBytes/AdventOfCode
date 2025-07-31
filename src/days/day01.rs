@@ -22,7 +22,7 @@ fn day01_part1(input: &str) {
     assert_eq!(get_floor(")())())"), -3);
 
     // Solve puzzle
-    assert_eq!(get_floor(&input), 138);
+    assert_eq!(get_floor(input), 138);
     println!("> DAY01 - part 1: OK!");
 }
 
@@ -32,7 +32,7 @@ fn day01_part2(input: &str) {
     assert_eq!(basement_when("()())"), 5);
 
     // Solve puzzle
-    assert_eq!(basement_when(&input), 1771);
+    assert_eq!(basement_when(input), 1771);
     println!("> DAY01 - part 2: OK!");
 }
 
