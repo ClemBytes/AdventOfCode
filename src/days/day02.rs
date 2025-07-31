@@ -1,3 +1,5 @@
+// DAY02: https://adventofcode.com/2015/day/2
+
 use std::fs::File;
 use std::io::{self, BufRead};
 

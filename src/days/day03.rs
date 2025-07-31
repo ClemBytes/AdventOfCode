@@ -1,3 +1,5 @@
+// DAY03: https://adventofcode.com/2015/day/3
+
 use core::panic;
 use std::fs;
 use std::collections::HashMap;

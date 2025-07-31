@@ -1,3 +1,5 @@
+// DAY01: https://adventofcode.com/2015/day/1
+
 use std::fs;
 
 pub fn run() {
