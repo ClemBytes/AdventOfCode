@@ -16,7 +16,10 @@ fn day03_part1(input: &str) {
     assert_eq!(nb_visited_houses(get_visited_houses("^v^v^v^v^v")), 2);
 
     // Solve puzzle
-    // println!("Result part 1: {}", nb_visited_houses(get_visited_houses(&input)));
+    // println!(
+    //     "Result part 1: {}",
+    //     nb_visited_houses(get_visited_houses(&input))
+    // );
     assert_eq!(nb_visited_houses(get_visited_houses(&input)), 2081);
     println!("> DAY03 - part 1: OK!");
 }
@@ -25,7 +28,10 @@ fn day03_part2(input: &str) {
     // Exemple tests
     assert_eq!(nb_visited_houses(get_visited_houses_with_robot("^v")), 3);
     assert_eq!(nb_visited_houses(get_visited_houses_with_robot("^>v<")), 3);
-    assert_eq!(nb_visited_houses(get_visited_houses_with_robot("^v^v^v^v^v")), 11);
+    assert_eq!(
+        nb_visited_houses(get_visited_houses_with_robot("^v^v^v^v^v")),
+        11
+    );
 
     // Solve puzzle
     // println!(
@@ -48,7 +54,9 @@ fn get_visited_houses(input: &str) -> HashMap<(i32, i32), u32> {
             '>' => { current_location.1 += 1; },
             other => panic!("Unknown direction: {other}"),
         }
-        let count = visited_houses.entry(current_location).or_insert(0);
+        let count = visited_houses
+            .entry(current_location)
+            .or_insert(0);
         *count += 1;
     }
     visited_houses
