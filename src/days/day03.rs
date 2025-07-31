@@ -56,35 +56,25 @@ fn get_visited_houses(input: &str) -> HashMap<(i32, i32), u32> {
 
 fn get_visited_houses_with_robot(input: &str) -> HashMap<(i32, i32), u32> {
     let mut visited_houses:HashMap<(i32, i32), u32> = HashMap::new();
-    let mut current_location_santa = (0, 0);
-    let mut current_location_robot = (0, 0);
-    visited_houses.insert(current_location_santa, 2);
+    let mut current_locations = ((0, 0), (0, 0));
+    visited_houses.insert(current_locations.0, 2);
     for (i, direction) in input.chars().enumerate() {
-        if i%2 == 0 {
-            match direction {
-                '^' => { current_location_santa.0 += 1; },
-                'v' => { current_location_santa.0 -= 1; },
-                '<' => { current_location_santa.1 -= 1; },
-                '>' => { current_location_santa.1 += 1; },
-                other => panic!("Unknown direction: {other}"),
-            }
-            let count = visited_houses
-                .entry(current_location_santa)
-                .or_insert(0);
-            *count += 1;
+        let perso = if i % 2 == 0 {
+            &mut current_locations.0
         } else {
-            match direction {
-                '^' => { current_location_robot.0 += 1; },
-                'v' => { current_location_robot.0 -= 1; },
-                '<' => { current_location_robot.1 -= 1; },
-                '>' => { current_location_robot.1 += 1; },
-                other => panic!("Unknown direction: {other}"),
-            }
-            let count = visited_houses
-                .entry(current_location_robot)
-                .or_insert(0);
-            *count += 1;
+            &mut current_locations.1
+        } ;
+        match direction {
+            '^' => { perso.0 += 1; },
+            'v' => { perso.0 -= 1; },
+            '<' => { perso.1 -= 1; },
+            '>' => { perso.1 += 1; },
+            other => panic!("Unknown direction: {other}"),
         }
+        let count = visited_houses
+            .entry(*perso)
+            .or_insert(0);
+        *count += 1;
     }
     visited_houses
 }
