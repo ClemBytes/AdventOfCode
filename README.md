@@ -1,0 +1,33 @@
+# 🎄 Advent of Code 2015 🎄
+
+This repository contains my solutions to [Advent of Code 2015](https://adventofcode.com/2015), a series of daily programming puzzles published in December 2015.
+
+## ✨ About
+
+Each day consists of two related puzzles that require problem-solving, algorithmic thinking, and some creative coding.  
+This project is written in **Rust**, mainly for learning and fun.
+I plan to do some puzzles also in **Python** and then compare how fast they are.
+
+## 📦 Requirements
+
+- [Rust](https://www.rust-lang.org/tools/install)
+
+## 🧠 Structure
+
+Each puzzle is implemented in its own module under `src/days/`. The corresponding data files are in `inputs/` (these are my inputs, they are generated differently for each user when logged into AdventOfCode so yours are different, you can't use my results directly).
+
+Compile and run all in debug mode with:
+```bash
+cargo run
+```
+
+Or compile in release mode, then run in release mode (faster run):
+```bash
+cargo build --release
+./target/release/AdventOfCode2015
+```
+You can try to run directly in release mode as I try to compile for release whenever my solutions works, but I might forget so don't be surprised if not all days are launched if you only do `./target/release/AdventOfCode2015`.
+
+## 🚧 Status
+
+I'm solving the problems at my own pace and may refactor as I go.
