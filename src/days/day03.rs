@@ -2,7 +2,7 @@
 
 use core::panic;
 use std::fs;
-use std::collections::HashMap;
+use std::collections::HashSet;
 
 pub fn run() {
     println!("------- DAY03 -------");
@@ -44,10 +44,10 @@ fn day03_part2(input: &str) {
     println!("> DAY03 - part 2: OK!");
 }
 
-fn get_visited_houses(input: &str) -> HashMap<(i32, i32), u32> {
-    let mut visited_houses:HashMap<(i32, i32), u32> = HashMap::new();
+fn get_visited_houses(input: &str) -> HashSet<(i32, i32)> {
+    let mut visited_houses = HashSet::new();
     let mut current_location = (0, 0);
-    visited_houses.insert(current_location, 1);
+    visited_houses.insert(current_location);
     for direction in input.chars() {
         match direction {
             '^' => { current_location.0 += 1; },
@@ -56,39 +56,34 @@ fn get_visited_houses(input: &str) -> HashMap<(i32, i32), u32> {
             '>' => { current_location.1 += 1; },
             other => panic!("Unknown direction: {other}"),
         }
-        let count = visited_houses
-            .entry(current_location)
-            .or_insert(0);
-        *count += 1;
+        visited_houses.insert(current_location);
     }
     visited_houses
 }
 
-fn get_visited_houses_with_robot(input: &str) -> HashMap<(i32, i32), u32> {
-    let mut visited_houses:HashMap<(i32, i32), u32> = HashMap::new();
-    let mut current_locations = ((0, 0), (0, 0));
-    visited_houses.insert(current_locations.0, 2);
+fn get_visited_houses_with_robot(input: &str) -> HashSet<(i32, i32)> {
+    let mut visited_houses = HashSet::new();
+    let mut santa = (0, 0);
+    let mut robot = (0, 0);
+    visited_houses.insert(santa);
     for (i, direction) in input.chars().enumerate() {
-        let perso = if i % 2 == 0 {
-            &mut current_locations.0
+        let person = if i % 2 == 0 {
+            &mut santa
         } else {
-            &mut current_locations.1
-        } ;
+            &mut robot
+        };
         match direction {
-            '^' => { perso.0 += 1; },
-            'v' => { perso.0 -= 1; },
-            '<' => { perso.1 -= 1; },
-            '>' => { perso.1 += 1; },
+            '^' => { person.0 += 1; },
+            'v' => { person.0 -= 1; },
+            '<' => { person.1 -= 1; },
+            '>' => { person.1 += 1; },
             other => panic!("Unknown direction: {other}"),
         }
-        let count = visited_houses
-            .entry(*perso)
-            .or_insert(0);
-        *count += 1;
+        visited_houses.insert(*person);
     }
     visited_houses
 }
 
-fn nb_visited_houses(visited_houses: HashMap<(i32, i32), u32>) -> usize {
+fn nb_visited_houses(visited_houses: HashSet<(i32, i32)>) -> usize {
     visited_houses.len()
 }
