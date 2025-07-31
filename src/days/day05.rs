@@ -51,14 +51,14 @@ fn day05_part2(path: &str) {
             }
         }
     }
-    println!("Result part 2: {counter}");
-    // assert_eq!(, );
-    // println!("> DAY05 - part 2: OK!");
+    // println!("Result part 2: {counter}");
+    assert_eq!(counter, 51);
+    println!("> DAY05 - part 2: OK!");
 }
 
 fn is_nice(s: &str) -> bool {
     // Check forbidden substrings
-    let forbidden_substrings = vec!["ab", "cd", "pq", "xy"];
+    let forbidden_substrings = ["ab", "cd", "pq", "xy"];
     for forbidden in forbidden_substrings {
         if s.contains(forbidden) {
             return false;
@@ -88,5 +88,27 @@ fn is_nice(s: &str) -> bool {
 }
 
 fn new_is_nice(s: &str) -> bool {
-    true
+    let chars: Vec<char> = s.chars().collect();
+    // Check double double-letter
+    let mut double_double = false;
+    'main_loop: for i in 1..(chars.len() - 2) {
+        for j in (i + 2)..chars.len() {
+            if chars[i - 1] == chars[j - 1] && chars[i] == chars[j] {
+                double_double = true;
+                break 'main_loop;
+            }
+        }
+    }
+
+    if !double_double {
+        return false;
+    }
+
+    // Check xyx pattern
+    for i in 2..chars.len() {
+        if chars[i] == chars[i - 2] {
+            return true;
+        }
+    }
+    false
 }
