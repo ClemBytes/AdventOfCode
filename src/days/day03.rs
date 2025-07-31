@@ -1,16 +1,15 @@
+use std::fs;
+
 pub fn run() {
     println!("------- DAY03 -------");
-    let _input = read_input("inputs/input_day03");
-    day03_part1();
-    day03_part2();
+    let input = fs::read_to_string("inputs/input_day03").unwrap();
+    day03_part1(&input);
+    day03_part2(&input);
 }
 
-fn read_input(_path: &str) {
-
-}
-
-fn day03_part1() {
-    println!("TODO - part1")
+fn day03_part1(input: &str) {
+    println!("TODO - part1");
+    println!("Input: {input}");
     // Exemple tests
     // assert_eq!(, 0);
 
@@ -20,8 +19,8 @@ fn day03_part1() {
     // println!("> DAY03 - part 1: OK!");
 }
 
-fn day03_part2() {
-    println!("TODO - part2")
+fn day03_part2(_input: &str) {
+    println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);
 

@@ -10,7 +10,7 @@ fn read_input(_path: &str) {
 }
 
 fn day0X_part1() {
-    println!("TODO - part1")
+    println!("TODO - part1");
     // Exemple tests
     // assert_eq!(, 0);
 
@@ -21,7 +21,7 @@ fn day0X_part1() {
 }
 
 fn day03_part2() {
-    println!("TODO - part2")
+    println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);
 
