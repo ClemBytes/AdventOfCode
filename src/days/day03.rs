@@ -1,4 +1,6 @@
+use core::panic;
 use std::fs;
+use std::collections::HashMap;
 
 pub fn run() {
     println!("------- DAY03 -------");
@@ -8,15 +10,37 @@ pub fn run() {
 }
 
 fn day03_part1(input: &str) {
-    println!("TODO - part1");
-    println!("Input: {input}");
     // Exemple tests
-    // assert_eq!(, 0);
+    assert_eq!(nb_visited_houses(get_visited_houses(">")), 2);
+    assert_eq!(nb_visited_houses(get_visited_houses("^>v<")), 4);
+    assert_eq!(nb_visited_houses(get_visited_houses("^v^v^v^v^v")), 2);
 
     // Solve puzzle
-    // println!("Result part 1: {}");
-    // assert_eq!(, );
-    // println!("> DAY03 - part 1: OK!");
+    // println!("Result part 1: {}", nb_visited_houses(get_visited_houses(&input)));
+    assert_eq!(nb_visited_houses(get_visited_houses(&input)), 2081);
+    println!("> DAY03 - part 1: OK!");
+}
+
+fn get_visited_houses(input: &str) -> HashMap<(i32, i32), u32> {
+    let mut visited_houses:HashMap<(i32, i32), u32> = HashMap::new();
+    let mut current_location = (0, 0);
+    visited_houses.insert(current_location, 1);
+    for direction in input.chars() {
+        match direction {
+            '^' => { current_location.0 += 1; },
+            'v' => { current_location.0 -= 1; },
+            '<' => { current_location.1 -= 1; },
+            '>' => { current_location.1 += 1; },
+            other => panic!("Unknown direction: {other}"),
+        }
+        let count = visited_houses.entry(current_location).or_insert(0);
+        *count += 1;
+    }
+    visited_houses
+}
+
+fn nb_visited_houses(visited_houses: HashMap<(i32, i32), u32>) -> usize {
+    visited_houses.len()
 }
 
 fn day03_part2(_input: &str) {
