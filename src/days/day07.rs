@@ -9,7 +9,7 @@ pub fn run() {
     let input_path = "inputs/input_day07";
     let raw_input = fs::read_to_string(input_path).expect("Unable to read input!");
     let input = parse(&raw_input);
-    
+
     day07_part1(input);
     day07_part2();
 }
@@ -18,7 +18,7 @@ fn day07_part1(instructions: Vec<Instruction>) {
     // Example tests
     // let final_state = apply_instructions(instructions);
     // println!("Example final state: {:#?}", final_state);
-    
+
     // Solve puzzle
     let final_state = apply_instructions(instructions);
     // println!("Result part 1: {}", final_state.get("a").unwrap());
@@ -51,7 +51,7 @@ fn apply_instructions(mut instructions: Vec<Instruction>) -> HashMap<String, u16
         let mut instructions_used: Vec<usize> = vec![];
         for (i, instruction) in instructions.iter().enumerate() {
             let mut used = false;
-            
+
             let res = instruction.gate.get_result(&mut map);
             if res.is_some() {
                 let sig = res.unwrap();
@@ -59,7 +59,9 @@ fn apply_instructions(mut instructions: Vec<Instruction>) -> HashMap<String, u16
                 used = true;
             }
 
-            if used { instructions_used.push(i); }
+            if used {
+                instructions_used.push(i);
+            }
         }
         // Delete used instructions
         for i in instructions_used.iter().rev() {
@@ -106,52 +108,48 @@ impl LogicGates {
             // ASSIGN
             LogicGates::Assign(input) => {
                 return input.get_signal(map);
-            },
+            }
 
             // NOT
             LogicGates::Not(input) => {
                 if map.contains_key(input) {
                     return Some(!*map.get(input).unwrap());
                 }
-            },
+            }
 
             // AND
-            LogicGates::And(a, b)
-            => {
+            LogicGates::And(a, b) => {
                 let sig_a = a.get_signal(map);
                 let sig_b = b.get_signal(map);
                 if sig_a.is_some() && sig_b.is_some() {
                     return Some(sig_a.unwrap() & sig_b.unwrap());
                 }
-            },
+            }
 
             // OR
-            LogicGates::Or(a, b)
-            => {
+            LogicGates::Or(a, b) => {
                 let sig_a = a.get_signal(map);
                 let sig_b = b.get_signal(map);
                 if sig_a.is_some() && sig_b.is_some() {
                     return Some(sig_a.unwrap() | sig_b.unwrap());
                 }
-            },
+            }
 
             // LSHIFT
-            LogicGates::Lshift(a, dec)
-            => {
+            LogicGates::Lshift(a, dec) => {
                 if map.contains_key(a) {
                     let sig_a = map.get(a).unwrap();
                     return Some(sig_a << dec);
                 }
-            },
+            }
 
             // RSHIFT
-            LogicGates::Rshift(a, dec)
-            => {
+            LogicGates::Rshift(a, dec) => {
                 if map.contains_key(a) {
                     let sig_a = map.get(a).unwrap();
                     return Some(sig_a >> dec);
                 }
-            },
+            }
         }
         return None;
     }
@@ -201,7 +199,7 @@ impl Instruction {
             } else {
                 Wire::Identifier(String::from(second))
             };
-            
+
             gate = LogicGates::Or(first, second);
         } else if prefix.contains("LSHIFT") {
             let first = String::from(prefix_words[0]);
