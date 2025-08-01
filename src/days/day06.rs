@@ -82,11 +82,7 @@ impl Instruction {
             for light in x.iter_mut().take(self.end.1 + 1).skip(self.start.1) {
                 match command {
                     Command::On => *light += 1,
-                    Command::Off => {
-                        if *light > 0 {
-                            *light -= 1;
-                        }
-                    }
+                    Command::Off => *light = light.saturating_sub(1),
                     Command::Toggle => *light += 2,
                 }
             }
