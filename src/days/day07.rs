@@ -21,9 +21,9 @@ fn day07_part1(instructions: Vec<Instruction>) {
     
     // Solve puzzle
     let final_state = apply_instructions(instructions);
-    println!("Result part 1: {}", final_state.get("a").unwrap());
-    // assert_eq!(, );
-    // println!("> DAY07 - part 1: OK!");
+    // println!("Result part 1: {}", final_state.get("a").unwrap());
+    assert_eq!(*final_state.get("a").unwrap(), 46065);
+    println!("> DAY07 - part 1: OK!");
 }
 
 fn day07_part2() {
@@ -75,6 +75,22 @@ enum Wire {
     Signal(u16),
 }
 
+impl Wire {
+    fn get_signal(&self, map: &HashMap<String, u16>) -> Option<u16> {
+        match self {
+            Wire::Identifier(id) => {
+                if map.contains_key(id) {
+                    return Some(*map.get(id).unwrap());
+                }
+            }
+            Wire::Signal(id) => {
+                return Some(*id);
+            }
+        }
+        return None;
+    }
+}
+
 enum LogicGates {
     Assign(Wire),
     Not(String),
@@ -85,20 +101,11 @@ enum LogicGates {
 }
 
 impl LogicGates {
-    fn get_result(&self, map: &mut HashMap<String, u16>) -> Option<u16> {
+    fn get_result(&self, map: &HashMap<String, u16>) -> Option<u16> {
         match self {
             // ASSIGN
             LogicGates::Assign(input) => {
-                match input {
-                    Wire::Identifier(id) => {
-                        if map.contains_key(id) {
-                            return Some(*map.get(id).unwrap());
-                        }
-                    }
-                    Wire::Signal(id) => {
-                        return Some(*id);
-                    }
-                }
+                return input.get_signal(map);
             },
 
             // NOT
@@ -111,72 +118,20 @@ impl LogicGates {
             // AND
             LogicGates::And(a, b)
             => {
-                match a {
-                    Wire::Identifier(id_a) => {
-                        if map.contains_key(id_a) {
-                            let sig_a = map.get(id_a).unwrap();
-                            match b {
-                                Wire::Identifier(id_b) => {
-                                    if map.contains_key(id_b) {
-                                        let sig_b = map.get(id_b).unwrap();
-                                        return Some(sig_a & sig_b);
-                                    }
-                                },
-                                Wire::Signal(sig_b) => {
-                                    return Some(sig_a & sig_b);
-                                }
-                            }
-                        }
-                    },
-                    Wire::Signal(sig_a) => {
-                        match b {
-                            Wire::Identifier(id_b) => {
-                                if map.contains_key(id_b) {
-                                    let sig_b = map.get(id_b).unwrap();
-                                    return Some(sig_a & sig_b);
-                                }
-                            },
-                            Wire::Signal(sig_b) => {
-                                return Some(sig_a & sig_b);
-                            }
-                        }
-                    }
+                let sig_a = a.get_signal(map);
+                let sig_b = b.get_signal(map);
+                if sig_a.is_some() && sig_b.is_some() {
+                    return Some(sig_a.unwrap() & sig_b.unwrap());
                 }
             },
 
             // OR
             LogicGates::Or(a, b)
             => {
-                match a {
-                    Wire::Identifier(id_a) => {
-                        if map.contains_key(id_a) {
-                            let sig_a = map.get(id_a).unwrap();
-                            match b {
-                                Wire::Identifier(id_b) => {
-                                    if map.contains_key(id_b) {
-                                        let sig_b = map.get(id_b).unwrap();
-                                        return Some(sig_a | sig_b);
-                                    }
-                                },
-                                Wire::Signal(sig_b) => {
-                                    return Some(sig_a | sig_b);
-                                }
-                            }
-                        }
-                    },
-                    Wire::Signal(sig_a) => {
-                        match b {
-                            Wire::Identifier(id_b) => {
-                                if map.contains_key(id_b) {
-                                    let sig_b = map.get(id_b).unwrap();
-                                    return Some(sig_a | sig_b);
-                                }
-                            },
-                            Wire::Signal(sig_b) => {
-                                return Some(sig_a | sig_b);
-                            }
-                        }
-                    }
+                let sig_a = a.get_signal(map);
+                let sig_b = b.get_signal(map);
+                if sig_a.is_some() && sig_b.is_some() {
+                    return Some(sig_a.unwrap() | sig_b.unwrap());
                 }
             },
 
