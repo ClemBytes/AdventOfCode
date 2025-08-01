@@ -28,7 +28,6 @@ Or compile in release mode, then run in release mode (faster run):
 cargo build --release
 ./target/release/AdventOfCode2015
 ```
-You can try to run directly in release mode as I try to compile for release whenever my solutions works, but I might forget so don't be surprised if not all days are launched if you only do `./target/release/AdventOfCode2015`.
 
 ## 🚧 Status
 
