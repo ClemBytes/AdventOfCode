@@ -47,12 +47,12 @@ fn parse(raw_input: &str) -> Vec<Instruction> {
 
 fn apply_instructions(mut instructions: Vec<Instruction>) -> HashMap<String, u16> {
     let mut map: HashMap<String, u16> = HashMap::new();
-    while instructions.len() > 0 {
+    while !instructions.is_empty() {
         let mut instructions_used: Vec<usize> = vec![];
         for (i, instruction) in instructions.iter().enumerate() {
             let mut used = false;
 
-            let res = instruction.gate.get_result(&mut map);
+            let res = instruction.gate.get_result(&map);
             if res.is_some() {
                 let sig = res.unwrap();
                 map.insert(instruction.output.clone(), sig);
@@ -89,7 +89,7 @@ impl Wire {
                 return Some(*id);
             }
         }
-        return None;
+        None
     }
 }
 
@@ -121,8 +121,8 @@ impl LogicGates {
             LogicGates::And(a, b) => {
                 let sig_a = a.get_signal(map);
                 let sig_b = b.get_signal(map);
-                if sig_a.is_some() && sig_b.is_some() {
-                    return Some(sig_a.unwrap() & sig_b.unwrap());
+                if let (Some(sig_a_val), Some(sig_b_val)) = (sig_a, sig_b) {
+                    return Some(sig_a_val & sig_b_val);
                 }
             }
 
@@ -130,8 +130,8 @@ impl LogicGates {
             LogicGates::Or(a, b) => {
                 let sig_a = a.get_signal(map);
                 let sig_b = b.get_signal(map);
-                if sig_a.is_some() && sig_b.is_some() {
-                    return Some(sig_a.unwrap() | sig_b.unwrap());
+                if let (Some(sig_a_val), Some(sig_b_val)) = (sig_a, sig_b) {
+                    return Some(sig_a_val | sig_b_val);
                 }
             }
 
@@ -151,7 +151,7 @@ impl LogicGates {
                 }
             }
         }
-        return None;
+        None
     }
 }
 
