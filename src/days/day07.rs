@@ -119,20 +119,16 @@ impl LogicGates {
 
             // AND
             LogicGates::And(a, b) => {
-                let sig_a = a.get_signal(map);
-                let sig_b = b.get_signal(map);
-                if let (Some(sig_a_val), Some(sig_b_val)) = (sig_a, sig_b) {
-                    return Some(sig_a_val & sig_b_val);
-                }
+                let sig_a = a.get_signal(map)?;
+                let sig_b = b.get_signal(map)?;
+                return Some(sig_a & sig_b);
             }
 
             // OR
             LogicGates::Or(a, b) => {
-                let sig_a = a.get_signal(map);
-                let sig_b = b.get_signal(map);
-                if let (Some(sig_a_val), Some(sig_b_val)) = (sig_a, sig_b) {
-                    return Some(sig_a_val | sig_b_val);
-                }
+                let sig_a = a.get_signal(map)?;
+                let sig_b = b.get_signal(map)?;
+                return Some(sig_a | sig_b);
             }
 
             // LSHIFT
