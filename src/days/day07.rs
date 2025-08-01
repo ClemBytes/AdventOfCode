@@ -91,63 +91,54 @@ impl Wire {
         }
         None
     }
+
+    fn from(s: &str) -> Self {
+        if s.parse::<u16>().is_ok() {
+            Wire::Signal(s.parse().unwrap())
+        } else {
+            Wire::Identifier(String::from(s))
+        }
+    }
 }
 
 enum LogicGates {
     Assign(Wire),
-    Not(String),
+    Not(Wire),
     And(Wire, Wire),
     Or(Wire, Wire),
-    Lshift(String, u16),
-    Rshift(String, u16),
+    Lshift(Wire, Wire),
+    Rshift(Wire, Wire),
 }
 
 impl LogicGates {
     fn get_result(&self, map: &HashMap<String, u16>) -> Option<u16> {
         match self {
-            // ASSIGN
-            LogicGates::Assign(input) => {
-                return input.get_signal(map);
-            }
-
-            // NOT
+            LogicGates::Assign(input) => input.get_signal(map),
             LogicGates::Not(input) => {
-                if map.contains_key(input) {
-                    return Some(!*map.get(input).unwrap());
-                }
+                let input = input.get_signal(map)?;
+                Some(!input)
             }
-
-            // AND
             LogicGates::And(a, b) => {
-                let sig_a = a.get_signal(map)?;
-                let sig_b = b.get_signal(map)?;
-                return Some(sig_a & sig_b);
+                let a = a.get_signal(map)?;
+                let b = b.get_signal(map)?;
+                Some(a & b)
             }
-
-            // OR
             LogicGates::Or(a, b) => {
-                let sig_a = a.get_signal(map)?;
-                let sig_b = b.get_signal(map)?;
-                return Some(sig_a | sig_b);
+                let a = a.get_signal(map)?;
+                let b = b.get_signal(map)?;
+                Some(a | b)
             }
-
-            // LSHIFT
-            LogicGates::Lshift(a, dec) => {
-                if map.contains_key(a) {
-                    let sig_a = map.get(a).unwrap();
-                    return Some(sig_a << dec);
-                }
+            LogicGates::Lshift(a, shift) => {
+                let a = a.get_signal(map)?;
+                let shift = shift.get_signal(map)?;
+                Some(a << shift)
             }
-
-            // RSHIFT
-            LogicGates::Rshift(a, dec) => {
-                if map.contains_key(a) {
-                    let sig_a = map.get(a).unwrap();
-                    return Some(sig_a >> dec);
-                }
+            LogicGates::Rshift(a, shift) => {
+                let a = a.get_signal(map)?;
+                let shift = shift.get_signal(map)?;
+                Some(a >> shift)
             }
         }
-        None
     }
 }
 
@@ -162,59 +153,27 @@ impl Instruction {
         let output = String::from(content[1]);
         let prefix = content[0];
         let prefix_words: Vec<&str> = prefix.split(' ').collect();
-        let gate: LogicGates;
-        if prefix.contains("NOT") {
-            gate = LogicGates::Not(String::from(prefix_words[1]));
+        let gate = if prefix.contains("NOT") {
+            LogicGates::Not(Wire::from(prefix_words[1]))
         } else if prefix.contains("AND") {
-            let first = prefix_words[0];
-            let first: Wire = if first.parse::<u16>().is_ok() {
-                Wire::Signal(first.parse().unwrap())
-            } else {
-                Wire::Identifier(String::from(first))
-            };
-
-            let second = prefix_words[2];
-            let second: Wire = if second.parse::<u16>().is_ok() {
-                Wire::Signal(second.parse().unwrap())
-            } else {
-                Wire::Identifier(String::from(second))
-            };
-
-            gate = LogicGates::And(first, second);
+            let first = Wire::from(prefix_words[0]);
+            let second = Wire::from(prefix_words[2]);
+            LogicGates::And(first, second)
         } else if prefix.contains("OR") {
-            let first = prefix_words[0];
-            let first: Wire = if first.parse::<u16>().is_ok() {
-                Wire::Signal(first.parse().unwrap())
-            } else {
-                Wire::Identifier(String::from(first))
-            };
-
-            let second = prefix_words[2];
-            let second: Wire = if second.parse::<u16>().is_ok() {
-                Wire::Signal(second.parse().unwrap())
-            } else {
-                Wire::Identifier(String::from(second))
-            };
-
-            gate = LogicGates::Or(first, second);
+            let first = Wire::from(prefix_words[0]);
+            let second = Wire::from(prefix_words[2]);
+            LogicGates::Or(first, second)
         } else if prefix.contains("LSHIFT") {
-            let first = String::from(prefix_words[0]);
-            let second: u16 = prefix_words[2].parse().unwrap();
-            gate = LogicGates::Lshift(first, second);
+            let first = Wire::from(prefix_words[0]);
+            let second = Wire::from(prefix_words[2]);
+            LogicGates::Lshift(first, second)
         } else if prefix.contains("RSHIFT") {
-            let first = String::from(prefix_words[0]);
-            let second: u16 = prefix_words[2].parse().unwrap();
-            gate = LogicGates::Rshift(first, second);
+            let first = Wire::from(prefix_words[0]);
+            let second = Wire::from(prefix_words[2]);
+            LogicGates::Rshift(first, second)
         } else {
-            let signal_or_id = prefix_words[0];
-            let signal_or_id: Wire = if signal_or_id.parse::<u16>().is_ok() {
-                Wire::Signal(signal_or_id.parse().unwrap())
-            } else {
-                Wire::Identifier(String::from(signal_or_id))
-            };
-
-            gate = LogicGates::Assign(signal_or_id);
-        }
+            LogicGates::Assign(Wire::from(prefix_words[0]))
+        };
 
         Instruction { gate, output }
     }
