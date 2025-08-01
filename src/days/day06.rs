@@ -56,38 +56,38 @@ impl Instruction {
         let end_vec: Vec<&str> = words[3].split(',').collect();
         let end: (usize, usize) = (end_vec[0].parse().unwrap(), end_vec[1].parse().unwrap());
 
-        let instruction = Instruction {
+        Instruction {
             command,
             start,
             end,
-        };
-
-        instruction
+        }
     }
 
-    fn apply_instruction_part1(&self, grid: &mut Vec<[u32; 1000]>) {
+    fn apply_instruction_part1(&self, grid: &mut [[u32; 1000]]) {
         let command = &self.command;
-        for x in self.start.0..(self.end.0 + 1) {
-            for y in self.start.1..(self.end.1 + 1) {
+        for x in grid.iter_mut().take(self.end.0 + 1).skip(self.start.0) {
+            for light in x.iter_mut().take(self.end.1 + 1).skip(self.start.1) {
                 match command {
-                    Command::On => grid[x][y] = 1,
-                    Command::Off => grid[x][y] = 0,
-                    Command::Toggle => grid[x][y] = 1 - grid[x][y],
+                    Command::On => *light = 1,
+                    Command::Off => *light = 0,
+                    Command::Toggle => *light = 1 - *light,
                 }
             }
         }
     }
 
-    fn apply_instruction_part2(&self, grid: &mut Vec<[u32; 1000]>) {
+    fn apply_instruction_part2(&self, grid: &mut [[u32; 1000]]) {
         let command = &self.command;
-        for x in self.start.0..(self.end.0 + 1) {
-            for y in self.start.1..(self.end.1 + 1) {
+        for x in grid.iter_mut().take(self.end.0 + 1).skip(self.start.0) {
+            for light in x.iter_mut().take(self.end.1 + 1).skip(self.start.1) {
                 match command {
-                    Command::On => grid[x][y] += 1,
+                    Command::On => *light += 1,
                     Command::Off => {
-                        if grid[x][y] > 0 { grid[x][y] -= 1; }
+                        if *light > 0 {
+                            *light -= 1;
+                        }
                     }
-                    Command::Toggle => grid[x][y] += 2,
+                    Command::Toggle => *light += 2,
                 }
             }
         }
