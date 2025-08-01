@@ -14,7 +14,9 @@ I plan to do some puzzles also in **Python** and then compare how fast they are.
 
 ## 🧠 Structure
 
-Each puzzle is implemented in its own module under `src/days/`. The corresponding data files are in `inputs/` (these are my inputs, they are generated differently for each user when logged into AdventOfCode so yours are different, you can't use my results directly).
+- Each puzzle is implemented in its own module under `src/days/`.
+- The corresponding data files are in `inputs/` (these are my inputs, they are generated differently for each user when logged into AdventOfCode so yours are different, you can't use my results directly).
+- Please note that for some days, I might have applied a change to the input file (for example in `day06`: I have deleted all the "turn ", transforming "turn on" into "on" and "turn off" into "off", in order to have more homogeneity with the "toggle" command).
 
 Compile and run all in debug mode with:
 ```bash
