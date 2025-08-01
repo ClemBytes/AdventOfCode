@@ -34,6 +34,6 @@ You can try to run directly in release mode as I try to compile for release when
 
 I'm solving the problems at my own pace and may refactor as I go.  
 Progress so far:  
-⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
-⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
-**10 / 50 stars**
+⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
+⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
+**12 / 50 stars**

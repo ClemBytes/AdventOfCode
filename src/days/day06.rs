@@ -12,22 +12,22 @@ fn day06_part1(input: &Vec<Instruction>) {
     // Solve puzzle
     let mut grid: Vec<[u32; 1000]> = vec![[0; 1000]; 1000];
     for instruction in input {
-        instruction.apply_instruction(&mut grid);
+        instruction.apply_instruction_part1(&mut grid);
     }
     // println!("Result part 1: {}", count_lights(&grid));
     assert_eq!(count_lights(&grid), 569999);
     println!("> DAY06 - part 1: OK!");
 }
 
-fn day06_part2(_input: &Vec<Instruction>) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-
+fn day06_part2(input: &Vec<Instruction>) {
     // Solve puzzle
-    // println!("Result part 2: {}");
-    // assert_eq!(, );
-    // println!("> DAY06 - part 2: OK!");
+    let mut grid: Vec<[u32; 1000]> = vec![[0; 1000]; 1000];
+    for instruction in input {
+        instruction.apply_instruction_part2(&mut grid);
+    }
+    // println!("Result part 2: {}", count_lights(&grid));
+    assert_eq!(count_lights(&grid), 17836115);
+    println!("> DAY06 - part 2: OK!");
 }
 
 enum Command {
@@ -65,7 +65,7 @@ impl Instruction {
         instruction
     }
 
-    fn apply_instruction(&self, grid: &mut Vec<[u32; 1000]>) {
+    fn apply_instruction_part1(&self, grid: &mut Vec<[u32; 1000]>) {
         let command = &self.command;
         for x in self.start.0..(self.end.0 + 1) {
             for y in self.start.1..(self.end.1 + 1) {
@@ -73,6 +73,21 @@ impl Instruction {
                     Command::On => grid[x][y] = 1,
                     Command::Off => grid[x][y] = 0,
                     Command::Toggle => grid[x][y] = 1 - grid[x][y],
+                }
+            }
+        }
+    }
+
+    fn apply_instruction_part2(&self, grid: &mut Vec<[u32; 1000]>) {
+        let command = &self.command;
+        for x in self.start.0..(self.end.0 + 1) {
+            for y in self.start.1..(self.end.1 + 1) {
+                match command {
+                    Command::On => grid[x][y] += 1,
+                    Command::Off => {
+                        if grid[x][y] > 0 { grid[x][y] -= 1; }
+                    }
+                    Command::Toggle => grid[x][y] += 2,
                 }
             }
         }
