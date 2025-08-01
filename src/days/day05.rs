@@ -1,6 +1,6 @@
 // DAY05: https://adventofcode.com/2015/day/5
 
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{self, BufRead};
 
 pub fn run() {
@@ -42,13 +42,10 @@ fn day05_part2(path: &str) {
 
     // Solve puzzle
     let mut counter = 0;
-    if let Ok(file) = File::open(path) {
-        let reader = io::BufReader::new(file);
-
-        for line in reader.lines() {
-            if new_is_nice(&line.unwrap()) {
-                counter += 1;
-            }
+    let data = fs::read_to_string(path).unwrap();
+    for line in data.lines() {
+        if new_is_nice(line) {
+            counter += 1;
         }
     }
     // println!("Result part 2: {counter}");
