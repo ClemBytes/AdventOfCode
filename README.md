@@ -34,5 +34,5 @@ cargo build --release
 I'm solving the problems at my own pace and may refactor as I go.  
 Progress so far:  
 ⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
-⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
-**15 / 50 stars**
+⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
+**16 / 50 stars**
