@@ -14,25 +14,29 @@ I plan to do some puzzles also in **Python** and then compare how fast they are.
 
 ## 🧠 Structure
 
-- Each puzzle is implemented in its own module under `src/days/`.
+- Each puzzle is implemented in its own module under `src/`.
 - The corresponding data files are in `inputs/` (these are my inputs, they are generated differently for each user when logged into AdventOfCode so yours are different, you can't use my results directly).
 - Please note that for some days, I might have applied a change to the input file (for example in `day06`: I have deleted all the "turn ", transforming "turn on" into "on" and "turn off" into "off", in order to have more homogeneity with the "toggle" command).
 
 Compile and run all in debug mode with:
 ```bash
-cargo run
+cargo test
 ```
 
-Or compile in release mode, then run in release mode (faster run):
+Compile and run a specific day X in debug mode with:
 ```bash
-cargo build --release
-./target/release/AdventOfCode2015
+cargo test -- day0X
+```
+
+In release mode (faster run):
+```bash
+cargo test --release
 ```
 
 ## 🚧 Status
 
 I'm solving the problems at my own pace and may refactor as I go.  
 Progress so far:  
-⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
-⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
-**16 / 50 stars**
+⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
+⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
+**18 / 50 stars**
