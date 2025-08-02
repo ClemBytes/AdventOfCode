@@ -1,6 +1,10 @@
 use std::fs;
 
 #[test]
+fn test() {
+    run();
+}
+
 pub fn run() {
     println!("------- DAY0X -------");
     let example = fs::read_to_string("inputs/example_day0X").expect("Unable to read input!");
