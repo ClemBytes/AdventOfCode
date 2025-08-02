@@ -1,3 +1,4 @@
+
 use std::{
     collections::{HashMap, HashSet},
     fs,
@@ -67,9 +68,9 @@ fn recursive_search_min(
     min_dist
 }
 
-fn search_min(distances: &HashMap<(&str, &str), u32>, cities_names: Vec<&str>) -> u32 {
+fn search_min(distances: &HashMap<(&str, &str), u32>, cities_names: &Vec<&str>) -> u32 {
     let mut min_dist = u32::MAX;
-    for city in &cities_names {
+    for city in cities_names {
         let cities_name_reduced = cities_names
             .iter()
             .copied()
@@ -107,9 +108,9 @@ fn recursive_search_max(
     max_dist
 }
 
-fn search_max(distances: &HashMap<(&str, &str), u32>, cities_names: Vec<&str>) -> u32 {
+fn search_max(distances: &HashMap<(&str, &str), u32>, cities_names: &Vec<&str>) -> u32 {
     let mut max_dist = 0;
-    for city in &cities_names {
+    for city in cities_names {
         let cities_name_reduced = cities_names
             .iter()
             .copied()
@@ -130,23 +131,23 @@ fn day09_part1(
     // Exemple tests
     let (example_distances, example_cities_names) = example;
     let example_cities_names: Vec<&str> = example_cities_names.iter().cloned().collect();
-    // println!(
-    //     "Example part1 : {}",
-    //     search(example_distances.clone(), example_cities_names.clone())
-    // );
+    println!(
+        "Example part1 : {}",
+        search_min(example_distances, &example_cities_names)
+    );
     assert_eq!(
-        search_min(example_distances, example_cities_names.clone()),
+        search_min(example_distances, &example_cities_names),
         605
     );
 
     // Solve puzzle
     let (input_distances, input_cities_names) = input;
     let input_cities_names: Vec<&str> = input_cities_names.iter().cloned().collect();
-    // println!(
-    //     "Result part 1: {}",
-    //     search(input_distances.clone(), input_cities_names.clone())
-    // );
-    assert_eq!(search_min(input_distances, input_cities_names.clone()), 141);
+    println!(
+        "Result part 1: {}",
+        search_min(input_distances, &input_cities_names)
+    );
+    assert_eq!(search_min(input_distances, &input_cities_names), 141);
     println!("> DAY09 - part 1: OK!");
 }
 
@@ -157,12 +158,12 @@ fn day09_part2(
     // Exemple tests
     let (example_distances, example_cities_names) = example;
     let example_cities_names: Vec<&str> = example_cities_names.iter().cloned().collect();
-    // println!(
-    //     "Example part1 : {}",
-    //     search(example_distances.clone(), example_cities_names.clone())
-    // );
+    println!(
+        "Example part1 : {}",
+        search_max(example_distances, &example_cities_names)
+    );
     assert_eq!(
-        search_max(example_distances, example_cities_names.clone()),
+        search_max(example_distances, &example_cities_names),
         982
     );
 
@@ -171,11 +172,11 @@ fn day09_part2(
     let input_cities_names: Vec<&str> = input_cities_names.iter().cloned().collect();
     println!(
         "Result part 2: {}",
-        search_max(input_distances, input_cities_names.clone())
+        search_max(input_distances, &input_cities_names)
     );
-    // assert_eq!(
-    //     search_max(input_distances.clone(), input_cities_names.clone()),
-    //     141
-    // );
-    // println!("> DAY09 - part 2: OK!");
+    assert_eq!(
+        search_max(input_distances, &input_cities_names),
+        736
+    );
+    println!("> DAY09 - part 2: OK!");
 }
