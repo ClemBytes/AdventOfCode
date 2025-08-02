@@ -35,7 +35,7 @@ fn get_distance(city1: &str, city2: &str, distances: HashMap<(&str, &str), u32>)
     *distances.get(&couple).unwrap()
 }
 
-fn recursive_search(
+fn recursive_search_min(
     distances: HashMap<(&str, &str), u32>,
     cities_names: Vec<&str>,
     current_city: &str,
@@ -51,7 +51,7 @@ fn recursive_search(
             .filter(|&x| x != *city)
             .collect();
         let total_dist = get_distance(current_city, city, distances.clone())
-            + recursive_search(distances.clone(), cities_name_reduced, city);
+            + recursive_search_min(distances.clone(), cities_name_reduced, city);
         if total_dist < min_dist {
             min_dist = total_dist;
         }
@@ -59,7 +59,7 @@ fn recursive_search(
     min_dist
 }
 
-fn search(distances: HashMap<(&str, &str), u32>, cities_names: Vec<&str>) -> u32 {
+fn search_min(distances: HashMap<(&str, &str), u32>, cities_names: Vec<&str>) -> u32 {
     let mut min_dist = u32::MAX;
     for city in &cities_names {
         let cities_name_reduced = cities_names
@@ -67,12 +67,52 @@ fn search(distances: HashMap<(&str, &str), u32>, cities_names: Vec<&str>) -> u32
             .copied()
             .filter(|&x| x != *city)
             .collect();
-        let total_dist = recursive_search(distances.clone(), cities_name_reduced, city);
+        let total_dist = recursive_search_min(distances.clone(), cities_name_reduced, city);
         if total_dist < min_dist {
             min_dist = total_dist;
         }
     }
     min_dist
+}
+
+fn recursive_search_max(
+    distances: HashMap<(&str, &str), u32>,
+    cities_names: Vec<&str>,
+    current_city: &str,
+) -> u32 {
+    if cities_names.is_empty() {
+        return 0;
+    }
+    let mut max_dist = 0;
+    for city in &cities_names {
+        let cities_name_reduced = cities_names
+            .iter()
+            .copied()
+            .filter(|&x| x != *city)
+            .collect();
+        let total_dist = get_distance(current_city, city, distances.clone())
+            + recursive_search_max(distances.clone(), cities_name_reduced, city);
+        if total_dist > max_dist {
+            max_dist = total_dist;
+        }
+    }
+    max_dist
+}
+
+fn search_max(distances: HashMap<(&str, &str), u32>, cities_names: Vec<&str>) -> u32 {
+    let mut max_dist = 0;
+    for city in &cities_names {
+        let cities_name_reduced = cities_names
+            .iter()
+            .copied()
+            .filter(|&x| x != *city)
+            .collect();
+        let total_dist = recursive_search_max(distances.clone(), cities_name_reduced, city);
+        if total_dist > max_dist {
+            max_dist = total_dist;
+        }
+    }
+    max_dist
 }
 
 fn day09_part1(
@@ -87,7 +127,7 @@ fn day09_part1(
     //     search(example_distances.clone(), example_cities_names.clone())
     // );
     assert_eq!(
-        search(example_distances.clone(), example_cities_names.clone()),
+        search_min(example_distances.clone(), example_cities_names.clone()),
         605
     );
 
@@ -99,22 +139,38 @@ fn day09_part1(
     //     search(input_distances.clone(), input_cities_names.clone())
     // );
     assert_eq!(
-        search(input_distances.clone(), input_cities_names.clone()),
+        search_min(input_distances.clone(), input_cities_names.clone()),
         141
     );
     println!("> DAY09 - part 1: OK!");
 }
 
 fn day09_part2(
-    _example: &(HashMap<(&str, &str), u32>, HashSet<&str>),
-    _input: &(HashMap<(&str, &str), u32>, HashSet<&str>),
+    example: &(HashMap<(&str, &str), u32>, HashSet<&str>),
+    input: &(HashMap<(&str, &str), u32>, HashSet<&str>),
 ) {
-    println!("TODO - part2");
     // Exemple tests
-    // assert_eq!(, 0);
+    let (example_distances, example_cities_names) = example;
+    let example_cities_names: Vec<&str> = example_cities_names.iter().cloned().collect();
+    // println!(
+    //     "Example part1 : {}",
+    //     search(example_distances.clone(), example_cities_names.clone())
+    // );
+    assert_eq!(
+        search_max(example_distances.clone(), example_cities_names.clone()),
+        982
+    );
 
     // Solve puzzle
-    // println!("Result part 2: {}");
-    // assert_eq!(, );
+    let (input_distances, input_cities_names) = input;
+    let input_cities_names: Vec<&str> = input_cities_names.iter().cloned().collect();
+    println!(
+        "Result part 2: {}",
+        search_max(input_distances.clone(), input_cities_names.clone())
+    );
+    // assert_eq!(
+    //     search_max(input_distances.clone(), input_cities_names.clone()),
+    //     141
+    // );
     // println!("> DAY09 - part 2: OK!");
 }
