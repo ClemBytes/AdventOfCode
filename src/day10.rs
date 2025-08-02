@@ -52,13 +52,13 @@ fn day10_part1(input: &str) {
     println!("> DAY10 - part 1: OK!");
 }
 
-fn day10_part2(_input: &str) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-
+fn day10_part2(input: &str) {
     // Solve puzzle
-    // println!("Result part 2: {}");
-    // assert_eq!(, );
-    // println!("> DAY10 - part 2: OK!");
+    let mut result = String::from(input);
+    for _ in 0..50 {
+        result = look_and_say(result);
+    }
+    println!("Result part 2: {}", result.len());
+    assert_eq!(result.len(), 3579328);
+    println!("> DAY10 - part 2: OK!");
 }
