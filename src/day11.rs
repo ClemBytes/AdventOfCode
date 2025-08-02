@@ -9,8 +9,8 @@ pub fn run() {
     println!("------- DAY11 -------");
     let input = "vzbxkghb";
 
-    day11_part1(input);
-    day11_part2(input);
+    let next = day11_part1(input);
+    day11_part2(next);
 }
 
 const BASE: u64 = 26;
@@ -129,7 +129,7 @@ impl Password {
     }
 }
 
-fn day11_part1(input: &str) {
+fn day11_part1(input: &str) -> Password {
     // Exemple tests
     println!("> Check conversions:");
     let ex = Password::from_string(String::from("aaaaaaaa"));
@@ -168,15 +168,13 @@ fn day11_part1(input: &str) {
     println!("\n> Result part 1: {res}");
     assert_eq!(res, "vzbxxyzz");
     println!("> DAY11 - part 1: OK!\n");
+    input
 }
 
-fn day11_part2(_input: &str) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-
+fn day11_part2(input: Password) {
     // Solve puzzle
-    // println!("Result part 2: {}");
-    // assert_eq!(, );
-    // println!("> DAY11 - part 2: OK!");
+    let res = input.next_correct().next_correct().s;
+    println!("\n> Result part 2: {res}");
+    assert_eq!(res, "vzcaabcc");
+    println!("> DAY11 - part 2: OK!");
 }
