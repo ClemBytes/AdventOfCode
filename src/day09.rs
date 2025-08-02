@@ -1,4 +1,3 @@
-
 use std::{
     collections::{HashMap, HashSet, VecDeque},
     fs,
@@ -8,7 +7,6 @@ use std::{
 fn test() {
     run();
 }
-
 
 pub fn run() {
     println!("------- DAY09 -------");
@@ -122,7 +120,7 @@ fn day09_part1(
 ) {
     // Exemple tests
     let (example_distances, example_cities_names) = example;
-    let mut example_cities_names: VecDeque<&str> = example_cities_names.iter().cloned().collect();
+    let mut example_cities_names: VecDeque<&str> = example_cities_names.iter().copied().collect();
     println!(
         "Example part1 : {}",
         search_min(example_distances, &mut example_cities_names)
@@ -134,7 +132,7 @@ fn day09_part1(
 
     // Solve puzzle
     let (input_distances, input_cities_names) = input;
-    let mut input_cities_names: VecDeque<&str> = input_cities_names.iter().cloned().collect();
+    let mut input_cities_names: VecDeque<&str> = input_cities_names.iter().copied().collect();
     println!(
         "Result part 1: {}",
         search_min(input_distances, &mut input_cities_names)
@@ -149,7 +147,7 @@ fn day09_part2(
 ) {
     // Exemple tests
     let (example_distances, example_cities_names) = example;
-    let mut example_cities_names: VecDeque<&str> = example_cities_names.iter().cloned().collect();
+    let mut example_cities_names: VecDeque<&str> = example_cities_names.iter().copied().collect();
     println!(
         "Example part1 : {}",
         search_max(example_distances, &mut example_cities_names)
@@ -161,14 +159,11 @@ fn day09_part2(
 
     // Solve puzzle
     let (input_distances, input_cities_names) = input;
-    let mut input_cities_names: VecDeque<&str> = input_cities_names.iter().cloned().collect();
+    let mut input_cities_names: VecDeque<&str> = input_cities_names.iter().copied().collect();
     println!(
         "Result part 2: {}",
         search_max(input_distances, &mut input_cities_names)
     );
-    assert_eq!(
-        search_max(input_distances, &mut input_cities_names),
-        736
-    );
+    assert_eq!(search_max(input_distances, &mut input_cities_names), 736);
     println!("> DAY09 - part 2: OK!");
 }
