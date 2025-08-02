@@ -2,6 +2,11 @@
 
 use std::fs;
 
+#[test]
+fn test() {
+    run();
+}
+
 pub fn run() {
     println!("------- DAY01 -------");
     let input = fs::read_to_string("inputs/input_day01").expect("Unable to read input!");

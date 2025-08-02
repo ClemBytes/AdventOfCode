@@ -2,6 +2,12 @@
 
 use md5::Digest;
 
+#[test]
+fn test() {
+    run();
+}
+
+
 pub fn run() {
     println!("------- DAY04 -------");
     let input = "bgvyzdsv";

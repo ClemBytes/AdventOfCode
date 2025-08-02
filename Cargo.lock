@@ -3,7 +3,7 @@
 version = 4
 
 [[package]]
-name = "AdventOfCode2015"
+name = "advent_of_code2015"
 version = "0.1.0"
 dependencies = [
  "md5",

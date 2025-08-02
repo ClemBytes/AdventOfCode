@@ -3,6 +3,12 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 
+#[test]
+fn test() {
+    run();
+}
+
+
 pub fn run() {
     println!("------- DAY02 -------");
     let input = read_input("inputs/input_day02");

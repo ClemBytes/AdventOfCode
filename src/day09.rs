@@ -3,6 +3,12 @@ use std::{
     fs,
 };
 
+#[test]
+fn test() {
+    run();
+}
+
+
 pub fn run() {
     println!("------- DAY09 -------");
     let example = fs::read_to_string("inputs/example_day09").expect("Unable to read input!");

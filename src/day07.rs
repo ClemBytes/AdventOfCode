@@ -1,5 +1,11 @@
 use std::{collections::HashMap, fs};
 
+#[test]
+fn test() {
+    run();
+}
+
+
 pub fn run() {
     println!("------- DAY07 -------");
     // let example_path = "inputs/example_day07";
