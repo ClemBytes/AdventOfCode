@@ -8,7 +8,6 @@ fn test() {
     run();
 }
 
-
 pub fn run() {
     println!("------- DAY02 -------");
     let input = read_input("inputs/input_day02");

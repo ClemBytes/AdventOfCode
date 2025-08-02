@@ -9,7 +9,6 @@ fn test() {
     run();
 }
 
-
 pub fn run() {
     println!("------- DAY03 -------");
     let input = fs::read_to_string("inputs/input_day03").unwrap();

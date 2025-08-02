@@ -8,7 +8,6 @@ fn test() {
     run();
 }
 
-
 pub fn run() {
     println!("------- DAY05 -------");
     let path = "inputs/input_day05";

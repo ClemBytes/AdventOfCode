@@ -5,7 +5,6 @@ fn test() {
     run();
 }
 
-
 pub fn run() {
     println!("------- DAY06 -------");
     let raw_input = fs::read_to_string("inputs/input_day06").expect("Unable to read input!");
