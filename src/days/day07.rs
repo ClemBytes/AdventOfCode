@@ -8,33 +8,34 @@ pub fn run() {
 
     let input_path = "inputs/input_day07";
     let raw_input = fs::read_to_string(input_path).expect("Unable to read input!");
-    let input = parse(&raw_input);
+    let input_part1 = parse(&raw_input);
+    let input_part2 = parse(&raw_input);
 
-    day07_part1(input);
-    day07_part2();
+    let a_part1 = day07_part1(input_part1);
+    day07_part2(input_part2, a_part1);
 }
 
-fn day07_part1(instructions: Vec<Instruction>) {
+fn day07_part1(instructions: Vec<Instruction>) -> u16 {
     // Example tests
     // let final_state = apply_instructions(instructions);
     // println!("Example final state: {:#?}", final_state);
 
     // Solve puzzle
-    let final_state = apply_instructions(instructions);
-    // println!("Result part 1: {}", final_state.get("a").unwrap());
-    assert_eq!(*final_state.get("a").unwrap(), 46065);
+    let final_state = apply_instructions_part1(instructions);
+    let a_part1 = *final_state.get("a").unwrap();
+    // println!("Result part 1: {a_part1}");
+    assert_eq!(a_part1, 46065);
     println!("> DAY07 - part 1: OK!");
+    a_part1
 }
 
-fn day07_part2() {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-
+fn day07_part2(instructions: Vec<Instruction>, a_part1: u16) {
     // Solve puzzle
-    // println!("Result part 2: {}");
-    // assert_eq!(, );
-    // println!("> DAY07 - part 2: OK!");
+    let final_state = apply_instructions_part2(instructions, a_part1);
+    let a_part2 = *final_state.get("a").unwrap();
+    // println!("Result part 2: {a_part2}");
+    assert_eq!(a_part2, 14134);
+    println!("> DAY07 - part 2: OK!");
 }
 
 fn parse(raw_input: &str) -> Vec<Instruction> {
@@ -45,7 +46,7 @@ fn parse(raw_input: &str) -> Vec<Instruction> {
     instructions
 }
 
-fn apply_instructions(mut instructions: Vec<Instruction>) -> HashMap<String, u16> {
+fn apply_instructions_part1(mut instructions: Vec<Instruction>) -> HashMap<String, u16> {
     let mut map: HashMap<String, u16> = HashMap::new();
     while !instructions.is_empty() {
         let mut instructions_used: Vec<usize> = vec![];
@@ -57,6 +58,41 @@ fn apply_instructions(mut instructions: Vec<Instruction>) -> HashMap<String, u16
                 let sig = res.unwrap();
                 map.insert(instruction.output.clone(), sig);
                 used = true;
+            }
+
+            if used {
+                instructions_used.push(i);
+            }
+        }
+        // Delete used instructions
+        for i in instructions_used.iter().rev() {
+            instructions.remove(*i);
+        }
+    }
+
+    map
+}
+
+fn apply_instructions_part2(
+    mut instructions: Vec<Instruction>,
+    a_part1: u16,
+) -> HashMap<String, u16> {
+    let mut map: HashMap<String, u16> = HashMap::new();
+    map.insert(String::from("b"), a_part1);
+    while !instructions.is_empty() {
+        let mut instructions_used: Vec<usize> = vec![];
+        for (i, instruction) in instructions.iter().enumerate() {
+            let mut used = false;
+
+            if instruction.output == "b" {
+                used = true;
+            } else {
+                let res = instruction.gate.get_result(&map);
+                if res.is_some() {
+                    let sig = res.unwrap();
+                    map.insert(instruction.output.clone(), sig);
+                    used = true;
+                }
             }
 
             if used {
