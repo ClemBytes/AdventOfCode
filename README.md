@@ -18,19 +18,36 @@ I plan to do some puzzles also in **Python** and then compare how fast they are.
 - The corresponding data files are in `inputs/` (these are my inputs, they are generated differently for each user when logged into AdventOfCode so yours are different, you can't use my results directly).
 - Please note that for some days, I might have applied a change to the input file (for example in `day06`: I have deleted all the "turn ", transforming "turn on" into "on" and "turn off" into "off", in order to have more homogeneity with the "toggle" command).
 
-Compile and run all in debug mode with:
+### Debug mode
+Compile and run **all** with:
 ```bash
 cargo test
 ```
 
-Compile and run a specific day X in debug mode with:
+Compile and run **a specific day X** with:
 ```bash
 cargo test -- day0X
 ```
 
-In release mode (faster run):
+Compile and run **a specific day X** and **print logs** with:
+```bash
+cargo test -- --nocapture day0X
+```
+
+### Release mode (faster run)
+Compile and run **all** with:
 ```bash
 cargo test --release
+```
+
+Compile and run **a specific day X** with:
+```bash
+cargo test --release -- day0X
+```
+
+Compile and run **a specific day X** and **print logs** with:
+```bash
+cargo test --release -- --nocapture day0X
 ```
 
 ## 🚧 Status
