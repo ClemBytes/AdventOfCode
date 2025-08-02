@@ -1,15 +1,25 @@
 pub fn run() {
     println!("------- DAY0X -------");
-    let _input = read_input("inputs/input_day0X");
-    day0X_part1();
-    day0X_part2();
+    let example = fs::read_to_string("inputs/example_day0X").expect("Unable to read input!");
+    let example = parse(&example);
+    let input = fs::read_to_string("inputs/input_day0X").expect("Unable to read input!");
+    let input = parse(&input);
+
+    day0X_part1(&example, &input);
+    day0X_part2(&example, &input);
 }
 
-fn read_input(_path: &str) {
-
+fn parse(raw_input: &String) -> Vec<_> {
+    let mut yyy: Vec<_> = vec![];
+    for _line in raw_input.lines() {
+        // TODO
+        // yyy.push(line);
+    }
+    yyy
 }
 
-fn day0X_part1() {
+
+fn day0X_part1(_example: &Vec<_>, _input: &Vec<_>) {
     println!("TODO - part1");
     // Exemple tests
     // assert_eq!(, 0);
@@ -20,7 +30,7 @@ fn day0X_part1() {
     // println!("> DAY0X - part 1: OK!");
 }
 
-fn day0X_part2() {
+fn day0X_part2(_example: &Vec<_>, _input: &Vec<_>) {
     println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);

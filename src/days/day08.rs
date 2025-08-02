@@ -1,17 +1,27 @@
+use std::fs;
+
 pub fn run() {
     println!("------- DAY08 -------");
-    let _input = read_input("inputs/input_day08");
-    day08_part1();
-    day08_part2();
+    let example = fs::read_to_string("inputs/example_day08").expect("Unable to read input!");
+    let example = parse(&example);
+    let input = fs::read_to_string("inputs/input_day08").expect("Unable to read input!");
+    let input = parse(&input);
+
+    day08_part1(&example, &input);
+    day08_part2(&example, &input);
 }
 
-fn read_input(_path: &str) {
-
+fn parse(raw_input: &String) -> Vec<String> {
+    let mut strings: Vec<String> = vec![];
+    for line in raw_input.lines() {
+        strings.push(String::from(line));
+    }
+    strings
 }
 
-fn day08_part1() {
-    println!("TODO - part1");
+fn day08_part1(example: &Vec<String>, _input: &Vec<String>) {
     // Exemple tests
+    println!("Example input: {example:#?}");
     // assert_eq!(, 0);
 
     // Solve puzzle
@@ -20,7 +30,7 @@ fn day08_part1() {
     // println!("> DAY08 - part 1: OK!");
 }
 
-fn day08_part2() {
+fn day08_part2(_example: &Vec<String>, _input: &Vec<String>) {
     println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);
