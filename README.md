@@ -24,14 +24,14 @@ Compile and run **all** with:
 cargo test
 ```
 
-Compile and run **a specific day X** with:
+Compile and run **a specific day XX** with:
 ```bash
-cargo test -- day0X
+cargo test -- dayXX
 ```
 
-Compile and run **a specific day X** and **print logs** with:
+Compile and run **a specific day XX** and **print logs** with:
 ```bash
-cargo test -- --nocapture day0X
+cargo test -- --nocapture dayXX
 ```
 
 ### Release mode (faster run)
@@ -40,20 +40,20 @@ Compile and run **all** with:
 cargo test --release
 ```
 
-Compile and run **a specific day X** with:
+Compile and run **a specific day XX** with:
 ```bash
-cargo test --release -- day0X
+cargo test --release -- dayXX
 ```
 
-Compile and run **a specific day X** and **print logs** with:
+Compile and run **a specific day XX** and **print logs** with:
 ```bash
-cargo test --release -- --nocapture day0X
+cargo test --release -- --nocapture dayXX
 ```
 
 ## 🚧 Status
 
 I'm solving the problems at my own pace and may refactor as I go.  
 Progress so far:  
-⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
+⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
 ⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆  
 **18 / 50 stars**

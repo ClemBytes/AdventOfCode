@@ -1,43 +1,58 @@
-use std::fs;
-
 #[test]
 fn test() {
     run();
 }
 
 pub fn run() {
-    println!("------- DAY0X -------");
-    let example = fs::read_to_string("inputs/example_day0X").expect("Unable to read input!");
-    let example = parse(&example);
-    let input = fs::read_to_string("inputs/input_day0X").expect("Unable to read input!");
-    let input = parse(&input);
+    println!("------- DAY10 -------");
+    let input = "1113222113";
 
-    day0X_part1(&example, &input);
-    day0X_part2(&example, &input);
+    day10_part1(input);
+    day10_part2(input);
 }
 
-fn parse(raw_input: &String) -> Vec<_> {
-    let mut yyy: Vec<_> = vec![];
-    for _line in raw_input.lines() {
-        // TODO
-        // yyy.push(line);
+fn look_and_say(s: String) -> String {
+    let mut i: usize = 0;
+    let s_col: Vec<char> = s.chars().collect();
+    let mut ret: String = String::new();
+    while i < s_col.len() {
+        if i == s_col.len() - 1 {
+            ret.push('1');
+            ret.push(s_col[i]);
+            return ret;
+        }
+        let mut nb_repeat = 1;
+        let mut j = i + 1;
+        while j < s.len() && s_col[j] == s_col[i] {
+            nb_repeat += 1;
+            j += 1;
+        }
+        ret.push_str(&nb_repeat.to_string());
+        ret.push(s_col[i]);
+        i = j;
     }
-    yyy
+    ret
 }
 
-
-fn day0X_part1(_example: &Vec<_>, _input: &Vec<_>) {
-    println!("TODO - part1");
+fn day10_part1(input: &str) {
     // Exemple tests
-    // assert_eq!(, 0);
+    assert_eq!(look_and_say(String::from("1")), String::from("11"));
+    assert_eq!(look_and_say(String::from("11")), String::from("21"));
+    assert_eq!(look_and_say(String::from("21")), String::from("1211"));
+    assert_eq!(look_and_say(String::from("1211")), String::from("111221"));
+    assert_eq!(look_and_say(String::from("111221")), String::from("312211"));
 
     // Solve puzzle
-    // println!("Result part 1: {}");
-    // assert_eq!(, );
-    // println!("> DAY0X - part 1: OK!");
+    let mut result = String::from(input);
+    for _ in 0..40 {
+        result = look_and_say(result);
+    }
+    println!("Result part 1: {}", result.len());
+    assert_eq!(result.len(), 252594);
+    println!("> DAY10 - part 1: OK!");
 }
 
-fn day0X_part2(_example: &Vec<_>, _input: &Vec<_>) {
+fn day10_part2(_input: &str) {
     println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);
@@ -45,5 +60,5 @@ fn day0X_part2(_example: &Vec<_>, _input: &Vec<_>) {
     // Solve puzzle
     // println!("Result part 2: {}");
     // assert_eq!(, );
-    // println!("> DAY0X - part 2: OK!");
+    // println!("> DAY10 - part 2: OK!");
 }
