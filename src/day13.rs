@@ -6,14 +6,14 @@ fn test() {
 }
 
 pub fn run() {
-    println!("------- DAYXX -------");
-    let example = fs::read_to_string("inputs/example_dayXX").expect("Unable to read input!");
+    println!("------- DAY13 -------");
+    let example = fs::read_to_string("inputs/example_day13").expect("Unable to read input!");
     let example = parse(&example);
-    let input = fs::read_to_string("inputs/input_dayXX").expect("Unable to read input!");
+    let input = fs::read_to_string("inputs/input_day13").expect("Unable to read input!");
     let input = parse(&input);
 
-    dayXX_part1(&example, &input);
-    dayXX_part2(&example, &input);
+    day13_part1(&example, &input);
+    day13_part2(&example, &input);
 }
 
 fn parse(raw_input: &String) -> Vec<_> {
@@ -25,7 +25,7 @@ fn parse(raw_input: &String) -> Vec<_> {
     yyy
 }
 
-fn dayXX_part1(_example: &Vec<_>, _input: &Vec<_>) {
+fn day13_part1(_example: &Vec<_>, _input: &Vec<_>) {
     println!("TODO - part1");
     // Exemple tests
     // assert_eq!(, 0);
@@ -33,10 +33,10 @@ fn dayXX_part1(_example: &Vec<_>, _input: &Vec<_>) {
     // Solve puzzle
     // println!("Result part 1: {}");
     // assert_eq!(, );
-    // println!("> DAYXX - part 1: OK!");
+    // println!("> DAY13 - part 1: OK!");
 }
 
-fn dayXX_part2(_example: &Vec<_>, _input: &Vec<_>) {
+fn day13_part2(_example: &Vec<_>, _input: &Vec<_>) {
     println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);
@@ -44,5 +44,5 @@ fn dayXX_part2(_example: &Vec<_>, _input: &Vec<_>) {
     // Solve puzzle
     // println!("Result part 2: {}");
     // assert_eq!(, );
-    // println!("> DAYXX - part 2: OK!");
+    // println!("> DAY13 - part 2: OK!");
 }
