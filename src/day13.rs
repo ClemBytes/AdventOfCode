@@ -13,10 +13,10 @@ pub fn run() {
     let example = fs::read_to_string("inputs/example_day13").expect("Unable to read input!");
     let example = parse(&example);
     let input = fs::read_to_string("inputs/input_day13").expect("Unable to read input!");
-    let mut input = parse(&input);
+    let input = parse(&input);
 
     day13_part1(&example, &input);
-    day13_part2(&mut input);
+    day13_part2(&input);
 }
 
 fn parse(raw_input: &str) -> HashMap<&str, HashMap<&str, i32>> {
@@ -50,8 +50,12 @@ fn get_mutual_happiness(
     guest2: &str,
     relations: &HashMap<&str, HashMap<&str, i32>>,
 ) -> i32 {
-    relations.get(&guest1).unwrap().get(&guest2).unwrap()
-        + relations.get(&guest2).unwrap().get(&guest1).unwrap()
+    if guest1 == "Clementine" || guest2 == "Clementine" {
+        0
+    } else {
+        relations.get(&guest1).unwrap().get(&guest2).unwrap()
+            + relations.get(&guest2).unwrap().get(&guest1).unwrap()
+    }
 }
 
 fn recursive_search_max(
@@ -99,19 +103,12 @@ fn day13_part1(
     println!("> DAY13 - part 1: OK!");
 }
 
-fn solve_part2<'a>(input: &mut HashMap<&'a str, HashMap<&'a str, i32>>) -> i32 {
+fn solve_part2(input: &HashMap<&str, HashMap<&str, i32>>) -> i32 {
     let mut guests_list: VecDeque<&str> = input.keys().copied().collect();
-    // Add ourself to the guests_list:
-    let mut my_relations: HashMap<&str, i32> = HashMap::new();
-    for &guest in &guests_list {
-        my_relations.insert(guest, 0);
-        input.entry(guest).or_default().insert("Clementine", 0);
-    }
-    input.insert("Clementine", my_relations);
     recursive_search_max(input, &mut guests_list, "Clementine", "Clementine")
 }
 
-fn day13_part2<'a>(input: &mut HashMap<&'a str, HashMap<&'a str, i32>>) {
+fn day13_part2(input: &HashMap<&str, HashMap<&str, i32>>) {
     // Solve puzzle
     let res = solve_part2(input);
     println!("Result part 2: {res}");
