@@ -23,39 +23,21 @@ pub fn run() {
 fn get_number_part1(input: &JsonValue) -> i64 {
     match input {
         JsonValue::Number(number) => number.as_fixed_point_i64(0).unwrap(),
-        JsonValue::Array(array) => {
-            let mut s: i64 = 0;
-            for element in array {
-                s += get_number_part1(element);
-            }
-            s
-        }
-        JsonValue::Object(object) => {
-            let mut s: i64 = 0;
-            for element in object.iter() {
-                s += get_number_part1(element.1);
-            }
-            s
-        }
-        JsonValue::Short(_) => 0,
-        JsonValue::String(_) => 0,
-        JsonValue::Boolean(_) => 0,
-        JsonValue::Null => 0,
+        JsonValue::Array(array) => array.iter().map(get_number_part1).sum(),
+        JsonValue::Object(object) => object
+            .iter()
+            .map(|(_name, value)| get_number_part1(value))
+            .sum(),
+        _ => 0,
     }
 }
 
 fn get_number_part2(input: &JsonValue) -> i64 {
     match input {
         JsonValue::Number(number) => number.as_fixed_point_i64(0).unwrap(),
-        JsonValue::Array(array) => {
-            let mut s: i64 = 0;
-            for element in array {
-                s += get_number_part2(element);
-            }
-            s
-        }
+        JsonValue::Array(array) => array.iter().map(get_number_part2).sum(),
         JsonValue::Object(object) => {
-            let mut s: i64 = 0;
+            let mut s = 0;
             for element in object.iter() {
                 if element.1 == "red" {
                     return 0;
@@ -64,10 +46,7 @@ fn get_number_part2(input: &JsonValue) -> i64 {
             }
             s
         }
-        JsonValue::Short(_) => 0,
-        JsonValue::String(_) => 0,
-        JsonValue::Boolean(_) => 0,
-        JsonValue::Null => 0,
+        _ => 0,
     }
 }
 
