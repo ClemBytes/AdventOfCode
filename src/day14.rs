@@ -1,5 +1,7 @@
 use std::fs;
 
+use regex::Regex;
+
 #[test]
 fn test() {
     run();
@@ -22,20 +24,13 @@ struct Reindeer {
 
 fn parse(raw_input: &str) -> Vec<Reindeer> {
     let mut reindeers_list: Vec<Reindeer> = vec![];
+    let re = Regex::new(r"^[A-Z][a-z]+ can fly ([0-9]+) km/s for ([0-9]+) seconds, but then must rest for ([0-9]+) seconds\.$").unwrap();
     for line in raw_input.lines() {
-        // First split: delete "XX can fly "
-        let line = line.split(" can fly ").collect::<Vec<&str>>()[1];
-        // Then: get speed
-        let split: Vec<&str> = line.split(" km/s for ").collect();
-        let speed: u32 = split[0].parse().unwrap();
-        let line = split[1];
-        // Then: get duration_flight
-        let split: Vec<&str> = line.split(" seconds, but then must rest for ").collect();
-        let duration_flight: u32 = split[0].parse().unwrap();
-        let line = split[1];
-        // Finally: get duration_rest
-        let split: Vec<&str> = line.split(" seconds.").collect();
-        let duration_rest: u32 = split[0].parse().unwrap();
+        let matches = re.captures(line).unwrap();
+        let speed: u32 = matches[1].parse().unwrap();
+        let duration_flight: u32 = matches[2].parse().unwrap();
+        let duration_rest: u32 = matches[3].parse().unwrap();
+        println!("{speed}, {duration_flight}, {duration_rest}");
         let new_reindeer = Reindeer {
             speed,
             duration_flight,
