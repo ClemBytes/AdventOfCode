@@ -24,8 +24,8 @@ pub fn run() {
     machine_result.insert(String::from("cars"), 2);
     machine_result.insert(String::from("perfumes"), 1);
 
-    day16_part1(&input, machine_result);
-    // day16_part2(&input);
+    day16_part1(&input, machine_result.clone());
+    day16_part2(&input, machine_result);
 }
 
 fn parse(raw_input: &str) -> Vec<HashMap<String, u32>> {
@@ -49,7 +49,10 @@ fn parse(raw_input: &str) -> Vec<HashMap<String, u32>> {
     sues
 }
 
-fn find_sue_number(input: &[HashMap<String, u32>], machine_result: HashMap<String, u32>) -> usize {
+fn find_sue_number_part1(
+    input: &[HashMap<String, u32>],
+    machine_result: HashMap<String, u32>,
+) -> usize {
     'next_sue: for (i, sue) in input.iter().enumerate() {
         for (thing_name, thing_nb) in sue {
             if !machine_result.contains_key(thing_name) {
@@ -64,23 +67,44 @@ fn find_sue_number(input: &[HashMap<String, u32>], machine_result: HashMap<Strin
     unreachable!("Never found Aunt Sue!");
 }
 
+fn find_sue_number_part2(
+    input: &[HashMap<String, u32>],
+    machine_result: HashMap<String, u32>,
+) -> usize {
+    'next_sue: for (i, sue) in input.iter().enumerate() {
+        for (thing_name, thing_nb) in sue {
+            if !machine_result.contains_key(thing_name) {
+                continue 'next_sue;
+            }
+            if thing_name == "cats" || thing_name == "trees" {
+                if thing_nb <= machine_result.get(thing_name).unwrap() {
+                    continue 'next_sue;
+                }
+            } else if thing_name == "pomeranians" || thing_name == "goldfish" {
+                if thing_nb >= machine_result.get(thing_name).unwrap() {
+                    continue 'next_sue;
+                }
+            } else if machine_result.get(thing_name).unwrap() != thing_nb {
+                continue 'next_sue;
+            }
+        }
+        return i + 1;
+    }
+    unreachable!("Never found Aunt Sue!");
+}
+
 fn day16_part1(input: &[HashMap<String, u32>], machine_result: HashMap<String, u32>) {
     // Solve puzzle
-    let res = find_sue_number(input, machine_result);
+    let res = find_sue_number_part1(input, machine_result);
     println!("Result part 1: {res}");
     assert_eq!(res, 40);
     println!("> DAY16 - part 1: OK!");
 }
 
-/*
-fn day16_part2(_input: &Vec<HashMap<&str, u32>>) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-
+fn day16_part2(input: &[HashMap<String, u32>], machine_result: HashMap<String, u32>) {
     // Solve puzzle
-    // println!("Result part 2: {}");
-    // assert_eq!(, );
-    // println!("> DAY16 - part 2: OK!");
+    let res = find_sue_number_part2(input, machine_result);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 241);
+    println!("> DAY16 - part 1: OK!");
 }
-*/
