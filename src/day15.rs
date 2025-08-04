@@ -20,7 +20,7 @@ pub fn run() {
 
 const MAX_TEASPOONS: i32 = 100;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Ingredient {
     capacity: i32,
     durability: i32,
@@ -58,7 +58,7 @@ fn compute_score(ingredients_list: &VecDeque<(Ingredient, i32)>) -> i32 {
         .sum::<i32>()
         != MAX_TEASPOONS
     {
-        panic!("Total number of teaspoons should be {MAX_TEASPOONS}!");
+        panic!("Total number of teaspoons should be {MAX_TEASPOONS}!\n List: {ingredients_list:?}");
     }
     let mut total_capacity: i32 = 0;
     let mut total_durability: i32 = 0;
@@ -70,40 +70,62 @@ fn compute_score(ingredients_list: &VecDeque<(Ingredient, i32)>) -> i32 {
         total_flavor += nb_teaspoons * ingredient.flavor;
         total_texture += nb_teaspoons * ingredient.texture;
     }
-    if total_capacity < 0 {
-        total_capacity = 0
-    };
-    if total_durability < 0 {
-        total_durability = 0
-    };
-    if total_flavor < 0 {
-        total_flavor = 0
-    };
-    if total_texture < 0 {
-        total_texture = 0
-    };
-    total_capacity * total_durability * total_flavor * total_texture
+    total_capacity.max(0) * total_durability.max(0) * total_flavor.max(0) * total_texture.max(0)
 }
 
-// recursive_search_max(
-//     ingredients_list: &mut VecDeque<(Ingredient, i32)>>,
-// ) -> i32 {
+fn recursive_search_max(
+    ingredients_list_to_empty: &mut VecDeque<(Ingredient, i32)>,
+    ingredients_list_to_fill: &mut VecDeque<(Ingredient, i32)>,
+) -> i32 {
+    if ingredients_list_to_empty.is_empty() {
+        let res = compute_score(ingredients_list_to_fill);
+        return res;
+    }
+    let mut max_score = 0;
+    let n = ingredients_list_to_empty.len();
+    for _ in 0..n {
+        let ingredient_tuple = ingredients_list_to_empty.pop_front().unwrap();
+        let (ref ingredient, _) = ingredient_tuple;
+        let already_used_teaspoons = ingredients_list_to_fill
+            .iter()
+            .map(|&(_, value)| value)
+            .sum::<i32>();
+        if n == 1 {
+            ingredients_list_to_fill
+                .push_back((ingredient.clone(), MAX_TEASPOONS - already_used_teaspoons));
+            let score = recursive_search_max(ingredients_list_to_empty, ingredients_list_to_fill);
+            if score > max_score {
+                max_score = score;
+            }
+            ingredients_list_to_fill.pop_back();
+        } else {
+            for tsp in 0..(MAX_TEASPOONS - already_used_teaspoons + 1) {
+                ingredients_list_to_fill.push_back((ingredient.clone(), tsp));
+                let score =
+                    recursive_search_max(ingredients_list_to_empty, ingredients_list_to_fill);
+                if score > max_score {
+                    max_score = score;
+                }
+                ingredients_list_to_fill.pop_back();
+            }
+        }
+        ingredients_list_to_empty.push_back(ingredient_tuple);
+    }
+    max_score
+}
 
-// }
-
-fn day15_part1(
-    example: &mut VecDeque<(Ingredient, i32)>,
-    _input: &mut VecDeque<(Ingredient, i32)>,
-) {
+fn day15_part1(example: &mut VecDeque<(Ingredient, i32)>, input: &mut VecDeque<(Ingredient, i32)>) {
     // Exemple tests
-    example[0].1 = 44;
-    example[1].1 = 56;
-    assert_eq!(compute_score(example), 62842880);
+    assert_eq!(
+        recursive_search_max(example, &mut VecDeque::new()),
+        62842880
+    );
 
     // Solve puzzle
-    // println!("Result part 1: {}");
-    // assert_eq!(, );
-    // println!("> DAY15 - part 1: OK!");
+    let res = recursive_search_max(input, &mut VecDeque::new());
+    println!("Result part 1: {res}");
+    assert_eq!(res, 13882464);
+    println!("> DAY15 - part 1: OK!");
 }
 
 fn day15_part2(
