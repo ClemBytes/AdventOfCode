@@ -31,8 +31,9 @@ fn dayXX_part1(_example: &Vec<_>, _input: &Vec<_>) {
     // assert_eq!(, 0);
 
     // Solve puzzle
-    // println!("Result part 1: {}");
-    // assert_eq!(, );
+    // let res = 
+    // println!("Result part 1: {res}");
+    // assert_eq!(res, );
     // println!("> DAYXX - part 1: OK!");
 }
 
@@ -42,7 +43,8 @@ fn dayXX_part2(_example: &Vec<_>, _input: &Vec<_>) {
     // assert_eq!(, 0);
 
     // Solve puzzle
-    // println!("Result part 2: {}");
-    // assert_eq!(, );
+    // let res = 
+    // println!("Result part 2: {res}");
+    // assert_eq!(res, );
     // println!("> DAYXX - part 2: OK!");
 }
