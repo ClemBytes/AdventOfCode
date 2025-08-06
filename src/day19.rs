@@ -28,7 +28,7 @@ fn parse(raw_input: &str) -> (HashMap<&str, Vec<&str>>, &str) {
     (replacements, molecule)
 }
 
-fn find_nb_distinct_creations(input: &(HashMap<&str, Vec<&str>>, &str)) -> usize {
+fn find_all_distinct_creations(input: &(HashMap<&str, Vec<&str>>, &str)) -> HashSet<String> {
     let mut creations: HashSet<String> = HashSet::new();
     let (replacements, molecule) = input;
     let n = molecule.len();
@@ -50,7 +50,11 @@ fn find_nb_distinct_creations(input: &(HashMap<&str, Vec<&str>>, &str)) -> usize
             }
         }
     }
-    creations.len()
+    creations
+}
+
+fn find_nb_distinct_creations(input: &(HashMap<&str, Vec<&str>>, &str)) -> usize {
+    find_all_distinct_creations(input).len()
 }
 
 fn day19_part1(input: &(HashMap<&str, Vec<&str>>, &str)) {
@@ -76,14 +80,75 @@ fn day19_part1(input: &(HashMap<&str, Vec<&str>>, &str)) {
     println!("> DAY19 - part 1: OK!");
 }
 
-fn day19_part2(_input: &(HashMap<&str, Vec<&str>>, &str)) {
-    println!("TODO - part2");
+fn nb_steps_to_find_molecule(
+    replacements: &HashMap<&str, Vec<&str>>,
+    wanted_molecule: &String,
+    current_molecule: String,
+    nb_steps: u32,
+) -> u32 {
+    // Apply one step
+    let distinct_creations =
+        find_all_distinct_creations(&(replacements.clone(), current_molecule.as_str()));
+
+    // Check if molecule found
+    if distinct_creations.contains(wanted_molecule) {
+        return nb_steps + 1;
+    }
+
+    // If not found, check length of creations to stop if they are all too long
+    let mut all_too_long = true;
+    for creation in distinct_creations.clone() {
+        if creation.len() <= wanted_molecule.len() {
+            all_too_long = false;
+        }
+    }
+    if all_too_long {
+        return 0;
+    }
+
+    // Then apply next step to all creations
+    let mut all_nb_steps = vec![];
+    for mol in distinct_creations {
+        all_nb_steps.push(nb_steps_to_find_molecule(
+            replacements,
+            wanted_molecule,
+            mol,
+            nb_steps + 1,
+        ));
+    }
+    *all_nb_steps.iter().max().unwrap()
+}
+
+fn day19_part2(input: &(HashMap<&str, Vec<&str>>, &str)) {
     // Exemple tests
-    // assert_eq!(, 0);
+    let mut replacements_example: HashMap<&str, Vec<&str>> = HashMap::new();
+    replacements_example.insert("H", vec!["HO", "OH"]);
+    replacements_example.insert("O", vec!["HH"]);
+    replacements_example.insert("e", vec!["H", "O"]);
+    let molecule_example = "HOH".to_string();
+    assert_eq!(
+        nb_steps_to_find_molecule(
+            &replacements_example,
+            &molecule_example,
+            String::from("e"),
+            0
+        ),
+        3
+    );
+    let molecule_example = "HOHOHO".to_string();
+    assert_eq!(
+        nb_steps_to_find_molecule(
+            &replacements_example,
+            &molecule_example,
+            String::from("e"),
+            0
+        ),
+        6
+    );
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
+    let res = nb_steps_to_find_molecule(&input.0, &input.1.to_string(), String::from("e"), 0);
+    println!("Result part 2: {res}");
     // assert_eq!(res, );
     // println!("> DAY19 - part 2: OK!");
 }
