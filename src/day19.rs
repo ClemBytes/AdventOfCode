@@ -3,6 +3,8 @@ use std::{
     fs,
 };
 
+use rand::{rng, seq::SliceRandom};
+
 #[test]
 fn test() {
     run();
@@ -11,13 +13,14 @@ fn test() {
 pub fn run() {
     println!("------- DAY19 -------");
     let input = fs::read_to_string("inputs/input_day19").expect("Unable to read input!");
-    let input = parse(&input);
+    let input1 = parse_for_part1(&input);
+    let input2 = parse_for_part2(&input);
 
-    day19_part1(&input);
-    day19_part2(&input);
+    day19_part1(&input1);
+    day19_part2(&input2);
 }
 
-fn parse(raw_input: &str) -> (HashMap<&str, Vec<&str>>, &str) {
+fn parse_for_part1(raw_input: &str) -> (HashMap<&str, Vec<&str>>, &str) {
     let mut replacements: HashMap<&str, Vec<&str>> = HashMap::new();
     let (list_of_replacements, molecule) = raw_input.split_once("\n\n").unwrap();
     for line in list_of_replacements.lines() {
@@ -28,7 +31,17 @@ fn parse(raw_input: &str) -> (HashMap<&str, Vec<&str>>, &str) {
     (replacements, molecule)
 }
 
-fn find_all_distinct_creations(input: &(HashMap<&str, Vec<&str>>, &str)) -> HashSet<String> {
+fn parse_for_part2(raw_input: &str) -> (Vec<(&str, &str)>, &str) {
+    let mut replacements: Vec<(&str, &str)> = vec![];
+    let (list_of_replacements, molecule) = raw_input.split_once("\n\n").unwrap();
+    for line in list_of_replacements.lines() {
+        let (before, after) = line.split_once(" => ").unwrap();
+        replacements.push((after, before));
+    }
+    (replacements, molecule.trim())
+}
+
+fn find_nb_distinct_creations(input: &(HashMap<&str, Vec<&str>>, &str)) -> usize {
     let mut creations: HashSet<String> = HashSet::new();
     let (replacements, molecule) = input;
     let n = molecule.len();
@@ -50,11 +63,7 @@ fn find_all_distinct_creations(input: &(HashMap<&str, Vec<&str>>, &str)) -> Hash
             }
         }
     }
-    creations
-}
-
-fn find_nb_distinct_creations(input: &(HashMap<&str, Vec<&str>>, &str)) -> usize {
-    find_all_distinct_creations(input).len()
+    creations.len()
 }
 
 fn day19_part1(input: &(HashMap<&str, Vec<&str>>, &str)) {
@@ -80,75 +89,55 @@ fn day19_part1(input: &(HashMap<&str, Vec<&str>>, &str)) {
     println!("> DAY19 - part 1: OK!");
 }
 
-fn nb_steps_to_find_molecule(
-    replacements: &HashMap<&str, Vec<&str>>,
-    wanted_molecule: &String,
-    current_molecule: String,
-    nb_steps: u32,
-) -> u32 {
-    // Apply one step
-    let distinct_creations =
-        find_all_distinct_creations(&(replacements.clone(), current_molecule.as_str()));
-
-    // Check if molecule found
-    if distinct_creations.contains(wanted_molecule) {
-        return nb_steps + 1;
-    }
-
-    // If not found, check length of creations to stop if they are all too long
-    let mut all_too_long = true;
-    for creation in distinct_creations.clone() {
-        if creation.len() <= wanted_molecule.len() {
-            all_too_long = false;
+fn nb_steps_to_find_molecule(input: &(Vec<(&str, &str)>, &str)) -> u32 {
+    let mut nb_shuffles = 0;
+    let mut replacements = input.0.clone();
+    let mut molecule = input.1.to_string();
+    let mut nb_steps: u32 = 0;
+    let old_molecule = molecule.clone();
+    'outer: while molecule != "e" {
+        for &repl in replacements.iter() {
+            let new_molecule = molecule.replacen(repl.0, repl.1, 1);
+            if new_molecule != molecule {
+                molecule = new_molecule;
+                nb_steps += 1;
+                continue 'outer;
+            }
         }
+        // No more replacements possible, so shuffle the replacements list and start again
+        let mut rng = rng();
+        replacements.shuffle(&mut rng);
+        molecule = old_molecule.clone();
+        nb_steps = 0;
+        nb_shuffles += 1;
     }
-    if all_too_long {
-        return 0;
-    }
-
-    // Then apply next step to all creations
-    let mut all_nb_steps = vec![];
-    for mol in distinct_creations {
-        all_nb_steps.push(nb_steps_to_find_molecule(
-            replacements,
-            wanted_molecule,
-            mol,
-            nb_steps + 1,
-        ));
-    }
-    *all_nb_steps.iter().max().unwrap()
+    println!("Solution found after {nb_shuffles} shuffle(s)!");
+    nb_steps
 }
 
-fn day19_part2(input: &(HashMap<&str, Vec<&str>>, &str)) {
+fn day19_part2(input: &(Vec<(&str, &str)>, &str)) {
     // Exemple tests
-    let mut replacements_example: HashMap<&str, Vec<&str>> = HashMap::new();
-    replacements_example.insert("H", vec!["HO", "OH"]);
-    replacements_example.insert("O", vec!["HH"]);
-    replacements_example.insert("e", vec!["H", "O"]);
-    let molecule_example = "HOH".to_string();
+    let replacements_example: Vec<(&str, &str)> = vec![
+        ("HH", "O"),
+        ("OH", "H"),
+        ("HO", "H"),
+        ("O", "e"),
+        ("H", "e"),
+    ];
+    let molecule_example = "HOH";
     assert_eq!(
-        nb_steps_to_find_molecule(
-            &replacements_example,
-            &molecule_example,
-            String::from("e"),
-            0
-        ),
+        nb_steps_to_find_molecule(&(replacements_example.clone(), molecule_example)),
         3
     );
-    let molecule_example = "HOHOHO".to_string();
+    let molecule_example = "HOHOHO";
     assert_eq!(
-        nb_steps_to_find_molecule(
-            &replacements_example,
-            &molecule_example,
-            String::from("e"),
-            0
-        ),
+        nb_steps_to_find_molecule(&(replacements_example, molecule_example)),
         6
     );
 
     // Solve puzzle
-    let res = nb_steps_to_find_molecule(&input.0, &input.1.to_string(), String::from("e"), 0);
+    let res = nb_steps_to_find_molecule(input);
     println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY19 - part 2: OK!");
+    assert_eq!(res, 207);
+    println!("> DAY19 - part 2: OK!");
 }
