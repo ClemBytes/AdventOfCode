@@ -16,7 +16,7 @@ pub fn run() {
     dayXX_part2(&example, &input);
 }
 
-fn parse(raw_input: &String) -> Vec<_> {
+fn parse(raw_input: &str) -> Vec<_> {
     let mut yyy: Vec<_> = vec![];
     for _line in raw_input.lines() {
         // TODO
