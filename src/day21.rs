@@ -18,26 +18,26 @@ pub fn run() {
 
     let shop = Shop {
         weapons: vec![
-            Item::Weapon(8, 4, 0),
-            Item::Weapon(10, 5, 0),
-            Item::Weapon(25, 6, 0),
-            Item::Weapon(40, 7, 0),
-            Item::Weapon(74, 8, 0),
+            Item{item_type: ItemType::Weapon, cost: 8, damage: 4, armor: 0},
+            Item{item_type: ItemType::Weapon, cost: 10, damage: 5, armor: 0},
+            Item{item_type: ItemType::Weapon, cost: 25, damage: 6, armor: 0},
+            Item{item_type: ItemType::Weapon, cost: 40, damage: 7, armor: 0},
+            Item{item_type: ItemType::Weapon, cost: 74, damage: 8, armor: 0},
         ],
         armors: vec![
-            Item::Armor(13, 0, 1),
-            Item::Armor(31, 0, 2),
-            Item::Armor(53, 0, 3),
-            Item::Armor(75, 0, 4),
-            Item::Armor(102, 0, 5),
+            Item{item_type: ItemType::Armor, cost: 13, damage: 0, armor: 1},
+            Item{item_type: ItemType::Armor, cost: 31, damage: 0, armor: 2},
+            Item{item_type: ItemType::Armor, cost: 53, damage: 0, armor: 3},
+            Item{item_type: ItemType::Armor, cost: 75, damage: 0, armor: 4},
+            Item{item_type: ItemType::Armor, cost: 102, damage: 0, armor: 5},
         ],
         rings: vec![
-            Item::Ring(25, 1, 0),
-            Item::Ring(50, 2, 0),
-            Item::Ring(100, 3, 0),
-            Item::Ring(20, 0, 1),
-            Item::Ring(40, 0, 2),
-            Item::Ring(80, 0, 3),
+            Item{item_type: ItemType::Ring, cost: 25, damage: 1, armor: 0},
+            Item{item_type: ItemType::Ring, cost: 50, damage: 2, armor: 0},
+            Item{item_type: ItemType::Ring, cost: 100, damage: 3, armor: 0},
+            Item{item_type: ItemType::Ring, cost: 20, damage: 0, armor: 1},
+            Item{item_type: ItemType::Ring, cost: 40, damage: 0, armor: 2},
+            Item{item_type: ItemType::Ring, cost: 80, damage: 0, armor: 3},
         ],
     };
 
@@ -52,13 +52,20 @@ struct Person {
     armor: i32,
 }
 
-enum Item {
+enum ItemType {
     // Player must buy exactly 1 weapon
-    Weapon(i32, i32, i32),
+    Weapon,
     // Player can buy 0 or 1 armor
-    Armor(i32, i32, i32),
+    Armor,
     // Player can buy 0, 1 or 2 rings
-    Ring(i32, i32, i32),
+    Ring,
+}
+
+struct Item {
+    item_type: ItemType,
+    cost: i32,
+    damage: i32,
+    armor: i32,
 }
 
 struct Shop {
@@ -93,7 +100,22 @@ fn play(boss: Person, player: Person) -> bool {
     player.hit_points > boss.hit_points
 }
 
-fn day21_part1(boss: Person, player: Person, _shop: &Shop) {
+fn find_cheapest_win(boss: Person, player: Person, shop: &Shop) -> i32 {
+    // Generate all possible layouts for the player with:
+    // - Exactly 1 weapon
+    // - 0 or 1 armor
+    // - 0, 1 or 2 rings
+    // Each player is associated with its total cost
+    let mut layouts: Vec<(Person, i32)> = vec![];
+    for weapon in shop.weapons.iter() {
+        let weapon: Item::Weapon = &weapon;
+        let new_player = player.clone();
+        new_player.damage += weapon.damage;
+    }
+    0
+}
+
+fn day21_part1(boss: Person, player: Person, shop: &Shop) {
     // Exemple tests
     let mut boss_example = boss.clone();
     boss_example.hit_points = 12;
@@ -106,8 +128,8 @@ fn day21_part1(boss: Person, player: Person, _shop: &Shop) {
     assert!(play(boss_example, player_example));
 
     // Solve puzzle
-    // let res = 
-    // println!("Result part 1: {res}");
+    let res = find_cheapest_win(boss, player, shop);
+    println!("Result part 1: {res}");
     // assert_eq!(res, );
     // println!("> DAY21 - part 1: OK!");
 }
