@@ -160,7 +160,7 @@ fn play(boss: Person, player: Person) -> bool {
     player.hit_points > boss.hit_points
 }
 
-fn find_cheapest_win(boss: Person, player: Person, shop: &Shop) -> i32 {
+fn generate_all_layouts(player: Person, shop: &Shop) -> Vec<(Person, i32)> {
     // Generate all possible layouts for the player with:
     // - Exactly 1 weapon
     // - 0 or 1 armor
@@ -232,6 +232,11 @@ fn find_cheapest_win(boss: Person, player: Person, shop: &Shop) -> i32 {
             new_cost -= first_ring.cost;
         }
     }
+    layouts
+}
+
+fn find_cheapest_win(boss: Person, player: Person, shop: &Shop) -> i32 {
+    let layouts = generate_all_layouts(player, shop);
     let mut min_cost_win = i32::MAX;
     for (player_test, cost) in layouts.iter() {
         if *cost < min_cost_win && play(boss.clone(), player_test.clone()) {
@@ -239,6 +244,17 @@ fn find_cheapest_win(boss: Person, player: Person, shop: &Shop) -> i32 {
         }
     }
     min_cost_win
+}
+
+fn find_priciest_loose(boss: Person, player: Person, shop: &Shop) -> i32 {
+    let layouts = generate_all_layouts(player, shop);
+    let mut max_cost_loose = 0;
+    for (player_test, cost) in layouts.iter() {
+        if *cost > max_cost_loose && !play(boss.clone(), player_test.clone()) {
+            max_cost_loose = *cost;
+        }
+    }
+    max_cost_loose
 }
 
 fn day21_part1(boss: Person, player: Person, shop: &Shop) {
@@ -260,14 +276,10 @@ fn day21_part1(boss: Person, player: Person, shop: &Shop) {
     println!("> DAY21 - part 1: OK!");
 }
 
-fn day21_part2(_boss: Person, _player: Person, _shop: &Shop) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-
+fn day21_part2(boss: Person, player: Person, shop: &Shop) {
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY21 - part 2: OK!");
+    let res = find_priciest_loose(boss, player, shop);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 188);
+    println!("> DAY21 - part 2: OK!");
 }
