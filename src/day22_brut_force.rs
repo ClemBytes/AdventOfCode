@@ -165,7 +165,6 @@ fn recursive_find_cheapest_mana_win(
         return i32::MAX;
     }
 
-
     // Else
     if is_player_turn {
         let mut min_mana_win = i32::MAX;
@@ -201,8 +200,13 @@ fn recursive_find_cheapest_mana_win(
 
             list_of_actions.push(action);
 
-            let res_mana =
-                recursive_find_cheapest_mana_win(boss_clone, player_clone, false, mana_used + action_mana, list_of_actions);
+            let res_mana = recursive_find_cheapest_mana_win(
+                boss_clone,
+                player_clone,
+                false,
+                mana_used + action_mana,
+                list_of_actions,
+            );
 
             list_of_actions.pop();
 

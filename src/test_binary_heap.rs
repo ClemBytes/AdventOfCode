@@ -27,10 +27,19 @@ impl PartialOrd for State {
 
 pub fn run() {
     let mut heap: BinaryHeap<State> = BinaryHeap::new();
-    heap.push(State{mana: 50, name: String::from("Bla")});
-    heap.push(State{mana: 100, name: String::from("Bli")});
-    heap.push(State{mana: 25, name: String::from("Blo")});
+    heap.push(State {
+        mana: 50,
+        name: String::from("Bla"),
+    });
+    heap.push(State {
+        mana: 100,
+        name: String::from("Bli"),
+    });
+    heap.push(State {
+        mana: 25,
+        name: String::from("Blo"),
+    });
     while !heap.is_empty() {
-        println!("{:?}", heap.pop().unwrap());   
+        println!("{:?}", heap.pop().unwrap());
     }
 }

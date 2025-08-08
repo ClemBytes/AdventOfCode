@@ -1,4 +1,8 @@
-use std::fs;
+use std::cmp::Ordering;
+use std::{
+    collections::{BinaryHeap, HashSet},
+    fs,
+};
 
 #[test]
 fn test() {
@@ -8,216 +12,243 @@ fn test() {
 pub fn run() {
     println!("------- DAY22 -------");
     let input = fs::read_to_string("inputs/input_day22").expect("Unable to read input!");
-    let boss = parse(&input);
+    let (boss_hp, boss_damage) = input.split_once("\n").unwrap();
+    let boss_hp = boss_hp.trim().split(": ").collect::<Vec<&str>>()[1]
+        .parse::<i32>()
+        .unwrap();
+    let boss_damage = boss_damage.trim().split(": ").collect::<Vec<&str>>()[1]
+        .parse::<i32>()
+        .unwrap();
 
-    let player = Player {
-        hit_points: 50,
-        mana: 500,
-        armor: 0,
-        shield_effect: 0,
-        recharge_effect: 0,
+    let initial_state_input = State {
+        mana_used: 0,
+        player_hp: 50,
+        player_mana: 500,
+        boss_hp,
+        boss_damage,
+        shield_timer: 0,
+        poison_timer: 0,
+        recharge_timer: 0,
+        turn: Turn::Player,
     };
 
-    day22_part1(boss.clone(), player.clone());
-    day22_part2(boss, player);
+    let initial_state_example1 = State {
+        mana_used: 0,
+        player_hp: 10,
+        player_mana: 250,
+        boss_hp: 13,
+        boss_damage: 8,
+        shield_timer: 0,
+        poison_timer: 0,
+        recharge_timer: 0,
+        turn: Turn::Player,
+    };
+
+    let initial_state_example2 = State {
+        mana_used: 0,
+        player_hp: 10,
+        player_mana: 250,
+        boss_hp: 14,
+        boss_damage: 8,
+        shield_timer: 0,
+        poison_timer: 0,
+        recharge_timer: 0,
+        turn: Turn::Player,
+    };
+
+    day22_part1(
+        initial_state_example1.clone(),
+        initial_state_example2.clone(),
+        initial_state_input.clone(),
+    );
+    day22_part2(
+        initial_state_example1.clone(),
+        initial_state_example2.clone(),
+        initial_state_input.clone(),
+    );
 }
 
-#[derive(Clone, Debug)]
-struct Boss {
-    hit_points: i32,
-    damage: i32,
-    // Poison deals 3 damages to the boss every turn for 6 turns
-    poison_effect: i32, // Nb of turns where this effect will still be active
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+enum Turn {
+    Player,
+    Boss,
 }
 
-#[derive(Clone, Debug)]
-struct Player {
-    hit_points: i32,
-    mana: i32,
-    armor: i32,
-    // Shield increases player's armor by 7 during 6 turns
-    shield_effect: i32, // Nb of turns where this effect will still be active
-    // Recharge increases player's mana by 101 every turn for 5 turns
-    recharge_effect: i32, // Nb of turns where this effect will still be active
-}
-
-#[derive(PartialEq, Clone, Copy, Debug)]
-enum Actions {
-    // Boss only has one action: attack
-    Attack,
-    // Player has 5 different spells
-    MagicMissile,
-    Drain,
-    Shield,
-    Poison,
-    Recharge,
-}
-
-impl Actions {
-    fn mana(&self) -> i32 {
-        match self {
-            Actions::Attack => 0, // boss action
-            Actions::MagicMissile => 53,
-            Actions::Drain => 73,
-            Actions::Shield => 113,
-            Actions::Poison => 173,
-            Actions::Recharge => 229,
-        }
-    }
-}
-
-fn parse(raw_input: &str) -> Boss {
-    let (hit_points, damage) = raw_input.split_once("\n").unwrap();
-    Boss {
-        hit_points: hit_points.trim().split(": ").collect::<Vec<&str>>()[1]
-            .parse::<i32>()
-            .unwrap(),
-        damage: damage.trim().split(": ").collect::<Vec<&str>>()[1]
-            .parse::<i32>()
-            .unwrap(),
-        poison_effect: 0,
-    }
-}
-
-fn apply_effects(boss: &mut Boss, player: &mut Player) {
-    // Poison deals 3 damages to the boss every turn for 6 turns
-    if boss.poison_effect > 0 {
-        boss.hit_points -= 3;
-        boss.poison_effect -= 1;
-    }
-
-    // Shield increases player's armor by 7 during 6 turns
-    if player.shield_effect > 0 {
-        player.armor = 7;
-        player.shield_effect -= 1;
-    } else {
-        player.armor = 0;
-    }
-
-    // Recharge increases player's mana by 101 every turn for 5 turns
-    if player.recharge_effect > 0 {
-        player.mana += 101;
-        player.recharge_effect -= 1;
-    }
-}
-
-fn play_turn(boss: &mut Boss, player: &mut Player, action: Actions) {
-    apply_effects(boss, player);
-    match action {
-        Actions::Attack => {
-            player.hit_points -= (boss.damage - player.armor).max(1);
-        }
-        Actions::MagicMissile => {
-            boss.hit_points -= 4;
-        }
-        Actions::Drain => {
-            boss.hit_points -= 2;
-            player.hit_points += 2;
-        }
-        Actions::Shield => {
-            if player.shield_effect > 0 {
-                panic!(
-                    "Player can't cast Shield when its effect is still active (for {} turns)!",
-                    player.shield_effect
-                );
-            }
-            player.shield_effect = 6;
-        }
-        Actions::Poison => {
-            if boss.poison_effect > 0 {
-                panic!(
-                    "Player can't cast Poison when its effect is still active (for {} turns)!",
-                    boss.poison_effect
-                );
-            }
-            boss.poison_effect = 6;
-        }
-        Actions::Recharge => {
-            if player.recharge_effect > 0 {
-                panic!(
-                    "Player can't cast Recharge when its effect is still active (for {} turns)!",
-                    player.recharge_effect
-                );
-            }
-            player.recharge_effect = 5;
-        }
-    }
-}
-
-fn recursive_find_cheapest_mana_win(
-    boss: Boss,
-    player: Player,
-    is_player_turn: bool,
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+struct State {
+    // All mana already spent
     mana_used: i32,
-) -> i32 {
-    // This function returns how much mana was used during the game (and i32::MAX if lose)
-    // Check if already win or lose
-    if boss.hit_points <= 0 {
-        // WIN!
-        return mana_used;
-    } else if player.hit_points <= 0 {
-        // Lose…
-        return i32::MAX;
+    // Player infos
+    player_hp: i32,
+    player_mana: i32,
+    // Boss infos
+    boss_hp: i32,
+    boss_damage: i32,
+    // Effects timers
+    shield_timer: i32,
+    poison_timer: i32,
+    recharge_timer: i32,
+    // Whose turn
+    turn: Turn,
+}
+
+impl Ord for State {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // Other and self inversed to do a MIN-heap
+        other.mana_used.cmp(&self.mana_used)
+    }
+}
+
+impl PartialOrd for State {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl State {
+    fn apply_effects(&self) -> Self {
+        let mut new_state = self.clone();
+        if self.shield_timer > 0 {
+            new_state.shield_timer -= 1;
+        }
+        if self.poison_timer > 0 {
+            new_state.boss_hp -= 3;
+            new_state.poison_timer -= 1;
+        }
+        if self.recharge_timer > 0 {
+            new_state.player_mana += 101;
+            new_state.recharge_timer -= 1;
+        }
+        new_state
     }
 
-    // Else
-    if is_player_turn {
-        let mut min_mana_win = i32::MAX;
-        let player_actions = vec![
-            Actions::MagicMissile,
-            Actions::Drain,
-            Actions::Shield,
-            Actions::Poison,
-            Actions::Recharge,
-        ];
-        for action in player_actions {
-            // Can't do an action with effect if effect already active
-            if action == Actions::Shield && player.shield_effect > 0 {
-                continue;
-            }
-            if action == Actions::Poison && boss.poison_effect > 0 {
-                continue;
-            }
-            if action == Actions::Recharge && player.recharge_effect > 0 {
-                continue;
+    fn next_states(&self) -> Vec<Self> {
+        let mut next_possible_states: Vec<State> = vec![];
+        let mut state = self.apply_effects();
+
+        match state.turn {
+            Turn::Player => {
+                state.turn = Turn::Boss;
+
+                // Magic Missile
+                let magic_missile_cost = 53;
+                if state.player_mana >= magic_missile_cost {
+                    let mut new_state = state.clone();
+                    new_state.boss_hp -= 4;
+                    new_state.player_mana -= magic_missile_cost;
+                    new_state.mana_used += magic_missile_cost;
+                    next_possible_states.push(new_state);
+                }
+
+                // Drain
+                let drain_cost = 73;
+                if state.player_mana >= drain_cost {
+                    let mut new_state = state.clone();
+                    new_state.boss_hp -= 2;
+                    new_state.player_hp += 2;
+                    new_state.player_mana -= drain_cost;
+                    new_state.mana_used += drain_cost;
+                    next_possible_states.push(new_state);
+                }
+
+                // Shield
+                let shield_cost = 113;
+                if state.player_mana >= shield_cost && state.shield_timer == 0 {
+                    let mut new_state = state.clone();
+                    new_state.shield_timer = 6;
+                    new_state.player_mana -= shield_cost;
+                    new_state.mana_used += shield_cost;
+                    next_possible_states.push(new_state);
+                }
+
+                // Poison
+                let poison_cost = 173;
+                if state.player_mana >= poison_cost && state.poison_timer == 0 {
+                    let mut new_state = state.clone();
+                    new_state.poison_timer = 6;
+                    new_state.player_mana -= poison_cost;
+                    new_state.mana_used += poison_cost;
+                    next_possible_states.push(new_state);
+                }
+
+                // Recharge
+                let recharge_cost = 229;
+                if state.player_mana >= recharge_cost && state.recharge_timer == 0 {
+                    let mut new_state = state.clone();
+                    new_state.recharge_timer = 5;
+                    new_state.player_mana -= recharge_cost;
+                    new_state.mana_used += recharge_cost;
+                    next_possible_states.push(new_state);
+                }
             }
 
-            let action_mana = action.mana();
-            // Can't do an action if not enough mana
-            if player.mana < action_mana {
-                continue;
-            }
-
-            let mut boss_clone = boss.clone();
-            let mut player_clone = player.clone();
-            player_clone.mana -= action_mana;
-            play_turn(&mut boss_clone, &mut player_clone, action);
-
-            let res_mana =
-                recursive_find_cheapest_mana_win(boss_clone, player_clone, false, mana_used + action_mana);
-
-            if res_mana < min_mana_win {
-                min_mana_win = res_mana;
+            Turn::Boss => {
+                state.turn = Turn::Player;
+                let player_armor = if state.shield_timer > 0 { 7 } else { 0 };
+                state.player_hp -= (state.boss_damage - player_armor).max(1);
+                next_possible_states.push(state);
             }
         }
-        min_mana_win
-    } else {
-        let mut boss_clone = boss.clone();
-        let mut player_clone = player.clone();
-        play_turn(&mut boss_clone, &mut player_clone, Actions::Attack);
-        recursive_find_cheapest_mana_win(boss_clone, player_clone, true, mana_used)
+        next_possible_states
     }
 }
 
-fn day22_part1(boss: Boss, player: Player) {
-    // Solve puzzle
-    let res = recursive_find_cheapest_mana_win(boss, player, true, 0);
-    println!("Result part 1: {res}");
-    // assert_eq!(res, ); // 932 is too low, 1415 is too high
-    // println!("> DAY22 - part 1: OK!");
+fn find_cheapest_mana_win_dijkstra(initial_state: State) -> i32 {
+    let mut seen_states: HashSet<State> = HashSet::new();
+    let mut min_heap: BinaryHeap<State> = BinaryHeap::new();
+    min_heap.push(initial_state);
+    while let Some(current_state) = min_heap.pop() {
+        // State already visited?
+        // TODO: merge contains and insert with Entry
+        if seen_states.contains(&current_state) {
+            continue;
+        }
+        seen_states.insert(current_state.clone());
+
+        // Win?
+        if current_state.boss_hp <= 0 {
+            return current_state.mana_used;
+        }
+
+        // Lose?
+        if current_state.player_hp <= 0 {
+            continue;
+        }
+
+        // Else: add neighbors to heap
+        for next_state in current_state.next_states() {
+            min_heap.push(next_state);
+        }
+    }
+    unreachable!();
 }
 
-fn day22_part2(_boss: Boss, _player: Player) {
+fn day22_part1(
+    initial_state_example1: State,
+    initial_state_example2: State,
+    initial_state_input: State,
+) {
+    // Exemple tests
+    let res = find_cheapest_mana_win_dijkstra(initial_state_example1);
+    println!("Result example 1 part 1: {res}");
+    assert_eq!(res, 226);
+
+    let res = find_cheapest_mana_win_dijkstra(initial_state_example2);
+    println!("Result example 2 part 1: {res}");
+    assert_eq!(res, 641);
+
+    // Solve puzzle
+    let res = find_cheapest_mana_win_dijkstra(initial_state_input);
+    println!("Result part 1: {res}");
+    assert_eq!(res, 1269); // 932 is too low, 1415 is too high, 1093 not Ok, should be 1269
+    println!("> DAY22 - part 1: OK!");
+}
+
+fn day22_part2(
+    _initial_state_example1: State,
+    _initial_state_example2: State,
+    _initial_state_input: State,
+) {
     println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);
