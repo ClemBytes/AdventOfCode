@@ -18,8 +18,7 @@ pub fn run() {
         recharge_effect: 0,
     };
 
-    day22_part1(boss.clone(), player.clone());
-    day22_part2(boss, player);
+    day22_part1(boss, player);
 }
 
 #[derive(Clone, Debug)]
@@ -155,13 +154,9 @@ fn recursive_find_cheapest_mana_win(
     // Check if already win or lose
     if boss.hit_points <= 0 {
         // WIN!
-        // println!("WIN: mana used: {mana_used}\n{list_of_actions:?}\n");
         return mana_used;
     } else if player.hit_points <= 0 {
         // Lose…
-        if mana_used < 1415 && mana_used > 932 {
-            // println!("Lose: {mana_used}\n{player:?}\n{boss:?}\n{list_of_actions:?}\n");
-        }
         return i32::MAX;
     }
 
@@ -180,7 +175,8 @@ fn recursive_find_cheapest_mana_win(
             if action == Actions::Shield && player.shield_effect > 0 {
                 continue;
             }
-            if action == Actions::Poison && boss.poison_effect > 0 {
+            if action == Actions::Poison && boss.poison_effect > 1 {
+                // > 1 because we consider that before applying effects, and we should not
                 continue;
             }
             if action == Actions::Recharge && player.recharge_effect > 0 {
@@ -246,18 +242,6 @@ fn day22_part1(boss: Boss, player: Player) {
     // Solve puzzle
     let res = recursive_find_cheapest_mana_win(boss, player, true, 0, &mut vec![]);
     println!("Result part 1: {res}");
-    // assert_eq!(res, ); // 932 is too low, 1415 is too high
-    // println!("> DAY22 - part 1: OK!");
-}
-
-fn day22_part2(_boss: Boss, _player: Player) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-
-    // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY22 - part 2: OK!");
+    assert_eq!(res, 1269);
+    println!("> DAY22 - part 1: OK!");
 }
