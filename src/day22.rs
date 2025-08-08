@@ -206,7 +206,6 @@ fn find_cheapest_mana_win_dijkstra(initial_state: State) -> i32 {
     min_heap.push(initial_state);
     while let Some(current_state) = min_heap.pop() {
         // State already visited?
-        // TODO: merge contains and insert with Entry
         if seen_states.contains(&current_state) {
             continue;
         }
