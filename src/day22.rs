@@ -20,7 +20,7 @@ pub fn run() {
         .parse::<i32>()
         .unwrap();
 
-    let initial_state_input = State {
+    let mut initial_state_input = State {
         mana_used: 0,
         player_hp: 50,
         player_mana: 500,
@@ -30,6 +30,7 @@ pub fn run() {
         poison_timer: 0,
         recharge_timer: 0,
         turn: Turn::Player,
+        hard: false,
     };
 
     let initial_state_example1 = State {
@@ -42,6 +43,7 @@ pub fn run() {
         poison_timer: 0,
         recharge_timer: 0,
         turn: Turn::Player,
+        hard: false,
     };
 
     let initial_state_example2 = State {
@@ -54,6 +56,7 @@ pub fn run() {
         poison_timer: 0,
         recharge_timer: 0,
         turn: Turn::Player,
+        hard: false,
     };
 
     day22_part1(
@@ -61,11 +64,9 @@ pub fn run() {
         initial_state_example2.clone(),
         initial_state_input.clone(),
     );
-    day22_part2(
-        initial_state_example1.clone(),
-        initial_state_example2.clone(),
-        initial_state_input.clone(),
-    );
+
+    initial_state_input.hard = true;
+    day22_part2(initial_state_input.clone());
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
@@ -90,6 +91,8 @@ struct State {
     recharge_timer: i32,
     // Whose turn
     turn: Turn,
+    // Difficulty
+    hard: bool,
 }
 
 impl Ord for State {
@@ -124,7 +127,11 @@ impl State {
 
     fn next_states(&self) -> Vec<Self> {
         let mut next_possible_states: Vec<State> = vec![];
-        let mut state = self.apply_effects();
+        let mut state = self.clone();
+        if state.hard && state.turn == Turn::Player {
+            state.player_hp -= 1;
+        }
+        let mut state = state.apply_effects();
 
         match state.turn {
             Turn::Player => {
@@ -244,18 +251,10 @@ fn day22_part1(
     println!("> DAY22 - part 1: OK!");
 }
 
-fn day22_part2(
-    _initial_state_example1: State,
-    _initial_state_example2: State,
-    _initial_state_input: State,
-) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-
+fn day22_part2(initial_state_input: State) {
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY22 - part 2: OK!");
+    let res = find_cheapest_mana_win_dijkstra(initial_state_input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 1309);
+    println!("> DAY22 - part 2: OK!");
 }
