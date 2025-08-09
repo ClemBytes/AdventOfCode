@@ -19,7 +19,7 @@ pub fn run() {
     let input = parse(&input);
 
     day23_part1(&example, &input);
-    day23_part2(&example, &input);
+    day23_part2(&input);
 }
 
 fn parse(raw_input: &str) -> Vec<Instructions> {
@@ -109,9 +109,9 @@ enum Instructions {
     JumpIfOne(Register, i32),
 }
 
-fn program(instructions: &[Instructions]) -> (u32, u32) {
-    let mut a = 0;
-    let mut b = 0;
+fn program(instructions: &[Instructions], start_a: u32, start_b: u32) -> (u32, u32) {
+    let mut a = start_a;
+    let mut b = start_b;
     let mut index: i32 = 0;
     while (index as usize) < instructions.len() && index >= 0 {
         match &instructions[index as usize] {
@@ -180,25 +180,21 @@ fn program(instructions: &[Instructions]) -> (u32, u32) {
 
 fn day23_part1(example: &[Instructions], input: &[Instructions]) {
     // Exemple tests
-    let (a, b) = program(example);
+    let (a, b) = program(example, 0, 0);
     println!("Result example part 1: a = {a} | b = {b}");
     assert_eq!(a, 2);
 
     // Solve puzzle
-    let (a, b) = program(input);
+    let (a, b) = program(input, 0, 0);
     println!("Result part 1: a = {a} | b = {b}");
     assert_eq!(b, 307);
     println!("> DAY23 - part 1: OK!");
 }
 
-fn day23_part2(_example: &[Instructions], _input: &[Instructions]) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-
+fn day23_part2(input: &[Instructions]) {
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY23 - part 2: OK!");
+    let (a, b) = program(input, 1, 0);
+    println!("Result part 1: a = {a} | b = {b}");
+    assert_eq!(b, 160);
+    println!("> DAY23 - part 2: OK!");
 }
