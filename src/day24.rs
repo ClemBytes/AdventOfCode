@@ -1,6 +1,5 @@
-use std::cmp::Ordering;
 use std::{
-    collections::{VecDeque, HashSet},
+    collections::VecDeque,
     fs,
 };
 
@@ -22,226 +21,123 @@ pub fn run() {
     day24_part2(&example, &input);
 }
 
-#[derive(PartialEq, Eq, Debug, Clone, Hash)]
-struct State {
-    group1: Vec<u64>,
-    packages_to_fit: Vec<u64>,
-    others: Vec<u64>,
-}
-
-fn can_be_balanced_in_2_groups(mut list_of_packages: Vec<u64>) -> bool {
-    let nb_packages = list_of_packages.len();
-    match nb_packages {
-        0 => true,
-        1 => false,
-        2 => list_of_packages[0] == list_of_packages[1],
-        _ => {
-            let last = list_of_packages.pop().unwrap();
-            for i in 0..list_of_packages.len() {
-                let mut list = list_of_packages.clone();
-                list[i] += last;
-                if can_be_balanced_in_2_groups(list) {
-                    return true;
-                }
-            }
-            false
-        }
-    }
-}
-
 // #[test]
-// fn test_can_be_balanced_in_2_groups() {
-//     assert!(can_be_balanced_in_2_groups(vec![5, 5]));
-//     assert!(!can_be_balanced_in_2_groups(vec![2, 3]));
-//     assert!(can_be_balanced_in_2_groups(vec![2, 5, 3]));
-//     assert!(!can_be_balanced_in_2_groups(vec![2, 2, 1]));
-//     assert!(!can_be_balanced_in_2_groups(vec![]));
-//     assert!(!can_be_balanced_in_2_groups(vec![42]));
-//     assert!(can_be_balanced_in_2_groups(vec![3, 3, 3, 3]));
-//     assert!(can_be_balanced_in_2_groups(vec![10, 20, 15, 5]));
-//     assert!(!can_be_balanced_in_2_groups(vec![1, 1, 1]));
-//     assert!(!can_be_balanced_in_2_groups(vec![1, 2, 100]));
-//     assert!(can_be_balanced_in_2_groups(vec![0, 0, 5, 5]));
-//     assert!(!can_be_balanced_in_2_groups(vec![0, 1, 2]));
-//     assert!(!can_be_balanced_in_2_groups(vec![
-//         1, 2, 3, 4, 5, 6, 7, 8, 9
-//     ]));
-//     assert!(can_be_balanced_in_2_groups(vec![
-//         1, 2, 3, 4, 6, 10, 8, 2, 4, 10
-//     ]));
-//     assert!(can_be_balanced_in_2_groups(vec![10; 20]));
-//     assert!(can_be_balanced_in_2_groups(vec![
-//         100, 200, 300, 400, 500, 600, 700, 800
-//     ]));
-//     assert!(!can_be_balanced_in_2_groups(vec![
-//         2, 4, 6, 8, 10, 12, 14, 16, 18
-//     ]));
+// fn testlkjlkja() {
+//     let bla = can_be_balanced_in_3_groups(&[1, 3, 5, 11, 13, 17, 19, 23, 29, 31, 41, 43, 47, 53, 59, 107, 101, 97, 89, 83, 79, 73, 71, 67]);
+//     println!("{bla}");
+// // }
+
+// fn nb_packages_group1(state: Vec<u8>) -> u8 {
+//     state.iter().sum()
 // }
 
-fn can_be_balanced_in_3_groups(input: &[u64]) -> bool {
-    let initial_state = State::from_packages(input);
-    let mut q: VecDeque<State> = VecDeque::new();
-    q.push_back(initial_state);
-    while let Some(current_state) = q.pop_front() {
-        // Found solution?
-        if current_state.can_be_balanced_part1() {
-            return true;
-        }
-
-        // Else: add neighbors to heap
-        for next_state in current_state.next_states() {
-            q.push_back(next_state);
+fn quantum_entanglement(state: &[u64], list_of_packages: &[u64]) -> u64 {
+    let mut qe = 1;
+    for (i, is_in_group1) in state.iter().enumerate() {
+        if *is_in_group1 == 1 {
+            qe *= list_of_packages[i];
         }
     }
-    false
+    qe
 }
+
+fn can_be_balanced(list_of_packages: &[u64], used: &mut Vec<u64>, target_weight: u64, used_weight: u64, nb_groups: usize) -> bool {
+    // Only one group or no packages to balance: trivially OK
+    if nb_groups == 1 {
+        return true;
+    }
+
+    if used_weight == target_weight {
+        can_be_balanced(list_of_packages, used, target_weight, used_weight, nb_groups - 1)
+    } else {
+        // Find last package added
+        let mut next_package_index = 0;
+        for (i, package) in used.iter().enumerate() {
+            if *package == 1 {
+                next_package_index = i + 1;
+            }
+        }
+        // Try to add each packages after that
+        for i in next_package_index..list_of_packages.len() {
+            used[i] = 1;
+            if can_be_balanced(list_of_packages, used, target_weight, used_weight, nb_groups) {
+                return true;
+            }
+            used[i] = 0;
+        }
+        false
+    }
+}
+
+/*
+#[test]
+fn test_find_subset() {
+    // Test possible subset
+    assert!(find_subset(&[1, 5, 2, 6, 3, 4, 8], &mut vec![0, 1, 0, 1, 0, 0, 1], 5));
+    assert!(find_subset(&[1, 5, 2, 6, 3, 4, 8], &mut vec![0, 1, 0, 1, 0, 1, 1], 3));
+    assert!(find_subset(&[1, 2, 3, 3, 4, 5, 9, 12], &mut vec![0, 1, 0, 0, 1, 0, 1, 1], 6));
+    // Test impossible subset
+    assert!(!find_subset(&[3, 7], &mut vec![0, 0], 5));
+    assert!(!find_subset(&[3, 3, 4], &mut vec![0, 0, 0], 5));
+    assert!(!find_subset(&[1, 2, 3, 3, 4, 5, 9, 12], &mut vec![1, 0, 1, 1, 1, 1, 1, 0], 7));
+}
+*/
 
 #[test]
-fn testlkjlkja() {
-    let bla = can_be_balanced_in_3_groups(&[1, 3, 5, 11, 13, 17, 19, 23, 29, 31, 41, 43, 47, 53, 59, 107, 101, 97, 89, 83, 79, 73, 71, 67]);
-    println!("{bla}");
+fn test_can_be_balanced() {
+    // Balance 3 groups
+    /*
+    assert!(!can_be_balanced(&[1, 2, 3, 4, 5], &mut vec![0, 0, 0, 0, 0], 5, 3)); // [] is used, can't do 0 whith the others
+    assert!(can_be_balanced(&[1, 2, 3, 4, 5], &mut vec![0, 0, 0, 0, 1], 5, 3)); // [5] is used, can do [1, 4] = 5 and [2, 3] = 5
+    assert!(can_be_balanced(&[5, 5, 5], &mut vec![0, 0, 1], 5, 3)); // [5] is used, can do [5] = 5 and [5] = 5
+    assert!(!can_be_balanced(&[1, 2, 3], &mut vec![1, 0, 0], 3)); // [1] is used and no possibility to do 1 with 2 and 3
+    assert!(can_be_balanced(&[2, 4, 2, 1, 3], &mut vec![0, 1, 0, 0, 0], 3)); // [4] is used and can do [2, 2] = 4 and [1, 3] = 4
+    assert!(!can_be_balanced(&[1, 2, 4, 2, 1, 3], &mut vec![1, 0, 1, 0, 0, 0], 3)); // [1, 4] = 5 is used and can do [1, 2, 2] = 5 but then [3] != 5
+    assert!(!can_be_balanced(&[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], &mut vec![0, 1, 0, 1, 0, 1, 0, 1, 0, 1], 3)); // [1, 1, 1, 1, 1] = 5 is used and then we can do [1, 1, 1, 1, 1] = 5 but then [] != 5
+    assert!(can_be_balanced(&[1, 1, 1, 1, 1, 1, 1, 1, 1], &mut vec![0, 1, 0, 0, 0, 0, 0, 1, 1], 3)); // [1, 1, 1] = 3 is used; can do twice [1, 1, 1] = 3
+    */
 }
 
-impl State {
-    fn from_packages(list_packages: &[u64]) -> Self {
-        State {
-            packages_to_fit: list_packages.to_owned(),
-            group1: vec![],
-            others: vec![],
-        }
-    }
+fn find_ideal_configuration(list_of_packages: &[u64], nb_groups: usize) -> u64 {
+    let total_weight: u64 = list_of_packages.iter().sum();
+    assert_eq!(total_weight % (nb_groups as u64), 0);
+    let target_weight: u64 = total_weight / (nb_groups as u64);
 
-    fn can_be_balanced_part1(&self) -> bool {
-        let weight_group1: u64 = self.group1.iter().sum();
-        let weight_others: u64 = self.others.iter().sum();
-        let weight_left: u64 = self.packages_to_fit.iter().sum();
-        let total_weight: u64 = weight_group1 + weight_others + weight_left;
-        if total_weight % 3 != 0 {
-            return false;
-        }
-        let target_weight = total_weight / 3;
-        if weight_group1 != target_weight {
-            return false;
-        }
-        can_be_balanced_in_2_groups([self.others.clone(), self.packages_to_fit.clone()].concat())
-    }
-
-    fn can_be_balanced_part2(&self) -> bool {
-        println!("a");
-        let weight_group1: u64 = self.group1.iter().sum();
-        let weight_others: u64 = self.others.iter().sum();
-        let weight_left: u64 = self.packages_to_fit.iter().sum();
-        let total_weight: u64 = weight_group1 + weight_others + weight_left;
-        if total_weight % 4 != 0 {
-        println!("b");
-            return false;
-        }
-        let target_weight = total_weight / 4;
-        if weight_group1 != target_weight {
-        println!("b");
-            return false;
-        }
-        let x = can_be_balanced_in_3_groups(&[self.others.clone(), self.packages_to_fit.clone()].concat());
-
-        println!("c");
-        x
-    }
-
-    fn next_states(&self) -> Vec<Self> {
-        let mut next: Vec<State> = vec![];
-        let next_state = &mut self.clone();
-        while let Some(new_package) = next_state.packages_to_fit.pop() {
-            // Add it to group1
-            next_state.group1.push(new_package);
-            next.push(next_state.clone());
-            // Take it off group1
-            next_state.group1.pop();
-            // Add it to others
-            next_state.others.push(new_package);
-        }
-        next
-    }
-}
-
-impl Ord for State {
-    fn cmp(&self, other: &Self) -> Ordering {
-        // Other and self inversed to do a MIN-heap
-        other.group1.len().cmp(&self.group1.len()).then(
-            other
-                .group1
-                .iter()
-                .product::<u64>()
-                .cmp(&self.group1.iter().product::<u64>()),
-        )
-    }
-}
-
-impl PartialOrd for State {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-fn find_ideal_configuration_part1(input: &[u64]) -> u64 {
-    let initial_state = State::from_packages(input);
-    let mut seen_states: HashSet<State> = HashSet::new();
-    let mut q: VecDeque<State> = VecDeque::new();
-    q.push_back(initial_state);
-    while let Some(current_state) = q.pop_front() {
-        // State already visited?
-        if seen_states.contains(&current_state) {
-            continue;
-        }
-        seen_states.insert(current_state.clone());
-        // println!("{:?}", current_state);
-
-        // Found solution?
-        if current_state.can_be_balanced_part1() {
-            return current_state.group1.iter().product::<u64>();
+    let nb_packages_total = list_of_packages.len();
+    let initial_state: Vec<u64> = vec![0; nb_packages_total];
+    let mut q: VecDeque<(Vec<u64>, u64)> = VecDeque::new();
+    q.push_back((initial_state, 0));
+    while let Some((mut used, used_weight)) = q.pop_front() {
+        if used_weight == target_weight && can_be_balanced(list_of_packages, &mut used, target_weight, used_weight, nb_groups - 1) {
+            return quantum_entanglement(&used, list_of_packages);
         }
 
         // Else: add neighbors to heap
-        for next_state in current_state.next_states() {
-            q.push_back(next_state);
+        // Find last package added
+        let mut next_package_index = 0;
+        for (i, is_used) in used.iter().enumerate() {
+            if *is_used == 1 {
+                next_package_index = i + 1;
+            }
+        }
+        // Try to add each packages after that
+        for i in next_package_index..nb_packages_total {
+            used[i] = 1;
+            q.push_back((used.clone(), used_weight + list_of_packages[i]));
+            used[i] = 0;
         }
     }
-    unreachable!();
-}
-
-fn find_ideal_configuration_part2(input: &[u64]) -> u64 {
-    let initial_state = State::from_packages(input);
-    let mut seen_states: HashSet<State> = HashSet::new();
-    let mut q: VecDeque<State> = VecDeque::new();
-    q.push_back(initial_state);
-    while let Some(current_state) = q.pop_front() {
-        // State already visited?
-        if seen_states.contains(&current_state) {
-            continue;
-        }
-        seen_states.insert(current_state.clone());
-        println!("{:?}", current_state);
-
-        // Found solution?
-        if current_state.can_be_balanced_part2() {
-            return current_state.group1.iter().product::<u64>();
-        }
-
-        // Else: add neighbors to heap
-        for next_state in current_state.next_states() {
-            q.push_back(next_state);
-        }
-    }
-    unreachable!();
+    unreachable!()
 }
 
 fn day24_part1(example: &[u64], input: &[u64]) {
     // Exemple tests
-    let res = find_ideal_configuration_part1(example);
+    let res = find_ideal_configuration(example, 3);
     println!("Result example part 1: {res}");
     assert_eq!(res, 99);
 
     // Solve puzzle
-    let res = find_ideal_configuration_part1(input);
+    let res = find_ideal_configuration(input, 3);
     println!("Result part 1: {res}");
     assert_eq!(res, 11266889531); // 22554787 is too low, 326440069283 is too high
     println!("> DAY24 - part 1: OK!");
@@ -249,12 +145,12 @@ fn day24_part1(example: &[u64], input: &[u64]) {
 
 fn day24_part2(example: &[u64], input: &[u64]) {
     // Exemple tests
-    let res = find_ideal_configuration_part2(example);
+    let res = find_ideal_configuration(example, 4);
     println!("Result example part 2: {res}");
     assert_eq!(res, 44);
 
     // Solve puzzle
-    let res = find_ideal_configuration_part2(input);
+    let res = find_ideal_configuration(input, 4);
     println!("Result part 2: {res}");
     assert_eq!(res, 77387711);
     println!("> DAY24 - part 2: OK!");
