@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 use std::{
-    collections::{BinaryHeap, HashSet},
+    collections::{VecDeque, HashSet},
     fs,
 };
 
@@ -24,8 +24,8 @@ pub fn run() {
 
 #[derive(PartialEq, Eq, Debug, Clone, Hash)]
 struct State {
-    packages_to_fit: Vec<u64>,
     group1: Vec<u64>,
+    packages_to_fit: Vec<u64>,
     others: Vec<u64>,
 }
 
@@ -80,32 +80,26 @@ fn can_be_balanced_in_2_groups(mut list_of_packages: Vec<u64>) -> bool {
 
 fn can_be_balanced_in_3_groups(input: &[u64]) -> bool {
     let initial_state = State::from_packages(input);
-    let mut seen_states: HashSet<State> = HashSet::new();
-    let mut min_heap: BinaryHeap<State> = BinaryHeap::new();
-    min_heap.push(initial_state);
-    while let Some(current_state) = min_heap.pop() {
-        // State already visited?
-        if seen_states.contains(&current_state) {
-            continue;
-        }
-        seen_states.insert(current_state.clone());
-
-        // Finish?
-        if current_state.packages_to_fit.is_empty() {
-            // Found solution?
-            if current_state.can_be_balanced_part1() {
-                return true;
-            }
-            // Not a solution:
-            continue;
+    let mut q: VecDeque<State> = VecDeque::new();
+    q.push_back(initial_state);
+    while let Some(current_state) = q.pop_front() {
+        // Found solution?
+        if current_state.can_be_balanced_part1() {
+            return true;
         }
 
         // Else: add neighbors to heap
         for next_state in current_state.next_states() {
-            min_heap.push(next_state);
+            q.push_back(next_state);
         }
     }
     false
+}
+
+#[test]
+fn testlkjlkja() {
+    let bla = can_be_balanced_in_3_groups(&[1, 3, 5, 11, 13, 17, 19, 23, 29, 31, 41, 43, 47, 53, 59, 107, 101, 97, 89, 83, 79, 73, 71, 67]);
+    println!("{bla}");
 }
 
 impl State {
@@ -129,36 +123,42 @@ impl State {
         if weight_group1 != target_weight {
             return false;
         }
-        can_be_balanced_in_2_groups(self.others.clone())
+        can_be_balanced_in_2_groups([self.others.clone(), self.packages_to_fit.clone()].concat())
     }
 
     fn can_be_balanced_part2(&self) -> bool {
+        println!("a");
         let weight_group1: u64 = self.group1.iter().sum();
         let weight_others: u64 = self.others.iter().sum();
         let weight_left: u64 = self.packages_to_fit.iter().sum();
         let total_weight: u64 = weight_group1 + weight_others + weight_left;
         if total_weight % 4 != 0 {
+        println!("b");
             return false;
         }
         let target_weight = total_weight / 4;
         if weight_group1 != target_weight {
+        println!("b");
             return false;
         }
-        can_be_balanced_in_3_groups(&self.others)
+        let x = can_be_balanced_in_3_groups(&[self.others.clone(), self.packages_to_fit.clone()].concat());
+
+        println!("c");
+        x
     }
 
     fn next_states(&self) -> Vec<Self> {
         let mut next: Vec<State> = vec![];
         let next_state = &mut self.clone();
-        let new_package = next_state.packages_to_fit.pop().unwrap();
-        // Add it to group1
-        next_state.group1.push(new_package);
-        next.push(next_state.clone());
-        // Take it off group1
-        next_state.group1.pop();
-        // Add it to others
-        next_state.others.push(new_package);
-        next.push(next_state.clone());
+        while let Some(new_package) = next_state.packages_to_fit.pop() {
+            // Add it to group1
+            next_state.group1.push(new_package);
+            next.push(next_state.clone());
+            // Take it off group1
+            next_state.group1.pop();
+            // Add it to others
+            next_state.others.push(new_package);
+        }
         next
     }
 }
@@ -185,28 +185,24 @@ impl PartialOrd for State {
 fn find_ideal_configuration_part1(input: &[u64]) -> u64 {
     let initial_state = State::from_packages(input);
     let mut seen_states: HashSet<State> = HashSet::new();
-    let mut min_heap: BinaryHeap<State> = BinaryHeap::new();
-    min_heap.push(initial_state);
-    while let Some(current_state) = min_heap.pop() {
+    let mut q: VecDeque<State> = VecDeque::new();
+    q.push_back(initial_state);
+    while let Some(current_state) = q.pop_front() {
         // State already visited?
         if seen_states.contains(&current_state) {
             continue;
         }
         seen_states.insert(current_state.clone());
+        // println!("{:?}", current_state);
 
-        // Finish?
-        if current_state.packages_to_fit.is_empty() {
-            // Found solution?
-            if current_state.can_be_balanced_part1() {
-                return current_state.group1.iter().product::<u64>();
-            }
-            // Not a solution:
-            continue;
+        // Found solution?
+        if current_state.can_be_balanced_part1() {
+            return current_state.group1.iter().product::<u64>();
         }
 
         // Else: add neighbors to heap
         for next_state in current_state.next_states() {
-            min_heap.push(next_state);
+            q.push_back(next_state);
         }
     }
     unreachable!();
@@ -215,28 +211,24 @@ fn find_ideal_configuration_part1(input: &[u64]) -> u64 {
 fn find_ideal_configuration_part2(input: &[u64]) -> u64 {
     let initial_state = State::from_packages(input);
     let mut seen_states: HashSet<State> = HashSet::new();
-    let mut min_heap: BinaryHeap<State> = BinaryHeap::new();
-    min_heap.push(initial_state);
-    while let Some(current_state) = min_heap.pop() {
+    let mut q: VecDeque<State> = VecDeque::new();
+    q.push_back(initial_state);
+    while let Some(current_state) = q.pop_front() {
         // State already visited?
         if seen_states.contains(&current_state) {
             continue;
         }
         seen_states.insert(current_state.clone());
+        println!("{:?}", current_state);
 
-        // Finish?
-        if current_state.packages_to_fit.is_empty() {
-            // Found solution?
-            if current_state.can_be_balanced_part2() {
-                return current_state.group1.iter().product::<u64>();
-            }
-            // Not a solution:
-            continue;
+        // Found solution?
+        if current_state.can_be_balanced_part2() {
+            return current_state.group1.iter().product::<u64>();
         }
 
         // Else: add neighbors to heap
         for next_state in current_state.next_states() {
-            min_heap.push(next_state);
+            q.push_back(next_state);
         }
     }
     unreachable!();
@@ -258,7 +250,7 @@ fn day24_part1(example: &[u64], input: &[u64]) {
 fn day24_part2(example: &[u64], input: &[u64]) {
     // Exemple tests
     let res = find_ideal_configuration_part2(example);
-    println!("Result example part 1: {res}");
+    println!("Result example part 2: {res}");
     assert_eq!(res, 44);
 
     // Solve puzzle
