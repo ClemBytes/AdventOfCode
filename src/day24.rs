@@ -1,7 +1,4 @@
-use std::{
-    collections::VecDeque,
-    fs,
-};
+use std::{collections::VecDeque, fs};
 
 #[test]
 fn test() {
@@ -31,14 +28,26 @@ fn quantum_entanglement(state: &[u64], list_of_packages: &[u64]) -> u64 {
     qe
 }
 
-fn can_be_balanced(list_of_packages: &[u64], used: &mut Vec<u64>, target_weight: u64, used_weight: u64, nb_groups: usize) -> bool {
+fn can_be_balanced(
+    list_of_packages: &[u64],
+    used: &mut Vec<u64>,
+    target_weight: u64,
+    used_weight: u64,
+    nb_groups: usize,
+) -> bool {
     // Only one group: trivially OK
     if nb_groups == 1 {
         return true;
     }
 
     if used_weight == target_weight {
-        can_be_balanced(list_of_packages, used, target_weight, used_weight, nb_groups - 1)
+        can_be_balanced(
+            list_of_packages,
+            used,
+            target_weight,
+            used_weight,
+            nb_groups - 1,
+        )
     } else {
         // Find last package added
         let mut next_package_index = 0;
@@ -50,7 +59,13 @@ fn can_be_balanced(list_of_packages: &[u64], used: &mut Vec<u64>, target_weight:
         // Try to add each packages after that
         for i in next_package_index..list_of_packages.len() {
             used[i] = 1;
-            if can_be_balanced(list_of_packages, used, target_weight, used_weight, nb_groups) {
+            if can_be_balanced(
+                list_of_packages,
+                used,
+                target_weight,
+                used_weight,
+                nb_groups,
+            ) {
                 return true;
             }
             used[i] = 0;
@@ -69,7 +84,15 @@ fn find_ideal_configuration(list_of_packages: &[u64], nb_groups: usize) -> u64 {
     let mut q: VecDeque<(Vec<u64>, u64)> = VecDeque::new();
     q.push_back((initial_state, 0));
     while let Some((mut used, used_weight)) = q.pop_front() {
-        if used_weight == target_weight && can_be_balanced(list_of_packages, &mut used, target_weight, used_weight, nb_groups - 1) {
+        if used_weight == target_weight
+            && can_be_balanced(
+                list_of_packages,
+                &mut used,
+                target_weight,
+                used_weight,
+                nb_groups - 1,
+            )
+        {
             return quantum_entanglement(&used, list_of_packages);
         }
 

@@ -54,8 +54,8 @@ cargo test --release -- --nocapture dayXX
 
 ## 🚧 Status
 
-I'm solving the problems at my own pace and may refactor as I go.  
-Progress so far:  
-⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆  
-⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆  
-**48 / 50 stars**
+All problems solved! 🎯 (But I might refactor some problems later.)
+Final progress:  
+⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐  
+⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐  
+**50 / 50 stars — Advent of Code 2015 completed! 🚀**
