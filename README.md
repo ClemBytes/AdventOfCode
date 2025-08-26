@@ -16,7 +16,8 @@ I plan to do some puzzles also in **Python** and then compare how fast they are.
 
 - Each puzzle is implemented in its own module under `src/`.
 - The corresponding data files are in `inputs/`, but I don't publish them here like [required by the author](https://adventofcode.com/2015/about) (these are my inputs, they are generated differently for each user when logged into AdventOfCode so yours are different, you can't use my results directly).
-- Please note that for some days, I might have applied a change to the input file.
+- Please note that for some days, I might have applied a change to the input file:
+    - For day 11, I didn't want to parse the short input and directly hardcoded the info I needed in an easy-to-use format.
 
 ### Debug mode
 Compile and run **all** with:
@@ -56,5 +57,5 @@ I'm solving the problems at my own pace and may refactor as I go.
 
 Progress so far:  
 ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆   
-⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆   
-**21 / 50 stars**
+⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆☆☆☆☆☆☆☆☆☆   
+**22 / 50 stars**

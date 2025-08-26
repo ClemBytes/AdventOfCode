@@ -7,13 +7,15 @@ fn test() {
 
 pub fn run() {
     /*
+    Ex:
     0 H
     1 L
-    2 P
-    3 T
-    4 p
-    5 R
-    6 C
+    Input:
+    0 P
+    1 T
+    2 p
+    3 R
+    4 C
      */
     println!("------- DAY11 -------");
     let mut example = Area {
@@ -33,16 +35,16 @@ pub fn run() {
         elevator: 0,
         floors: [
             vec![
+                Object::Generator(0),
+                Object::Generator(1),
+                Object::Microchip(1),
                 Object::Generator(2),
                 Object::Generator(3),
                 Object::Microchip(3),
                 Object::Generator(4),
-                Object::Generator(5),
-                Object::Microchip(5),
-                Object::Generator(6),
-                Object::Microchip(6),
+                Object::Microchip(4),
             ],
-            vec![Object::Microchip(2), Object::Microchip(4)],
+            vec![Object::Microchip(0), Object::Microchip(2)],
             vec![],
             vec![],
         ],
@@ -66,6 +68,40 @@ enum Object {
 struct Area {
     elevator: usize,
     floors: [Vec<Object>; 4],
+}
+
+// Compact representation: elevator floor + couples (microchip floor, generator floor)
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+struct NormalizedArea {
+    elevator: usize,
+    pairs: Vec<(usize, usize)>,
+}
+
+impl Area {
+    fn normalized(&self) -> NormalizedArea {
+        // Get nb_couples
+        let mut n = 0;
+        for f in 0..4 {
+            n += self.floors[f].len();
+        }
+        n /= 2;
+
+        // Init pairs
+        let mut pairs = vec![(0, 0); n];
+        for f in 0..4 {
+            for object in &self.floors[f] {
+                match object {
+                    Object::Generator(element) => pairs[*element as usize].0 = f,
+                    Object::Microchip(element) => pairs[*element as usize].1 = f,
+                }
+            }
+        }
+
+        NormalizedArea {
+            elevator: self.elevator,
+            pairs,
+        }
+    }
 }
 
 fn check_floor(floor: &Vec<Object>) -> bool {
@@ -101,7 +137,13 @@ fn temp() {
 }
 */
 
-fn move_floor(current_area: &Area, q: &mut Vec<Area>, from: usize, to: usize, visited: &mut HashSet<Area>) {
+fn move_floor(
+    current_area: &Area,
+    q: &mut Vec<Area>,
+    from: usize,
+    to: usize,
+    visited: &mut HashSet<NormalizedArea>,
+) {
     // Max elevator capacity: 2 objects
     // I can move :
     // - 1 object
@@ -114,7 +156,6 @@ fn move_floor(current_area: &Area, q: &mut Vec<Area>, from: usize, to: usize, vi
         let mut next_area = current_area.clone();
         next_area.floors[from].remove(i);
         next_area.floors[to].push(object);
-        next_area.floors[to].sort();
 
         // For each microchip at a given floor, I need to check if there is no generator that can fry it
         if !check_floor(&next_area.floors[0])
@@ -125,10 +166,11 @@ fn move_floor(current_area: &Area, q: &mut Vec<Area>, from: usize, to: usize, vi
             continue;
         }
 
-        if !visited.contains(&next_area) {
-            next_area.elevator = to;
+        next_area.elevator = to;
+        let normalized_next_area = next_area.normalized();
+        if !visited.contains(&normalized_next_area) {
             q.push(next_area.clone());
-            visited.insert(next_area);
+            visited.insert(normalized_next_area);
         }
     }
 
@@ -140,7 +182,6 @@ fn move_floor(current_area: &Area, q: &mut Vec<Area>, from: usize, to: usize, vi
             let first_object = next_area.floors[from].remove(i);
             next_area.floors[to].push(first_object);
             next_area.floors[to].push(second_object);
-            next_area.floors[to].sort();
 
             // For each microchip at a given floor, I need to check if there is no generator that can fry it
             if !check_floor(&next_area.floors[0])
@@ -151,19 +192,22 @@ fn move_floor(current_area: &Area, q: &mut Vec<Area>, from: usize, to: usize, vi
                 continue;
             }
 
-            if !visited.contains(&next_area) {
-                next_area.elevator = to;
+            next_area.elevator = to;
+            let normalized_next_area = next_area.normalized();
+            if !visited.contains(&normalized_next_area) {
                 q.push(next_area.clone());
-                visited.insert(next_area);
+                visited.insert(normalized_next_area);
             }
         }
     }
 }
 
-fn expand_front(front: &mut Vec<Area>, visited_same_front: &mut HashSet<Area>) -> Vec<Area> {
+fn expand_front(
+    front: &mut Vec<Area>,
+    visited_same_front: &mut HashSet<NormalizedArea>,
+) -> Vec<Area> {
     let mut next_front = vec![];
     while let Some(current) = front.pop() {
-        // println!("front: {}", front.len());
         // If no object on elevator floor => impossible, continue
         for f in 0..4 {
             assert!(!(current.elevator == f && current.floors[f].is_empty()));
@@ -199,7 +243,7 @@ fn expand_front(front: &mut Vec<Area>, visited_same_front: &mut HashSet<Area>) -
 
 fn find_minimum_steps(input: Area) -> u32 {
     // Init
-    let mut visited_from_start: HashSet<Area> = HashSet::new();
+    let mut visited_from_start: HashSet<NormalizedArea> = HashSet::new();
     let mut front_from_start = Vec::new();
     let mut end_area = Area {
         elevator: 3,
@@ -210,7 +254,7 @@ fn find_minimum_steps(input: Area) -> u32 {
             end_area.floors[3].push(*object);
         }
     }
-    let mut visited_from_end: HashSet<Area> = HashSet::new();
+    let mut visited_from_end: HashSet<NormalizedArea> = HashSet::new();
     let mut front_from_end = Vec::new();
 
     // Start
@@ -221,27 +265,27 @@ fn find_minimum_steps(input: Area) -> u32 {
     loop {
         // Go one step further from start
         front_from_start = expand_front(&mut front_from_start, &mut visited_from_start);
+        nb_steps_from_start += 1;
         // Check if current area from start has been seen from end
         if visited_from_end
             .intersection(&visited_from_start)
             .next()
             .is_some()
         {
-            return nb_steps_from_start + nb_steps_from_end - 1;
+            return nb_steps_from_start + nb_steps_from_end;
         }
-        nb_steps_from_start += 1;
 
         // Go one step before from end
         front_from_end = expand_front(&mut front_from_end, &mut visited_from_end);
+        nb_steps_from_end += 1;
         // Check if current area from end has been seen from start
-        if visited_from_end
-            .intersection(&visited_from_start)
+        if visited_from_start
+            .intersection(&visited_from_end)
             .next()
             .is_some()
         {
-            return nb_steps_from_start + nb_steps_from_end - 1;
+            return nb_steps_from_start + nb_steps_from_end;
         }
-        nb_steps_from_end += 1;
     }
 }
 
@@ -259,15 +303,15 @@ fn day11_part1(example: Area, input: Area) {
 }
 
 fn day11_part2(mut input: Area) {
-    // Add additionnal elements: 7 D & 8 E
-    input.floors[0].push(Object::Generator(7));
-    input.floors[0].push(Object::Microchip(7));
-    input.floors[0].push(Object::Generator(8));
-    input.floors[0].push(Object::Microchip(8));
+    // Add additionnal elements: 5 E & 6 D
+    input.floors[0].push(Object::Generator(5));
+    input.floors[0].push(Object::Microchip(5));
+    input.floors[0].push(Object::Generator(6));
+    input.floors[0].push(Object::Microchip(6));
     input.floors[0].sort();
     // Solve puzzle
     let res = find_minimum_steps(input);
     println!("Result part 2: {res}");
-    // assert_eq!(res, ); // 75 not OK
-    // println!("> DAY11 - part 2: OK!");
+    assert_eq!(res, 71);
+    println!("> DAY11 - part 2: OK!");
 }
