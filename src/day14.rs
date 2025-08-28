@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::VecDeque;
 
 #[test]
 fn test() {
@@ -51,35 +51,24 @@ fn test_find_repeat5() {
 }
 */
 
-fn find_index_password(salt: &str, nb_more_hashings: u32) -> u32 {
+fn find_index_password(salt: &str, nb_more_hashings: u32) -> usize {
     let mut index = 0;
     let mut nb_keys = 0;
-    let mut computed_md5 = HashMap::new();
+    let mut computed_md5 = VecDeque::new();
     while nb_keys < 64 {
-        computed_md5.entry(index).or_insert_with(|| {
-            let s = format!("{salt}{index}");
+        while computed_md5.len() <= 1001 {
+            let s = format!("{salt}{}", index + computed_md5.len());
             let mut hash = format!("{:x}", md5::compute(s));
             for _ in 0..nb_more_hashings {
                 hash = format!("{:x}", md5::compute(hash));
             }
-            hash.chars().collect::<Vec<char>>()
-        });
+            computed_md5.push_back(hash.chars().collect::<Vec<char>>());
+        }
 
-        let hash = computed_md5.get(&index).unwrap();
+        let hash = computed_md5.pop_front().unwrap();
 
-        if let Some(val) = find_repeat3(hash) {
-            for j in index + 1..index + 1001 {
-                computed_md5.entry(j).or_insert_with(|| {
-                    let s = format!("{salt}{j}");
-                    let mut hash = format!("{:x}", md5::compute(s));
-                    for _ in 0..nb_more_hashings {
-                        hash = format!("{:x}", md5::compute(hash));
-                    }
-                    hash.chars().collect::<Vec<char>>()
-                });
-
-                let new_hash = computed_md5.get(&j).unwrap();
-
+        if let Some(val) = find_repeat3(&hash) {
+            for new_hash in &computed_md5 {
                 if find_repeat5(new_hash, val) {
                     nb_keys += 1;
                     break;
