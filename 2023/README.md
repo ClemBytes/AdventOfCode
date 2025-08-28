@@ -14,7 +14,7 @@ Solutions written in **Python**, this time using **Jupyter Notebooks** for explo
 ## 🧠 Structure
 
 - One folder per day (`J01`, `J02`, …).  
-- Each folder contains a notebook `AdventOfCode2022-JX.ipynb`.  
+- Each folder contains a notebook `AdventOfCode2023-JX.ipynb`.  
 - Example and input files are committed.
 
 ## 🚧 Status
