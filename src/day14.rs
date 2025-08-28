@@ -51,15 +51,18 @@ fn test_find_repeat5() {
 }
 */
 
-fn find_index_password(salt: &str) -> u32 {
+fn find_index_password(salt: &str, nb_more_hashings: u32) -> u32 {
     let mut index = 0;
     let mut nb_keys = 0;
     let mut computed_md5 = HashMap::new();
     while nb_keys < 64 {
         computed_md5.entry(index).or_insert_with(|| {
             let s = format!("{salt}{index}");
-            let hash: Vec<char> = format!("{:x}", md5::compute(s)).chars().collect();
-            hash
+            let mut hash = format!("{:x}", md5::compute(s));
+            for _ in 0..nb_more_hashings {
+                hash = format!("{:x}", md5::compute(hash));
+            }
+            hash.chars().collect::<Vec<char>>()
         });
 
         let hash = computed_md5.get(&index).unwrap();
@@ -68,8 +71,11 @@ fn find_index_password(salt: &str) -> u32 {
             for j in index + 1..index + 1001 {
                 computed_md5.entry(j).or_insert_with(|| {
                     let s = format!("{salt}{j}");
-                    let hash: Vec<char> = format!("{:x}", md5::compute(s)).chars().collect();
-                    hash
+                    let mut hash = format!("{:x}", md5::compute(s));
+                    for _ in 0..nb_more_hashings {
+                        hash = format!("{:x}", md5::compute(hash));
+                    }
+                    hash.chars().collect::<Vec<char>>()
                 });
 
                 let new_hash = computed_md5.get(&j).unwrap();
@@ -87,25 +93,24 @@ fn find_index_password(salt: &str) -> u32 {
 
 fn day14_part1(example: &str, input: &str) {
     // Exemple tests
-    let res = find_index_password(example);
+    let res = find_index_password(example, 0);
     assert_eq!(res, 22728);
-    println!("Example OK");
 
     // Solve puzzle
-    let res = find_index_password(input);
+    let res = find_index_password(input, 0);
     println!("Result part 1: {res}");
     assert_eq!(res, 23769);
     println!("> DAY14 - part 1: OK!");
 }
 
-fn day14_part2(_example: &str, _input: &str) {
-    println!("TODO - part2");
+fn day14_part2(example: &str, input: &str) {
     // Exemple tests
-    // assert_eq!(, 0);
+    let res = find_index_password(example, 2016);
+    assert_eq!(res, 22551);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY14 - part 2: OK!");
+    let res = find_index_password(input, 2016);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 20606);
+    println!("> DAY14 - part 2: OK!");
 }
