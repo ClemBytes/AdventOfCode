@@ -51,7 +51,7 @@ fn checksum(dragon_result: &str) -> String {
     res
 }
 
-fn solve_part1(input: &str, size_disk: usize) -> String {
+fn solve(input: &str, size_disk: usize) -> String {
     checksum(&fill_disk(input, size_disk))
 }
 
@@ -63,23 +63,19 @@ fn day16_part1(input: &str) {
     assert_eq!(dragon_step("111100001010"), "1111000010100101011110000");
     assert_eq!(fill_disk("10000", 20), "10000011110010000111");
     assert_eq!(checksum("110010110100"), "100");
-    assert_eq!(solve_part1("10000", 20), "01100");
+    assert_eq!(solve("10000", 20), "01100");
 
     // Solve puzzle
-    let res = solve_part1(input, 272);
+    let res = solve(input, 272);
     println!("Result part 1: {res}");
     assert_eq!(res, "11111000111110000");
     println!("> DAY16 - part 1: OK!");
 }
 
-fn day16_part2(_input: &str) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-
+fn day16_part2(input: &str) {
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
+    let res = solve(input, 35651584);
+    println!("Result part 2: {res}");
     // assert_eq!(res, );
     // println!("> DAY16 - part 2: OK!");
 }
