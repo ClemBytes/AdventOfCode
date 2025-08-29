@@ -12,10 +12,10 @@ pub fn run() {
     let example = fs::read_to_string("inputs/example_day15").expect("Unable to read input!");
     let example = parse(&example);
     let input = fs::read_to_string("inputs/input_day15").expect("Unable to read input!");
-    let input = parse(&input);
+    let mut input = parse(&input);
 
     day15_part1(&example, &input);
-    day15_part2(&example, &input);
+    day15_part2(&mut input);
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -59,7 +59,7 @@ fn test_position(discs: &[Disc], start_time: u32) -> bool {
     true
 }
 
-fn solve_part1(input: &[Disc]) -> u32 {
+fn solve(input: &[Disc]) -> u32 {
     let mut time = 0;
     loop {
         if test_position(input, time) {
@@ -71,25 +71,26 @@ fn solve_part1(input: &[Disc]) -> u32 {
 
 fn day15_part1(example: &[Disc], input: &[Disc]) {
     // Exemple tests
-    let res = solve_part1(example);
+    let res = solve(example);
     assert_eq!(res, 5);
-    println!("Example OK");
 
     // Solve puzzle
-    let res = solve_part1(input);
+    let res = solve(input);
     println!("Result part 1: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY15 - part 1: OK!");
+    assert_eq!(res, 148737);
+    println!("> DAY15 - part 1: OK!");
 }
 
-fn day15_part2(_example: &[Disc], _input: &[Disc]) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
+fn day15_part2(input: &mut Vec<Disc>) {
+    // Add new disc
+    input.push(Disc {
+        nb_positions: 11,
+        start_position: 0,
+    });
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY15 - part 2: OK!");
+    let res = solve(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 2353212);
+    println!("> DAY15 - part 2: OK!");
 }
