@@ -15,7 +15,7 @@ pub fn run() {
     let input = Tile::from_str(&input);
 
     day18_part1(&example1, &example2, &input);
-    day18_part2(&example1, &example2, &input);
+    day18_part2(&input);
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -66,14 +66,17 @@ impl Tile {
 }
 
 fn nb_safe(first_row: &[Tile], nb_rows: usize) -> usize {
-    let mut grid = vec![first_row.to_owned()];
-    for i in 0..nb_rows - 1 {
-        grid.push(Tile::next_row(&grid[i]));
+    let mut row = first_row.to_owned();
+    let mut nb_safe = 0;
+    for _ in 0..nb_rows {
+        nb_safe += row
+            .clone()
+            .into_iter()
+            .filter(|tile| matches!(tile, Tile::Safe))
+            .count();
+        row = Tile::next_row(&row);
     }
-    grid.iter()
-        .flatten()
-        .filter(|tile| matches!(tile, Tile::Safe))
-        .count()
+    nb_safe
 }
 
 fn day18_part1(example1: &[Tile], example2: &[Tile], input: &[Tile]) {
@@ -96,14 +99,10 @@ fn day18_part1(example1: &[Tile], example2: &[Tile], input: &[Tile]) {
     println!("> DAY18 - part 1: OK!");
 }
 
-fn day18_part2(_example1: &[Tile], _example2: &[Tile], _input: &[Tile]) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-
+fn day18_part2(input: &[Tile]) {
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY18 - part 2: OK!");
+    let res = nb_safe(input, 400000);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 20000795);
+    println!("> DAY18 - part 2: OK!");
 }
