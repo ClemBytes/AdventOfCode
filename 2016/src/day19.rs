@@ -13,7 +13,6 @@ pub fn run() {
 }
 
 fn solve_part1(nb_elves: u32) -> u32 {
-    // Create circle
     let mut circle: Vec<u32> = (1..(nb_elves + 1)).collect();
     while circle.len() > 2 {
         let mut new_circle = vec![];
@@ -31,6 +30,19 @@ fn solve_part1(nb_elves: u32) -> u32 {
     circle[0]
 }
 
+fn solve_part2(nb_elves: u32) -> u32 {
+    let mut winner = 0;
+    for n in 2..(nb_elves + 1) {
+        let nb_to_delete = n / 2;
+        let mut next = 1 + winner;
+        if nb_to_delete <= next {
+            next += 1;
+        }
+        winner = next % n;
+    }
+    winner + 1
+}
+
 fn day19_part1(example: u32, input: u32) {
     // Exemple tests
     assert_eq!(solve_part1(example), 3);
@@ -44,15 +56,14 @@ fn day19_part1(example: u32, input: u32) {
     println!("> DAY19 - part 1: OK!");
 }
 
-fn day19_part2(_example: u32, _input: u32) {
-    println!("TODO - part2");
+fn day19_part2(example: u32, input: u32) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(solve_part2(example), 2);
+    println!("Example OK");
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY19 - part 2: OK!");
+    let res = solve_part2(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 1410630);
+    println!("> DAY19 - part 2: OK!");
 }
