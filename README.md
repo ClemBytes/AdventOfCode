@@ -11,7 +11,7 @@ I use Advent of Code as both a fun challenge and a way to explore different prog
 | Year                                                             | Language          | Stars        | Progress                           |
 |:----------------------------------------------------------------:|:-----------------:|:------------:|:----------------------------------:|
 | [2015](https://github.com/ClemBytes/AdventOfCode/tree/main/2015) | Rust 🦀           |  50 ⭐ /  50 | ![](https://progress-bar.xyz/100/) |
-| [2016](https://github.com/ClemBytes/AdventOfCode/tree/main/2016) | Rust 🦀           |  36 ⭐ /  50 | ![](https://progress-bar.xyz/72/)  |
+| [2016](https://github.com/ClemBytes/AdventOfCode/tree/main/2016) | Rust 🦀           |  41 ⭐ /  50 | ![](https://progress-bar.xyz/82/)  |
 | *2017*                                                           | *Not done yet* ❌ | *0 ⭐ /  50* | ![](https://progress-bar.xyz/0/)   |
 | *2018*                                                           | *Not done yet* ❌ | *0 ⭐ /  50* | ![](https://progress-bar.xyz/0/)   |
 | *2019*                                                           | *Not done yet* ❌ | *0 ⭐ /  50* | ![](https://progress-bar.xyz/0/)   |
