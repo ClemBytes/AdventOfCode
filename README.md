@@ -20,7 +20,7 @@ I use Advent of Code as both a fun challenge and a way to explore different prog
 | [2022](https://github.com/ClemBytes/AdventOfCode/tree/main/2022) | Python (Jupyter)  |  12 ⭐ /  50 | ![](https://progress-bar.xyz/24/)  |
 | [2023](https://github.com/ClemBytes/AdventOfCode/tree/main/2023) | Python (Jupyter)  |  20 ⭐ /  50 | ![](https://progress-bar.xyz/40/)  |
 | [2024](https://github.com/ClemBytes/AdventOfCode/tree/main/2024) | Python (Jupyter)  |  23 ⭐ /  50 | ![](https://progress-bar.xyz/46/)  |
-| **TOTAL**                                                        |                   | 194 ⭐ / 500 | ![](https://progress-bar.xyz/38/)  |
+| **TOTAL**                                                        |                   | 195 ⭐ / 500 | ![](https://progress-bar.xyz/39/)  |
 
 I first discovered **Advent of Code** in 2020, and since then I’ve made it a habit to take part every December.  
 At the time, while working full-time as a teacher, I only had a short amount of time each day — so I usually dropped out after a few puzzles (which clearly shows in the number of stars collected those years).  
