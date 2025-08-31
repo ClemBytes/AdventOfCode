@@ -57,5 +57,5 @@ I'm solving the problems at my own pace and may refactor as I go.
 
 Progress so far:  
 ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆   
-⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆☆   
-**41 / 50 stars**
+⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆☆☆☆   
+**42 / 50 stars**

@@ -110,15 +110,59 @@ impl Operation {
         }
         new.iter().collect()
     }
+
+    fn revert(&self, s: String) -> String {
+        let mut new: Vec<char> = s.clone().chars().collect();
+        match *self {
+            Operation::SwapPosition(x, y) => {
+                new.swap(x, y);
+            }
+            Operation::SwapLetter(a, b) => {
+                let x = new.iter().position(|&l| l == a).unwrap();
+                let y = new.iter().position(|&l| l == b).unwrap();
+                new.swap(x, y);
+            }
+            Operation::RotateLeft(x) => {
+                new.rotate_right(x);
+            }
+            Operation::RotateRight(x) => {
+                new.rotate_left(x);
+            }
+            Operation::RotatePosition(a) => {
+                let previous: String = new.clone().iter().collect();
+                for _ in 0..new.len() {
+                    new.rotate_left(1);
+                    if Operation::RotatePosition(a).apply(new.iter().collect()) == previous {
+                        break;
+                    }
+                }
+            }
+            Operation::Reverse(x, y) => {
+                new[x..=y].reverse();
+            }
+            Operation::Move(x, y) => {
+                let a = new.remove(y);
+                new.insert(x, a);
+            }
+        }
+        new.iter().collect()
+    }
 }
 
-fn solve_part1(operations: &[Operation], start: String, print: bool) -> String {
+fn solve_part1(operations: &[Operation], start: String) -> String {
     let mut s = start.clone();
     for operation in operations {
         s = operation.apply(s);
-        if print {
-            println!("{s}");
-        }
+    }
+    s
+}
+
+fn solve_part2(operations: &[Operation], start: String) -> String {
+    let mut s = start.clone();
+    let mut reverse_operations = operations.to_vec();
+    reverse_operations.reverse();
+    for operation in reverse_operations {
+        s = operation.revert(s);
     }
     s
 }
@@ -157,25 +201,66 @@ fn day21_part1(example: &[Operation], input: &[Operation]) {
         Operation::apply(&Operation::RotatePosition('d'), "ecabd".to_string()),
         "decab"
     );
-    assert_eq!(solve_part1(example, "abcde".to_string(), true), "decab");
+    assert_eq!(solve_part1(example, "abcde".to_string()), "decab");
     println!("Example OK");
 
     // Solve puzzle
-    let res = solve_part1(input, "abcdefgh".to_string(), false);
+    let res = solve_part1(input, "abcdefgh".to_string());
     println!("Result part 1: {res}");
     assert_eq!(res, "aefgbcdh");
     println!("> DAY21 - part 1: OK!");
 }
 
-fn day21_part2(_example: &[Operation], _input: &[Operation]) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+fn day21_part2(example: &[Operation], input: &[Operation]) {
+    // Verifications
+    assert_eq!(
+        Operation::revert(&Operation::SwapPosition(4, 0), "ebcda".to_string()),
+        "abcde"
+    );
+    assert_eq!(
+        Operation::revert(&Operation::SwapLetter('d', 'b'), "edcba".to_string()),
+        "ebcda"
+    );
+    assert_eq!(
+        Operation::revert(&Operation::Reverse(0, 4), "abcde".to_string()),
+        "edcba"
+    );
+    assert_eq!(
+        Operation::revert(&Operation::RotateLeft(1), "bcdea".to_string()),
+        "abcde"
+    );
+    assert_eq!(
+        Operation::revert(&Operation::Move(1, 4), "bdeac".to_string()),
+        "bcdea"
+    );
+    assert_eq!(
+        Operation::revert(&Operation::Move(3, 0), "abdec".to_string()),
+        "bdeac"
+    );
+    assert_eq!(
+        Operation::revert(&Operation::RotatePosition('b'), "ecabd".to_string()),
+        "abdec"
+    );
+    assert_eq!(
+        Operation::revert(&Operation::RotatePosition('d'), "decab".to_string()),
+        "ecabd"
+    );
+    println!("Asserts OK");
+    // For example
+    let unscrambled = "abcde".to_string();
+    let scrambled = solve_part1(example, unscrambled.clone());
+    let res = solve_part2(example, scrambled);
+    assert_eq!(unscrambled, res);
+    // For part1 input
+    let unscrambled = "abcdefgh".to_string();
+    let scrambled = solve_part1(input, unscrambled.clone());
+    let res = solve_part2(input, scrambled);
+    assert_eq!(unscrambled, res);
+    println!("Example OK");
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY21 - part 2: OK!");
+    let res = solve_part2(input, "fbgdceah".to_string());
+    println!("Result part 2: {res}");
+    assert_eq!(res, "egcdahbf");
+    println!("> DAY21 - part 2: OK!");
 }
