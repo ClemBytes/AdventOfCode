@@ -9,19 +9,19 @@ fn test() {
 
 pub fn run() {
     println!("------- DAY22 -------");
+    let example = fs::read_to_string("inputs/example_day22").expect("Unable to read input!");
+    let example = Node::from_str(&example);
     let input = fs::read_to_string("inputs/input_day22").expect("Unable to read input!");
     let input = Node::from_str(&input);
 
     day22_part1(&input);
-    day22_part2(&input);
+    day22_part2(&example, &input);
 }
 
 #[derive(Debug, Clone, Copy)]
 struct Node {
-    _size: u32,
+    size: u32,
     used: u32,
-    avail: u32,
-    _percentage: u32,
 }
 
 impl Node {
@@ -31,7 +31,7 @@ impl Node {
         let mut nodes = vec![];
         let mut new_line = vec![];
         let re = Regex::new(
-            r"^\/dev\/grid\/node-x([0-9]+)-y([0-9]+) +([0-9]+)T +([0-9]+)T +([0-9]+)T +([0-9]+)%$",
+            r"^\/dev\/grid\/node-x([0-9]+)-y([0-9]+) +([0-9]+)T +([0-9]+)T +[0-9]+T +[0-9]+%$",
         )
         .unwrap();
         let lines = raw_input.lines();
@@ -44,10 +44,8 @@ impl Node {
                     new_line.clear();
                 }
                 new_line.push(Node {
-                    _size: matches[3].parse().unwrap(),
+                    size: matches[3].parse().unwrap(),
                     used: matches[4].parse().unwrap(),
-                    avail: matches[5].parse().unwrap(),
-                    _percentage: matches[6].parse().unwrap(),
                 });
             } else {
                 println!("Ignore line: {line}");
@@ -62,7 +60,7 @@ impl Node {
     }
 
     fn fits_in(&self, b: Node) -> bool {
-        self.used <= b.avail
+        self.used <= (b.size - b.used)
     }
 
     fn viable_with(&self, b: Node) -> bool {
@@ -87,6 +85,28 @@ fn nb_viable_pairs(input: &[Vec<Node>]) -> u32 {
     nb
 }
 
+fn find_shortest_path(grid: &[Vec<Node>]) -> usize {
+    // Check that exactly one node can contain data to move and get its coordinates
+    let x_max = grid.len() - 1;
+    let y_max = grid[0].len() - 1;
+    let data_to_move_size = grid[x_max][0].used;
+    let mut disponible_cell = vec![];
+    for x in 0..=x_max {
+        for y in 0..=y_max {
+            if data_to_move_size <= (grid[x][y].size - grid[x][y].used) {
+                disponible_cell.push((x, y));
+            }
+        }
+    }
+    assert_eq!(disponible_cell.len(), 1);
+
+    // BFS
+    let 
+
+
+    0
+}
+
 fn day22_part1(input: &[Vec<Node>]) {
     // Solve puzzle
     let res = nb_viable_pairs(input);
@@ -95,14 +115,15 @@ fn day22_part1(input: &[Vec<Node>]) {
     println!("> DAY22 - part 1: OK!");
 }
 
-fn day22_part2(_input: &[Vec<Node>]) {
-    println!("TODO - part2");
+fn day22_part2(example: &[Vec<Node>], input: &[Vec<Node>]) {
     // Exemple tests
-    // assert_eq!(, 0);
+    let res = find_shortest_path(example);
+    // assert_eq!(res, 7);
     // println!("Example OK");
 
     // Solve puzzle
-    // let res =
+    println!();
+    let res = find_shortest_path(input);
     // println!("Result part 2: {res}");
     // assert_eq!(res, );
     // println!("> DAY22 - part 2: OK!");
