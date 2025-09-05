@@ -13,7 +13,7 @@ pub fn run() {
     let input = parse(&input);
 
     day23_part1(&example, &input);
-    day23_part2(&example, &input);
+    day23_part2(&input);
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -264,15 +264,10 @@ fn day23_part1(example: &[Instruction], input: &[Instruction]) {
     println!("> DAY23 - part 1: OK!");
 }
 
-fn day23_part2(_example: &[Instruction], _input: &[Instruction]) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
-
+fn day23_part2(input: &[Instruction]) {
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY23 - part 2: OK!");
+    let res = execute_code(input, 12);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 479007900);
+    println!("> DAY23 - part 2: OK!");
 }
