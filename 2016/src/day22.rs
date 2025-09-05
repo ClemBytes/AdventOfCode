@@ -1,4 +1,7 @@
-use std::fs;
+use std::{
+    collections::{HashSet, VecDeque},
+    fs,
+};
 
 use regex::Regex;
 
@@ -90,21 +93,60 @@ fn find_shortest_path(grid: &[Vec<Node>]) -> usize {
     let x_max = grid.len() - 1;
     let y_max = grid[0].len() - 1;
     let data_to_move_size = grid[x_max][0].used;
-    let mut disponible_cell = vec![];
-    for x in 0..=x_max {
-        for y in 0..=y_max {
-            if data_to_move_size <= (grid[x][y].size - grid[x][y].used) {
-                disponible_cell.push((x, y));
+    let mut empty_cell = vec![];
+    for (x, grid_x) in grid.iter().enumerate().take(x_max + 1) {
+        for (y, node) in grid_x.iter().enumerate().take(y_max + 1) {
+            if data_to_move_size <= (node.size - node.used) {
+                empty_cell.push((x, y));
             }
         }
     }
-    assert_eq!(disponible_cell.len(), 1);
+    assert_eq!(empty_cell.len(), 1);
+    let empty_total = grid[empty_cell[0].0][empty_cell[0].1].size;
 
     // BFS
-    let 
+    let mut visited = HashSet::new();
+    let mut q = VecDeque::new();
+    let start_state = (empty_cell[0], (x_max, 0));
+    q.push_back((start_state, 0));
+    while let Some((state, steps)) = q.pop_front() {
+        if visited.contains(&state) {
+            continue;
+        }
+        visited.insert(state);
+        let (empty_cell, data_position) = state;
 
+        if data_position == (0, 0) {
+            return steps;
+        }
 
-    0
+        // Try to move empty cell
+        let (ex, ey) = empty_cell;
+        let mut movable_nodes = vec![];
+        if ex > 0 {
+            movable_nodes.push((ex - 1, ey));
+        }
+        if ex < x_max {
+            movable_nodes.push((ex + 1, ey));
+        }
+        if ey > 0 {
+            movable_nodes.push((ex, ey - 1));
+        }
+        if ey < y_max {
+            movable_nodes.push((ex, ey + 1));
+        }
+        for (nx, ny) in movable_nodes {
+            if grid[nx][ny].used > empty_total {
+                continue;
+            }
+            let mut new_data_position = data_position;
+            if (nx, ny) == data_position {
+                new_data_position = empty_cell;
+            }
+            q.push_back((((nx, ny), new_data_position), steps + 1));
+        }
+    }
+    unreachable!();
 }
 
 fn day22_part1(input: &[Vec<Node>]) {
@@ -118,13 +160,11 @@ fn day22_part1(input: &[Vec<Node>]) {
 fn day22_part2(example: &[Vec<Node>], input: &[Vec<Node>]) {
     // Exemple tests
     let res = find_shortest_path(example);
-    // assert_eq!(res, 7);
-    // println!("Example OK");
+    assert_eq!(res, 7);
 
     // Solve puzzle
-    println!();
     let res = find_shortest_path(input);
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY22 - part 2: OK!");
+    println!("Result part 2: {res}");
+    assert_eq!(res, 202);
+    println!("> DAY22 - part 2: OK!");
 }
