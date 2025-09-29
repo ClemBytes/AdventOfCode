@@ -16,7 +16,7 @@ pub fn run() {
     let input = parse(&input);
 
     day24_part1(&example, &input);
-    day24_part2(&example, &input);
+    day24_part2(&input);
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -115,6 +115,67 @@ fn find_shortest_route(input: &(Vec<Vec<Location>>, (usize, usize), usize)) -> u
     unreachable!();
 }
 
+fn find_shortest_route_back_to_zero(input: &(Vec<Vec<Location>>, (usize, usize), usize)) -> u32 {
+    let (grid, start, max_poi) = input;
+    let mut visited_pois = vec![false; max_poi + 1];
+    visited_pois[0] = true;
+    let initial_state = State {
+        visited_pois,
+        current_position: *start,
+    };
+    let mut visited_states: HashSet<State> = HashSet::new();
+    let mut q = VecDeque::new();
+    q.push_back((initial_state, 0, false));
+    while let Some((current_state, nb_steps, mut going_back_to_zero)) = q.pop_front() {
+        if current_state.visited_pois.iter().all(|&b| b) {
+            going_back_to_zero = true;
+        }
+
+        if going_back_to_zero && current_state.current_position == *start {
+            return nb_steps;
+        }
+
+        if visited_states.contains(&current_state) {
+            continue;
+        }
+        visited_states.insert(current_state.clone());
+
+        let (x, y) = current_state.current_position;
+        let mut current_visited_pois = current_state.visited_pois;
+        for (nx, ny) in [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)] {
+            match grid[nx][ny] {
+                Location::Wall => {}
+                Location::Open => {
+                    q.push_back((
+                        State {
+                            visited_pois: current_visited_pois.clone(),
+                            current_position: (nx, ny),
+                        },
+                        nb_steps + 1,
+                        going_back_to_zero,
+                    ));
+                }
+                Location::Poi(p) => {
+                    let prev = current_visited_pois[p];
+                    current_visited_pois[p] = true;
+                    // println!("Found {p} at ({nx}, {ny}), nb_steps = {}", nb_steps + 1);
+                    // println!("Visited: {current_visited_pois:?}\n");
+                    q.push_back((
+                        State {
+                            visited_pois: current_visited_pois.clone(),
+                            current_position: (nx, ny),
+                        },
+                        nb_steps + 1,
+                        going_back_to_zero,
+                    ));
+                    current_visited_pois[p] = prev;
+                }
+            }
+        }
+    }
+    unreachable!();
+}
+
 fn day24_part1(
     example: &(Vec<Vec<Location>>, (usize, usize), usize),
     input: &(Vec<Vec<Location>>, (usize, usize), usize),
@@ -133,18 +194,10 @@ fn day24_part1(
     println!("> DAY24 - part 1: OK!");
 }
 
-fn day24_part2(
-    _example: &(Vec<Vec<Location>>, (usize, usize), usize),
-    _input: &(Vec<Vec<Location>>, (usize, usize), usize),
-) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
-
+fn day24_part2(input: &(Vec<Vec<Location>>, (usize, usize), usize)) {
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY24 - part 2: OK!");
+    let res = find_shortest_route_back_to_zero(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 664);
+    println!("> DAY24 - part 2: OK!");
 }
