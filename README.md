@@ -12,7 +12,7 @@ I use Advent of Code as both a fun challenge and a way to explore different prog
 |:----------------------------------------------------------------:|:-----------------:|:------------:|:----------------------------------:|
 | [2015](https://github.com/ClemBytes/AdventOfCode/tree/main/2015) | Rust 🦀           |  50 ⭐ /  50 | ![](https://progress-bar.xyz/100/) |
 | [2016](https://github.com/ClemBytes/AdventOfCode/tree/main/2016) | Rust 🦀           |  50 ⭐ /  50 | ![](https://progress-bar.xyz/100/)  |
-| *2017*                                                           | *Not done yet* ❌ | *0 ⭐ /  50* | ![](https://progress-bar.xyz/0/)   |
+| [2017](https://github.com/ClemBytes/AdventOfCode/tree/main/2017) | Rust 🦀           |   0 ⭐ /  50 | ![](https://progress-bar.xyz/0/)   |
 | *2018*                                                           | *Not done yet* ❌ | *0 ⭐ /  50* | ![](https://progress-bar.xyz/0/)   |
 | *2019*                                                           | *Not done yet* ❌ | *0 ⭐ /  50* | ![](https://progress-bar.xyz/0/)   |
 | [2020](https://github.com/ClemBytes/AdventOfCode/tree/main/2020) | Python 🐍         |  30 ⭐ /  50 | ![](https://progress-bar.xyz/60/)  |
@@ -31,6 +31,6 @@ I’ve therefore gone back to earlier editions (starting from 2015), and my long
 ## 🚀 How to run
 
 - See each year’s folder for specific instructions:
-    - Rust projects (2015, 2016) → use `cargo test (--release)`.
+    - Rust projects (2015, 2016, 2017) → use `cargo test (--release)`.
     - Python Jupyter projects (2022–2024) → open the notebooks in Jupyter.
     - Python scripts (2020-2021) → run with Python 3.
