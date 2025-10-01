@@ -53,9 +53,15 @@ cargo test --release -- --nocapture dayXX
 
 ## 🚧 Status
 
-I'm solving the problems at my own pace and may refactor as I go.  
+All problems solved! 🎯 (But I might refactor some problems later.)
 
-Progress so far:  
-⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐   
-⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐   
-**50 / 50 stars**
+Final progress:  
+⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐  
+⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐  
+**50 / 50 stars — Advent of Code 2015 completed! 🚀**
+
+## ⚡ Performance
+
+Here is a screenshot from my terminal showing the total runtime for all 25 days (compiled in release mode) on my machine, the full solutions for all 25 days execute in about **50.41 seconds** (days 11 and 23 are longer and could be optimized):
+
+![Running of 25 days on release mode](./total_running_release_time.jpg)
