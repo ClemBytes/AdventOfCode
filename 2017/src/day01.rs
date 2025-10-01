@@ -7,45 +7,51 @@ fn test() {
 
 pub fn run() {
     println!("------- DAY01 -------");
-    let example = fs::read_to_string("inputs/example_day01").expect("Unable to read input!");
-    let example = parse(&example);
     let input = fs::read_to_string("inputs/input_day01").expect("Unable to read input!");
-    let input = parse(&input);
 
-    day01_part1(&example, &input);
-    day01_part2(&example, &input);
+    day01_part1(&input);
+    day01_part2(&input);
 }
 
-fn parse(raw_input: &str) -> Vec<_> {
-    let mut yyy: Vec<_> = vec![];
-    for _line in raw_input.lines() {
-        // TODO
-        // yyy.push(line);
+fn solve_part1(input: &str) -> u32 {
+    let digits: Vec<u32> = input
+        .to_string()
+        .chars()
+        .map(|c| c.to_digit(10).unwrap())
+        .collect();
+    let mut s = 0;
+    let nb_digits = digits.len();
+    for (i, &d) in digits.iter().enumerate() {
+        if d == digits[(i + 1) % nb_digits] {
+            s += d;
+        }
     }
-    yyy
+    s
 }
 
-fn day01_part1(_example: &Vec<_>, _input: &Vec<_>) {
-    println!("TODO - part1");
+fn day01_part1(input: &str) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(solve_part1("1122"), 3);
+    assert_eq!(solve_part1("1111"), 4);
+    assert_eq!(solve_part1("1234"), 0);
+    assert_eq!(solve_part1("91212129"), 9);
+    println!("Example OK");
 
     // Solve puzzle
-    // let res = 
-    // println!("Result part 1: {res}");
+    let res = solve_part1(input);
+    println!("Result part 1: {res}");
     // assert_eq!(res, );
     // println!("> DAY01 - part 1: OK!");
 }
 
-fn day01_part2(_example: &Vec<_>, _input: &Vec<_>) {
+fn day01_part2(_input: &str) {
     println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);
     // println!("Example OK");
 
     // Solve puzzle
-    // let res = 
+    // let res =
     // println!("Result part 2: {res}");
     // assert_eq!(res, );
     // println!("> DAY01 - part 2: OK!");
