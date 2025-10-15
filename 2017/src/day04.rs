@@ -47,15 +47,30 @@ fn day04_part1(input: &Vec<String>) {
     println!("> DAY04 - part 1: OK!");
 }
 
-fn day04_part2(_input: &Vec<String>) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+fn nb_valid_passwords_without_anagrams(passwords: &Vec<String>) -> u32 {
+    let mut nb = 0;
+    for password in passwords {
+        let words: Vec<&str> = password.split_whitespace().collect();
+        let mut words_set = HashSet::new();
+        let mut words_list = vec![];
+        for &word in &words {
+            let mut chars: Vec<char> = word.chars().collect();
+            chars.sort_unstable();
+            let sorted_word: String = chars.into_iter().collect();
+            words_set.insert(sorted_word.clone());
+            words_list.push(sorted_word);
+        }
+        if words_list.len() == words_set.len() {
+            nb += 1
+        }
+    }
+    nb
+}
 
+fn day04_part2(input: &Vec<String>) {
     // Solve puzzle
-    // let res = 
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY04 - part 2: OK!");
+    let res = nb_valid_passwords_without_anagrams(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 251);
+    println!("> DAY04 - part 2: OK!");
 }
