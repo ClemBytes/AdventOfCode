@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[test]
 fn test() {
     run();
@@ -57,15 +59,67 @@ fn day03_part1(input: u32) {
     println!("> DAY03 - part 1: OK!");
 }
 
-fn day03_part2(_input: u32) {
-    println!("TODO - part2");
+fn solve_part2(input: u32) -> u32 {
+    // Just fill the spiral, and keep coordinates
+    let mut spiral = HashMap::new();
+    let mut value = 1;
+    // let mut square = 1;
+    let mut x = 0;
+    let mut y = 0;
+    let mut dx = 1;
+    let mut dy = 0;
+    spiral.insert((x, y), value);
+    while value <= input {
+        x += dx;
+        y += dy;
+        let neighbors = [
+            spiral.get(&(x - 1, y)),     // down
+            spiral.get(&(x - 1, y - 1)), // down-left
+            spiral.get(&(x - 1, y + 1)), // down-right
+            spiral.get(&(x + 1, y)),     // up
+            spiral.get(&(x + 1, y - 1)), // up-left
+            spiral.get(&(x + 1, y + 1)), // up-right
+            spiral.get(&(x, y - 1)),     // left
+            spiral.get(&(x, y + 1)),     // right
+        ];
+        value = 0;
+        for v in neighbors.into_iter().flatten() {
+            value += v
+        }
+        spiral.insert((x, y), value);
+        if x > 0 && y == -(x - 1) {
+            // right to UP
+            dx = 0;
+            dy = 1;
+        } else if x > 0 && y == x {
+            // up to LEFT
+            dx = -1;
+            dy = 0;
+        } else if x < 0 && y == -x {
+            // left to DOWN
+            dx = 0;
+            dy = -1;
+        } else if x < 0 && y == x {
+            // down to RIGHT
+            dx = 1;
+            dy = 0;
+        }
+    }
+    value
+}
+
+fn day03_part2(input: u32) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(solve_part2(1), 2);
+    assert_eq!(solve_part2(2), 4);
+    assert_eq!(solve_part2(13), 23);
+    assert_eq!(solve_part2(25), 26);
+    assert_eq!(solve_part2(58), 59);
+    assert_eq!(solve_part2(438), 747);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY03 - part 2: OK!");
+    let res = solve_part2(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 363010);
+    println!("> DAY03 - part 2: OK!");
 }
