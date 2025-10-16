@@ -49,15 +49,31 @@ fn day05_part1(example: &[i32], input: &[i32]) {
     println!("> DAY05 - part 1: OK!");
 }
 
-fn day05_part2(_example: &[i32], _input: &[i32]) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+fn nb_steps_to_escape_strange(instructions: &[i32]) -> u32 {
+    let mut instructions = instructions.to_owned();
+    let mut nb_steps = 0;
+    let mut position = 0i32;
+    let nb_instructions = instructions.len() as i32;
+    while position >= 0 && position < nb_instructions {
+        let offset = instructions[position as usize];
+        let next_position = position + offset;
+        if offset >= 3 {
+            instructions[position as usize] -= 1;
+        } else {
+            instructions[position as usize] += 1;
+        }
+        position = next_position;
+        nb_steps += 1;
+    }
+    nb_steps
+}
+
+fn day05_part2(example: &[i32], input: &[i32]) {
+    assert_eq!(nb_steps_to_escape_strange(example), 10);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY05 - part 2: OK!");
+    let res = nb_steps_to_escape_strange(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 25608480);
+    println!("> DAY05 - part 2: OK!");
 }
