@@ -17,7 +17,7 @@ I plan to do some puzzles also in **Python** and then compare how fast they are.
 - Each puzzle is implemented in its own module under `src/`.
 - The corresponding data files are in `inputs/`, but I don't publish them here like [required by the author](https://adventofcode.com/2017/about) (these are my inputs, they are generated differently for each user when logged into AdventOfCode so yours are different, you can't use my results directly).
 - Please note that for some days, I might have applied a change to the input file:
-    - For day 02, I replaced tabs by spaces.
+    - For days 02 and 06, I replaced tabs by spaces.
 
 ### Debug mode
 Compile and run **all** with:
