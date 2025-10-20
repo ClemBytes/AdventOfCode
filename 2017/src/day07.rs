@@ -87,6 +87,9 @@ fn day07_part1(example: &HashMap<String, Node>, input: &HashMap<String, Node>) {
 }
 
 fn day07_part2(_example: &HashMap<String, Node>, _input: &HashMap<String, Node>) {
+    // En gros, il faut que je calcule les poids de chaque sous-stack (donc le noeud + ceux qu'il porte récursivement)
+    // Une fois que c'est fait, je parcours mon arbre en regardant pour chaque noeud lequel n'est pas égal à ses voisins.
+
     println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);

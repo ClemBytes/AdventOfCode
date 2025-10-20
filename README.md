@@ -12,7 +12,7 @@ I use Advent of Code as both a fun challenge and a way to explore different prog
 |:----------------------------------------------------------------:|:-----------------:|:------------:|:----------------------------------:|
 | [2015](https://github.com/ClemBytes/AdventOfCode/tree/main/2015) | Rust 🦀           |  50 ⭐ /  50 | ![](https://progress-bar.xyz/100/) |
 | [2016](https://github.com/ClemBytes/AdventOfCode/tree/main/2016) | Rust 🦀           |  50 ⭐ /  50 | ![](https://progress-bar.xyz/100/) |
-| [2017](https://github.com/ClemBytes/AdventOfCode/tree/main/2017) | Rust 🦀           |  12 ⭐ /  50 | ![](https://progress-bar.xyz/24/)  |
+| [2017](https://github.com/ClemBytes/AdventOfCode/tree/main/2017) | Rust 🦀           |  13 ⭐ /  50 | ![](https://progress-bar.xyz/26/)  |
 | *2018*                                                           | *Not done yet* ❌ | *0 ⭐ /  50* | ![](https://progress-bar.xyz/0/)   |
 | *2019*                                                           | *Not done yet* ❌ | *0 ⭐ /  50* | ![](https://progress-bar.xyz/0/)   |
 | [2020](https://github.com/ClemBytes/AdventOfCode/tree/main/2020) | Python 🐍         |  30 ⭐ /  50 | ![](https://progress-bar.xyz/60/)  |
@@ -20,7 +20,7 @@ I use Advent of Code as both a fun challenge and a way to explore different prog
 | [2022](https://github.com/ClemBytes/AdventOfCode/tree/main/2022) | Python (Jupyter)  |  12 ⭐ /  50 | ![](https://progress-bar.xyz/24/)  |
 | [2023](https://github.com/ClemBytes/AdventOfCode/tree/main/2023) | Python (Jupyter)  |  20 ⭐ /  50 | ![](https://progress-bar.xyz/40/)  |
 | [2024](https://github.com/ClemBytes/AdventOfCode/tree/main/2024) | Python (Jupyter)  |  23 ⭐ /  50 | ![](https://progress-bar.xyz/46/)  |
-| **TOTAL**                                                        |                   | 217 ⭐ / 500 | ![](https://progress-bar.xyz/43/)  |
+| **TOTAL**                                                        |                   | 218 ⭐ / 500 | ![](https://progress-bar.xyz/43/)  |
 
 I first discovered **Advent of Code** in 2020, and since then I’ve made it a habit to take part every December.  
 At the time, while working full-time as a teacher, I only had a short amount of time each day — so I usually dropped out after a few puzzles (which clearly shows in the number of stars collected those years).  
