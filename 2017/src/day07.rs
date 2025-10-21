@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs};
+use std::{collections::{HashMap, HashSet, VecDeque}, fs};
 
 use regex::Regex;
 
@@ -10,17 +10,18 @@ fn test() {
 pub fn run() {
     println!("------- DAY07 -------");
     let example = fs::read_to_string("inputs/example_day07").expect("Unable to read input!");
-    let example = parse(&example);
+    let mut example = parse(&example);
     let input = fs::read_to_string("inputs/input_day07").expect("Unable to read input!");
-    let input = parse(&input);
+    let mut input = parse(&input);
 
     day07_part1(&example, &input);
-    day07_part2(&example, &input);
+    day07_part2(&mut example, &mut input);
 }
 
 #[derive(Debug, Clone)]
 struct Node {
-    size: u32,
+    weight: u32,
+    stack_weight: u32,
     parent: Option<String>,
     children: Vec<String>,
 }
@@ -31,16 +32,16 @@ fn parse(raw_input: &str) -> HashMap<String, Node> {
     let re_no_children = Regex::new(r"^([a-z]+) \(([0-9]+)\)$").unwrap();
     for line in raw_input.lines() {
         let name: String;
-        let size: u32;
+        let weight: u32;
         let mut children = Vec::new();
         if let Some(matches) = re_no_children.captures(line) {
             name = matches[1].to_string();
-            size = matches[2].parse().unwrap();
+            weight = matches[2].parse().unwrap();
         } else {
             let parts: Vec<&str> = line.split(" -> ").collect();
             if let Some(matches) = re_no_children.captures(parts[0]) {
                 name = matches[1].to_string();
-                size = matches[2].parse().unwrap();
+                weight = matches[2].parse().unwrap();
                 children = parts[1].split(", ").map(|s| s.to_string()).collect();
             } else {
                 unreachable!("Unknown start: {}", parts[0]);
@@ -49,7 +50,8 @@ fn parse(raw_input: &str) -> HashMap<String, Node> {
         nodes.insert(
             name,
             Node {
-                size,
+                weight,
+                stack_weight: 0,
                 parent: None,
                 children,
             },
@@ -86,18 +88,78 @@ fn day07_part1(example: &HashMap<String, Node>, input: &HashMap<String, Node>) {
     println!("> DAY07 - part 1: OK!");
 }
 
-fn day07_part2(_example: &HashMap<String, Node>, _input: &HashMap<String, Node>) {
+fn balance_tower(nodes: &mut HashMap<String, Node>) -> u32 {
+    // First, fill stack_weights, starting from leaves
+    // Then, for each leave, the stack_weight is equal to its own weight + its chidren' stack_weights
+    // And I push back it's parent, keeping track of already added nodes
+    let mut nodes_to_compute = VecDeque::new();
+    let mut added_nodes = HashSet::new();
+    for (name, node) in &mut *nodes {
+        if node.children.is_empty() {
+            nodes_to_compute.push_back(name.clone());
+            added_nodes.insert(name.clone());
+        }
+    }
+    while let Some(name) = nodes_to_compute.pop_front() {
+        // Get children' stack_weights
+        let mut children_stack_weight = 0;
+        for child in &nodes.get(&name).unwrap().children {
+            children_stack_weight += &nodes.get(child).unwrap().stack_weight;
+        }
+        // Update current stack_weight
+        let current_weight = nodes.get(&name).unwrap().weight;
+        nodes.get_mut(&name).unwrap().stack_weight = current_weight + children_stack_weight;
+        // Add parent to VecDeque if not already added
+        let parent = &nodes.get(&name).unwrap().parent;
+        if let Some(parent_name) = parent && !added_nodes.contains(parent_name) {
+            nodes_to_compute.push_back(parent_name.clone());
+            added_nodes.insert(parent_name.clone());
+        }
+    }
+
+    // println!("{nodes:#?}"); // Seems OK here
+    // Now, search for wrong weight
+    let nodes_clone = nodes.clone();
+    for (_, node) in nodes {
+        if node.children.is_empty() {
+            continue;
+        }
+        // Get children stack_weights
+        let mut children_stack_weights = HashMap::new();
+        for child in &node.children {
+            let w = nodes_clone.get(child).unwrap().weight;
+            let sw = nodes_clone.get(child).unwrap().stack_weight;
+            // children_stack_weights.insert(sw);
+            let count = children_stack_weights.entry((w, sw)).or_insert(0);
+            *count += 1;
+        }
+        // Check if all equals
+        if children_stack_weights.len() == 1 {
+            continue;
+        }
+        // If not, find good value
+        let mut good_value = 0;
+        if let Some((&(_, sw), &_)) = children_stack_weights.iter().max_by_key(|&(_, v)| v) {
+            good_value = sw;
+        }
+        if let Some((&(w, sw), &_)) = children_stack_weights.iter().min_by_key(|&(_, v)| v) {
+            return good_value - (sw - w);
+        }
+    } // Ouh là. J'ai pas le même résultat à chaque fois...
+    unreachable!("No wrong weight found");
+}
+
+fn day07_part2(example: &mut HashMap<String, Node>, input: &mut HashMap<String, Node>) {
     // En gros, il faut que je calcule les poids de chaque sous-stack (donc le noeud + ceux qu'il porte récursivement)
     // Une fois que c'est fait, je parcours mon arbre en regardant pour chaque noeud lequel n'est pas égal à ses voisins.
 
-    println!("TODO - part2");
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(balance_tower(example), 60);
+    println!("Example OK");
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
+    let res = balance_tower(input);
+    println!("Result part 2: {res}"); // 365 too low
     // assert_eq!(res, );
     // println!("> DAY07 - part 2: OK!");
 }
