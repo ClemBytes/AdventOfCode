@@ -118,9 +118,9 @@ fn balance_tower(nodes: &mut HashMap<String, Node>) -> u32 {
     }
 
     // println!("{nodes:#?}"); // Seems OK here
-    // Now, search for wrong weight
+    // Now, search for wrong weight. TODO: RESTART THIS PART
     let nodes_clone = nodes.clone();
-    for (_, node) in nodes {
+    for (name, node) in nodes {
         if node.children.is_empty() {
             continue;
         }
@@ -130,20 +130,22 @@ fn balance_tower(nodes: &mut HashMap<String, Node>) -> u32 {
             let w = nodes_clone.get(child).unwrap().weight;
             let sw = nodes_clone.get(child).unwrap().stack_weight;
             // children_stack_weights.insert(sw);
-            let count = children_stack_weights.entry((w, sw)).or_insert(0);
-            *count += 1;
+            let count = children_stack_weights.entry(sw).or_insert((w, 0));
+            count.1 += 1;
         }
         // Check if all equals
         if children_stack_weights.len() == 1 {
             continue;
         }
         // If not, find good value
-        let mut good_value = 0;
-        if let Some((&(_, sw), &_)) = children_stack_weights.iter().max_by_key(|&(_, v)| v) {
-            good_value = sw;
+        let mut stack_weight_should_be = 0;
+        if let Some((&sw, &(_w, _count))) = children_stack_weights.iter().max_by_key(|(_sw, (_w, count))| count) {
+            stack_weight_should_be = sw;
         }
-        if let Some((&(w, sw), &_)) = children_stack_weights.iter().min_by_key(|&(_, v)| v) {
-            return good_value - (sw - w);
+        if let Some((&sw, &(w, _count))) = children_stack_weights.iter().min_by_key(|(_sw, (_w, count))| count) {
+            println!("children_stack_weights: {children_stack_weights:?}");
+            println!("parent name: {name} | weight: {w} | stack_weight: {sw} | stack_weight_should_be: {stack_weight_should_be}");
+            return stack_weight_should_be - (sw - w);
         }
     } // Ouh là. J'ai pas le même résultat à chaque fois...
     unreachable!("No wrong weight found");
@@ -159,7 +161,7 @@ fn day07_part2(example: &mut HashMap<String, Node>, input: &mut HashMap<String, 
 
     // Solve puzzle
     let res = balance_tower(input);
-    println!("Result part 2: {res}"); // 365 too low
+    println!("Result part 2: {res}"); // 365 too low, 1104 also, 9182 too high, 2012 not good
     // assert_eq!(res, );
     // println!("> DAY07 - part 2: OK!");
 }
