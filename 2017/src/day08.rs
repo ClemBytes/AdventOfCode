@@ -18,10 +18,11 @@ pub fn run() {
     day08_part2(&example, &input);
 }
 
-fn parse_and_apply(raw_input: &str) -> HashMap<String, i32> {
+fn parse_and_apply(raw_input: &str) -> Vec<i32> {
     let mut registers = HashMap::new();
     let r = Regex::new(r"^([a-z]+) (inc|dec) (-?[0-9]+) if ([a-z]+) (<|>|<=|>=|==|!=) (-?[0-9]+)$")
         .unwrap();
+    let mut max_values = vec![];
     for line in raw_input.lines() {
         if let Some(matches) = r.captures(line) {
             let r1 = matches[1].to_string();
@@ -59,32 +60,32 @@ fn parse_and_apply(raw_input: &str) -> HashMap<String, i32> {
         } else {
             unreachable!("Bad instruction: {line}");
         }
+        let (_, &max) = registers.iter().max_by_key(|&(_k, v)| *v).unwrap();
+        max_values.push(max);
         // println!("{registers:#?}");
     }
-    registers
+    max_values
 }
 
-fn day08_part1(example: &HashMap<String, i32>, input: &HashMap<String, i32>) {
+fn day08_part1(example: &[i32], input: &[i32]) {
     // Exemple tests
-    let (_, &max) = example.iter().max_by_key(|&(_k, v)| *v).unwrap();
-    assert_eq!(max, 1);
+    let &res = example.last().unwrap();
+    assert_eq!(res, 1);
 
     // Solve puzzle
-    let (_, &res) = input.iter().max_by_key(|&(_k, v)| *v).unwrap();
+    let &res = input.last().unwrap();
     println!("Result part 1: {res}");
     assert_eq!(res, 3089);
     println!("> DAY08 - part 1: OK!");
 }
 
-fn day08_part2(_example: &HashMap<String, i32>, _input: &HashMap<String, i32>) {
-    println!("TODO - part2");
+fn day08_part2(example: &[i32], input: &[i32]) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(*example.iter().max().unwrap(), 10);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY08 - part 2: OK!");
+    let res = *input.iter().max().unwrap();
+    println!("Result part 2: {res}");
+    assert_eq!(res, 5391);
+    println!("> DAY08 - part 2: OK!");
 }
