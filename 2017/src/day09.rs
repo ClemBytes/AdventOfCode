@@ -13,53 +13,53 @@ pub fn run() {
     day09_part2(&input);
 }
 
-fn compute_score (input: &String) -> u32 {
+fn compute_score(input: &str) -> u32 {
     let mut total_score = 0;
     let mut current_score = 0;
     let chars_input: Vec<char> = input.chars().collect();
     let size_input = chars_input.len();
     let mut canceled = false;
     let mut garbage = false;
-    for position in 0..size_input {
+    for &c in chars_input.iter().take(size_input) {
         if canceled {
             canceled = false;
             continue;
         }
         if garbage {
-            if chars_input[position] == '!' {
+            if c == '!' {
                 canceled = true;
             }
-            if chars_input[position] == '>' {
+            if c == '>' {
                 garbage = false;
             }
             continue;
         }
-        match chars_input[position] {
+        match c {
             '{' => current_score += 1,
             '}' => {
                 total_score += current_score;
                 current_score -= 1;
-            },
+            }
             '<' => garbage = true,
             '>' => garbage = false,
             '!' => canceled = true,
-            _ => continue
+            _ => continue,
         }
-        // println!("position: {position} | character: '{}' | current_score: {current_score} | total_score: {total_score}", chars_input[position])
+        // println!("position: {position} | character: '{c}' | current_score: {current_score} | total_score: {total_score}")
     }
     total_score
 }
 
-fn day09_part1(input: &String) {
+fn day09_part1(input: &str) {
     // Exemple tests
-    assert_eq!(compute_score(&"{}".to_string()), 1);
-    assert_eq!(compute_score(&"{{{}}}".to_string()), 6);
-    assert_eq!(compute_score(&"{{},{}}".to_string()), 5);
-    assert_eq!(compute_score(&"{{{},{},{{}}}}".to_string()), 16);
-    assert_eq!(compute_score(&"{<a>,<a>,<a>,<a>}".to_string()), 1);
-    assert_eq!(compute_score(&"{{<ab>},{<ab>},{<ab>},{<ab>}}".to_string()), 9);
-    assert_eq!(compute_score(&"{{<!!>},{<!!>},{<!!>},{<!!>}}".to_string()), 9);
-    assert_eq!(compute_score(&"{{<a!>},{<a!>},{<a!>},{<ab>}}".to_string()), 3);
+    assert_eq!(compute_score("{}"), 1);
+    assert_eq!(compute_score("{{{}}}"), 6);
+    assert_eq!(compute_score("{{},{}}"), 5);
+    assert_eq!(compute_score("{{{},{},{{}}}}"), 16);
+    assert_eq!(compute_score("{<a>,<a>,<a>,<a>}"), 1);
+    assert_eq!(compute_score("{{<ab>},{<ab>},{<ab>},{<ab>}}"), 9);
+    assert_eq!(compute_score("{{<!!>},{<!!>},{<!!>},{<!!>}}"), 9);
+    assert_eq!(compute_score("{{<a!>},{<a!>},{<a!>},{<ab>}}"), 3);
 
     // Solve puzzle
     let res = compute_score(input);
@@ -68,15 +68,57 @@ fn day09_part1(input: &String) {
     println!("> DAY09 - part 1: OK!");
 }
 
-fn day09_part2(_input: &String) {
-    println!("TODO - part2");
+fn count_garbage(input: &str) -> u32 {
+    let mut garbage_count = 0;
+    let chars_input: Vec<char> = input.chars().collect();
+    let size_input = chars_input.len();
+    let mut canceled = false;
+    let mut garbage = false;
+    for &c in chars_input.iter().take(size_input) {
+        if canceled {
+            canceled = false;
+            continue;
+        }
+        match c {
+            '<' => {
+                if !garbage {
+                    garbage = true;
+                    continue;
+                }
+            }
+            '>' => {
+                if garbage {
+                    garbage = false;
+                    continue;
+                }
+            }
+            '!' => {
+                canceled = true;
+                continue;
+            }
+            _ => {}
+        }
+        if garbage {
+            garbage_count += 1;
+        }
+        // println!("position: {position} | character: '{}' | garbage_count: {garbage_count} | garbage: {garbage}", chars_input[position])
+    }
+    garbage_count
+}
+
+fn day09_part2(input: &str) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(count_garbage("<>"), 0);
+    assert_eq!(count_garbage("<random characters>"), 17);
+    assert_eq!(count_garbage("<<<<>"), 3);
+    assert_eq!(count_garbage("<{!>}>"), 2);
+    assert_eq!(count_garbage("<!!>"), 0);
+    assert_eq!(count_garbage("<!!!>>"), 0);
+    assert_eq!(count_garbage("<{o\"i!a,<{i<a>"), 10);
 
     // Solve puzzle
-    // let res = 
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY09 - part 2: OK!");
+    let res = count_garbage(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 9495);
+    println!("> DAY09 - part 2: OK!");
 }
