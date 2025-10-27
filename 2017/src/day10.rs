@@ -7,12 +7,12 @@ fn test() {
 
 pub fn run() {
     println!("------- DAY10 -------");
-    let example = vec![3, 4, 1, 5];
+    let example_parsed = vec![3, 4, 1, 5];
     let input = fs::read_to_string("inputs/input_day10").expect("Unable to read input!");
-    let input = parse(&input);
+    let input_parsed = parse(&input);
 
-    day10_part1(&example, &input);
-    day10_part2(&example, &input);
+    day10_part1(&example_parsed, &input_parsed);
+    day10_part2(input);
 }
 
 fn parse(raw_input: &str) -> Vec<usize> {
@@ -71,15 +71,75 @@ fn day10_part1(example: &[usize], input: &[usize]) {
     println!("> DAY10 - part 1: OK!");
 }
 
-fn day10_part2(_example: &[usize], _input: &[usize]) {
-    println!("TODO - part2");
+fn hash_n_times(n: usize, size_list: usize, lengths: &[usize]) -> Vec<usize> {
+    let mut list: Vec<usize> = (0..size_list).collect();
+    let mut current_position = 0;
+    let mut skip_size = 0;
+    for _ in 0..n {
+        for &length in lengths {
+            list = apply_one_turn(list, length, current_position);
+            current_position += (length + skip_size) % size_list;
+            skip_size += 1;
+        }
+    }
+    list
+}
+
+fn complete_knot_hash(input: String) -> String {
+    // 1. Convert from ASCII
+    let mut lengths: Vec<usize> = Vec::from(input.clone()).iter().map(|&x| x as usize).collect();
+
+    // 2. Add final sequence
+    let mut final_sequence: Vec<usize> = vec![17, 31, 73, 47, 23];
+    lengths.append(&mut final_sequence);
+    // println!("lengths: {lengths:?}");
+
+    // 3. Run 64 times
+    let n = 64;
+    let hashed_list = hash_n_times(n, 256, &lengths);
+    // println!("hashed_list: {hashed_list:?}");
+
+    // 4. Bitwise XOR on blocks of 16:
+    let mut pos = 0;
+    let mut dense_hash = vec![];
+    let mut x= 0;
+    while pos < hashed_list.len() {
+        match pos % 16 {
+            0 => {
+                dense_hash.push(x);
+                x = hashed_list[pos];
+            },
+            _ => {x ^= hashed_list[pos]},
+        }
+        pos += 1;
+    }
+    dense_hash.push(x);
+    // println!("dense_hash: {dense_hash:?}");
+
+    let mut final_hash = "".to_string();
+    for n in dense_hash {
+        // println!("n: {n} | hex: {n:02x}");
+        final_hash.push_str(&format!("{:02x}", n));
+    }
+    // println!("final_hash: {final_hash:?}");
+    final_hash.remove(0);
+    final_hash.remove(0);
+    // println!("final_hash: {final_hash:?}");
+
+    final_hash
+}
+
+fn day10_part2(input: String) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(complete_knot_hash("".to_string()), "a2582a3a0e66e6e86e3812dcb672a272".to_string());
+    assert_eq!(complete_knot_hash("AoC 2017".to_string()), "33efeb34ea91902bb2f59c9920caa6cd".to_string());
+    assert_eq!(complete_knot_hash("1,2,3".to_string()), "3efbe78a8d82f29979031a4aa0b16a9d".to_string());
+    assert_eq!(complete_knot_hash("1,2,4".to_string()), "63960835bcdc130f0b66d7ff4f6a5a8e".to_string());
+    println!("Examples OK");
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
+    let res = complete_knot_hash(input);
+    println!("Result part 2: {res}"); // 9fbf9a82d0e7b5957f805f54fd4d6c07 not OK
     // assert_eq!(res, );
     // println!("> DAY10 - part 2: OK!");
 }
