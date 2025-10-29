@@ -87,7 +87,10 @@ fn hash_n_times(n: usize, size_list: usize, lengths: &[usize]) -> Vec<usize> {
 
 fn complete_knot_hash(input: String) -> String {
     // 1. Convert from ASCII
-    let mut lengths: Vec<usize> = Vec::from(input.clone()).iter().map(|&x| x as usize).collect();
+    let mut lengths: Vec<usize> = Vec::from(input.clone())
+        .iter()
+        .map(|&x| x as usize)
+        .collect();
 
     // 2. Add final sequence
     let mut final_sequence: Vec<usize> = vec![17, 31, 73, 47, 23];
@@ -102,14 +105,14 @@ fn complete_knot_hash(input: String) -> String {
     // 4. Bitwise XOR on blocks of 16:
     let mut pos = 0;
     let mut dense_hash = vec![];
-    let mut x= 0;
+    let mut x = 0;
     while pos < hashed_list.len() {
         match pos % 16 {
             0 => {
                 dense_hash.push(x);
                 x = hashed_list[pos];
-            },
-            _ => {x ^= hashed_list[pos]},
+            }
+            _ => x ^= hashed_list[pos],
         }
         pos += 1;
     }
@@ -131,15 +134,26 @@ fn complete_knot_hash(input: String) -> String {
 
 fn day10_part2(input: String) {
     // Exemple tests
-    assert_eq!(complete_knot_hash("".to_string()), "a2582a3a0e66e6e86e3812dcb672a272".to_string());
-    assert_eq!(complete_knot_hash("AoC 2017".to_string()), "33efeb34ea91902bb2f59c9920caa6cd".to_string());
-    assert_eq!(complete_knot_hash("1,2,3".to_string()), "3efbe78a8d82f29979031a4aa0b16a9d".to_string());
-    assert_eq!(complete_knot_hash("1,2,4".to_string()), "63960835bcdc130f0b66d7ff4f6a5a8e".to_string());
-    println!("Examples OK");
+    assert_eq!(
+        complete_knot_hash("".to_string()),
+        "a2582a3a0e66e6e86e3812dcb672a272".to_string()
+    );
+    assert_eq!(
+        complete_knot_hash("AoC 2017".to_string()),
+        "33efeb34ea91902bb2f59c9920caa6cd".to_string()
+    );
+    assert_eq!(
+        complete_knot_hash("1,2,3".to_string()),
+        "3efbe78a8d82f29979031a4aa0b16a9d".to_string()
+    );
+    assert_eq!(
+        complete_knot_hash("1,2,4".to_string()),
+        "63960835bcdc130f0b66d7ff4f6a5a8e".to_string()
+    );
 
     // Solve puzzle
-    let res = complete_knot_hash(input);
-    println!("Result part 2: {res}"); // 9fbf9a82d0e7b5957f805f54fd4d6c07 not OK
-    // assert_eq!(res, );
-    // println!("> DAY10 - part 2: OK!");
+    let res = complete_knot_hash(input.trim().to_string());
+    println!("Result part 2: {res}");
+    assert_eq!(res, "7adfd64c2a03a4968cf708d1b7fd418d".to_string());
+    println!("> DAY10 - part 2: OK!");
 }
