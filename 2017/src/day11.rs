@@ -1,4 +1,4 @@
-use std::fs;
+use std::{collections::HashSet, fs};
 
 #[test]
 fn test() {
@@ -106,15 +106,20 @@ fn day11_part1(input: &[Direction]) {
     println!("> DAY11 - part 1: OK!");
 }
 
-fn day11_part2(_input: &[Direction]) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+fn steps_further(child_path: &[Direction]) -> i32 {
+    let mut position = (0, 0, 0);
+    let mut steps_away = HashSet::new();
+    for direction in child_path {
+        position = move_one_direction(position, direction);
+        steps_away.insert(position.0.abs().max(position.1.abs()).max(position.2.abs()));
+    }
+    *steps_away.iter().max().unwrap()
+}
 
+fn day11_part2(input: &[Direction]) {
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY11 - part 2: OK!");
+    let res = steps_further(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 1567);
+    println!("> DAY11 - part 2: OK!");
 }
