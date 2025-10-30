@@ -9,7 +9,7 @@ pub fn run() {
     println!("------- DAY11 -------");
     let binding = fs::read_to_string("inputs/input_day11").expect("Unable to read input!");
     let input = binding.trim();
-    let input = parse(&input);
+    let input = parse(input);
 
     day11_part1(&input);
     day11_part2(&input);
@@ -43,31 +43,52 @@ fn parse(raw_input: &str) -> Vec<Direction> {
     directions
 }
 
-fn fewer_steps(_child_path: &Vec<Direction>) -> u32 {
-    0
+fn move_one_direction(start: (i32, i32, i32), direction: &Direction) -> (i32, i32, i32) {
+    let (mut x, mut y, mut z) = start;
+    match direction {
+        Direction::N => {
+            x += 1;
+            z -= 1;
+        }
+        Direction::NE => {
+            x += 1;
+            y += 1;
+        }
+        Direction::SE => {
+            y += 1;
+            z += 1;
+        }
+        Direction::S => {
+            x -= 1;
+            z += 1;
+        }
+        Direction::SW => {
+            x -= 1;
+            y -= 1;
+        }
+        Direction::NW => {
+            y -= 1;
+            z -= 1;
+        }
+    }
+    (x, y, z)
 }
 
-fn day11_part1(input: &Vec<Direction>) {
+fn fewer_steps(child_path: &[Direction]) -> i32 {
+    let mut position = (0, 0, 0);
+    for direction in child_path {
+        position = move_one_direction(position, direction);
+    }
+    position.0.abs().max(position.1.abs()).max(position.2.abs())
+}
+
+fn day11_part1(input: &[Direction]) {
     // Exemple tests
-    let ex = vec![
-        Direction::NE,
-        Direction::NE,
-        Direction::NE,
-    ];
+    let ex = vec![Direction::NE, Direction::NE, Direction::NE];
     assert_eq!(fewer_steps(&ex), 3);
-    let ex = vec![
-        Direction::NE,
-        Direction::NE,
-        Direction::SW,
-        Direction::SW,
-    ];
+    let ex = vec![Direction::NE, Direction::NE, Direction::SW, Direction::SW];
     assert_eq!(fewer_steps(&ex), 0);
-    let ex = vec![
-        Direction::NE,
-        Direction::NE,
-        Direction::S,
-        Direction::S,
-    ];
+    let ex = vec![Direction::NE, Direction::NE, Direction::S, Direction::S];
     assert_eq!(fewer_steps(&ex), 2);
     let ex = vec![
         Direction::SE,
@@ -77,23 +98,22 @@ fn day11_part1(input: &Vec<Direction>) {
         Direction::SW,
     ];
     assert_eq!(fewer_steps(&ex), 3);
-    println!("Examples OK");
 
     // Solve puzzle
     let res = fewer_steps(input);
     println!("Result part 1: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY11 - part 1: OK!");
+    assert_eq!(res, 810);
+    println!("> DAY11 - part 1: OK!");
 }
 
-fn day11_part2(_input: &Vec<Direction>) {
+fn day11_part2(_input: &[Direction]) {
     println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);
     // println!("Example OK");
 
     // Solve puzzle
-    // let res = 
+    // let res =
     // println!("Result part 2: {res}");
     // assert_eq!(res, );
     // println!("> DAY11 - part 2: OK!");
