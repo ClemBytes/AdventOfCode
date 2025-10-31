@@ -70,15 +70,48 @@ fn day12_part1(example: &HashMap<u32, Vec<u32>>, input: &HashMap<u32, Vec<u32>>)
     println!("> DAY12 - part 1: OK!");
 }
 
-fn day12_part2(_example: &HashMap<u32, Vec<u32>>, _input: &HashMap<u32, Vec<u32>>) {
-    println!("TODO - part2");
+fn nb_groups(pipes: &HashMap<u32, Vec<u32>>) -> u32 {
+    let mut id = 0;
+    let mut nb_groups = 0;
+
+    let mut to_check: VecDeque<u32> = VecDeque::new();
+    let mut visited: HashSet<u32> = HashSet::new();
+
+    while visited.len() < pipes.len() {
+        let id_list = pipes.get(&id).unwrap();
+        for &i in id_list {
+            to_check.push_back(i);
+        }
+        visited.insert(id);
+        while let Some(new_id) = to_check.pop_front() {
+            if visited.contains(&new_id) {
+                continue;
+            }
+            let id_list = pipes.get(&new_id).unwrap();
+            for &i in id_list {
+                to_check.push_back(i);
+            }
+            visited.insert(new_id);
+        }
+
+        nb_groups += 1;
+        for i in 0..pipes.len() {
+            if !visited.contains(&(i as u32)) {
+                id = i as u32;
+            }
+        }
+    }
+
+    nb_groups
+}
+
+fn day12_part2(example: &HashMap<u32, Vec<u32>>, input: &HashMap<u32, Vec<u32>>) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(nb_groups(example), 2);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY12 - part 2: OK!");
+    let res = nb_groups(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 207);
+    println!("> DAY12 - part 2: OK!");
 }
