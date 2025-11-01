@@ -30,13 +30,13 @@ fn parse(raw_input: &str) -> HashMap<u32, u32> {
     firewall
 }
 
-fn caught(picosecond: u32, firewall: &HashMap<u32, u32>) -> bool {
-    if !firewall.contains_key(&picosecond) {
+fn caught(picosecond: u32, depth: u32, firewall: &HashMap<u32, u32>) -> bool {
+    if !firewall.contains_key(&depth) {
         return false;
     }
-    let &range = firewall.get(&picosecond).unwrap();
+    let &range = firewall.get(&depth).unwrap();
     // println!("picosecond: {picosecond} | range: {range} | (range * 2 - 2): {}", (range * 2 - 2));
-    if picosecond == 0 {
+    if (picosecond == 0) && (depth == 0) {
         return true;
     }
     if picosecond % (range * 2 - 2) == 0 {
@@ -45,10 +45,11 @@ fn caught(picosecond: u32, firewall: &HashMap<u32, u32>) -> bool {
     false
 }
 
-fn severity(firewall: &HashMap<u32, u32>) -> u32 {
+fn severity(firewall: &HashMap<u32, u32>, delay: u32) -> u32 {
     let mut sev = 0;
-    for (&picosecond, &range) in firewall {
-        if caught(picosecond, firewall) {
+    for (&depth, &range) in firewall {
+        let picosecond = depth + delay;
+        if caught(picosecond, depth, firewall) {
             sev += picosecond * range;
         }
     }
@@ -57,31 +58,43 @@ fn severity(firewall: &HashMap<u32, u32>) -> u32 {
 
 fn day13_part1(example: &HashMap<u32, u32>, input: &HashMap<u32, u32>) {
     // Exemple tests
-    assert!(caught(0, example));
-    assert!(!caught(1, example));
-    assert!(!caught(2, example));
-    assert!(!caught(3, example));
-    assert!(!caught(4, example));
-    assert!(!caught(5, example));
-    assert!(caught(6, example));
-    assert_eq!(severity(example), 24);
+    assert!(caught(0, 0, example));
+    assert!(!caught(1, 1, example));
+    assert!(!caught(2, 2, example));
+    assert!(!caught(3, 3, example));
+    assert!(!caught(4, 4, example));
+    assert!(!caught(5, 5, example));
+    assert!(caught(6, 6, example));
+    assert_eq!(severity(example, 0), 24);
 
     // Solve puzzle
-    let res = severity(input);
+    let res = severity(input, 0);
     println!("Result part 1: {res}");
     assert_eq!(res, 1840);
     println!("> DAY13 - part 1: OK!");
 }
 
-fn day13_part2(_example: &HashMap<u32, u32>, _input: &HashMap<u32, u32>) {
-    println!("TODO - part2");
+fn smallest_delay(firewall: &HashMap<u32, u32>) -> u32 {
+    let mut delay = 0;
+    'big_loop: loop {
+        for &depth in firewall.keys() {
+            let picosecond = depth + delay;
+            if caught(picosecond, depth, firewall) {
+                delay += 1;
+                continue 'big_loop;
+            }
+        }
+        return delay;
+    }
+}
+
+fn day13_part2(example: &HashMap<u32, u32>, input: &HashMap<u32, u32>) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(smallest_delay(example), 10);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY13 - part 2: OK!");
+    let res = smallest_delay(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 3850260);
+    println!("> DAY13 - part 2: OK!");
 }
