@@ -1,5 +1,5 @@
 use crate::day10::complete_knot_hash;
-use std::fs;
+use std::{collections::{HashSet, VecDeque}, fs};
 
 #[test]
 fn test() {
@@ -23,13 +23,13 @@ fn translate_line(line: String) -> String {
     res
 }
 
-fn create_grid(input: String) -> Vec<String> {
+fn create_grid(input: String) -> Vec<Vec<char>> {
     let mut grid = Vec::new();
     for i in 0..128 {
         let mut line = input.clone();
         line.push_str(&format!("-{i}"));
         let hash = complete_knot_hash(line);
-        grid.push(translate_line(hash));
+        grid.push(translate_line(hash).chars().collect());
     }
     grid
 }
@@ -38,7 +38,7 @@ fn nb_used_squares(input: String) -> usize {
     let grid = create_grid(input);
     let mut res = 0;
     for line in grid {
-        res += line.chars().filter(|&c| c == '1').count();
+        res += line.into_iter().filter(|&c| c == '1').count();
     }
     res
 }
@@ -62,15 +62,29 @@ fn day14_part1(example: String, input: String) {
     println!("> DAY14 - part 1: OK!");
 }
 
-fn day14_part2(_example: String, _input: String) {
-    println!("TODO - part2");
+fn nb_regions(input: String) -> u32 {
+    let grid = create_grid(input);
+    let mut nb = 0;
+    let mut visited = HashSet::new();
+    let mut next_positions = VecDeque::new();
+    next_positions.push_back((0, 0));
+    while let Some(position) = next_positions.pop_front() {
+        if visited.contains(&position) {
+            continue;
+        }
+        visited.insert(position);
+    }
+    nb
+}
+
+fn day14_part2(example: String, input: String) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(nb_regions(example), 1242);
+    println!("Example OK");
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
+    let res = nb_regions(input);
+    println!("Result part 2: {res}");
     // assert_eq!(res, );
     // println!("> DAY14 - part 2: OK!");
 }
