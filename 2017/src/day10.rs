@@ -85,7 +85,7 @@ fn hash_n_times(n: usize, size_list: usize, lengths: &[usize]) -> Vec<usize> {
     list
 }
 
-fn complete_knot_hash(input: String) -> String {
+pub fn complete_knot_hash(input: String) -> String {
     // 1. Convert from ASCII
     let mut lengths: Vec<usize> = Vec::from(input.clone())
         .iter()
