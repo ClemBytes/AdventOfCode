@@ -1,5 +1,8 @@
 use crate::day10::complete_knot_hash;
-use std::{collections::{HashSet, VecDeque}, fs};
+use std::{
+    collections::{HashSet, VecDeque},
+    fs,
+};
 
 #[test]
 fn test() {
@@ -66,13 +69,42 @@ fn nb_regions(input: String) -> u32 {
     let grid = create_grid(input);
     let mut nb = 0;
     let mut visited = HashSet::new();
-    let mut next_positions = VecDeque::new();
-    next_positions.push_back((0, 0));
-    while let Some(position) = next_positions.pop_front() {
-        if visited.contains(&position) {
-            continue;
+    for i in 0..128 {
+        for j in 0..128 {
+            if grid[i][j] == '1' && !visited.contains(&(i, j)) {
+                // Found a new region!
+                nb += 1;
+
+                // Let's visit it:
+                let mut next_positions = VecDeque::new();
+                next_positions.push_back((i, j));
+
+                while let Some(position) = next_positions.pop_front() {
+                    if visited.contains(&position) {
+                        continue;
+                    }
+                    visited.insert(position);
+
+                    let (i, j) = position;
+
+                    for (ni, nj) in [
+                        (i as i32 - 1, j as i32),
+                        (i as i32 + 1, j as i32),
+                        (i as i32, j as i32 - 1),
+                        (i as i32, j as i32 + 1),
+                    ] {
+                        if (0..128).contains(&ni)
+                            && (0..128).contains(&nj)
+                            && (grid[ni as usize][nj as usize] == '1')
+                        {
+                            next_positions.push_back((ni as usize, nj as usize));
+                        }
+                    }
+                }
+            } else {
+                visited.insert((i, j));
+            }
         }
-        visited.insert(position);
     }
     nb
 }
@@ -80,11 +112,10 @@ fn nb_regions(input: String) -> u32 {
 fn day14_part2(example: String, input: String) {
     // Exemple tests
     assert_eq!(nb_regions(example), 1242);
-    println!("Example OK");
 
     // Solve puzzle
     let res = nb_regions(input);
     println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY14 - part 2: OK!");
+    assert_eq!(res, 1074);
+    println!("> DAY14 - part 2: OK!");
 }
