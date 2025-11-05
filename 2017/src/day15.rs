@@ -75,15 +75,40 @@ fn day15_part1(example: (u64, u64), input: (u64, u64)) {
     println!("> DAY15 - part 1: OK!");
 }
 
-fn day15_part2(_example: (u64, u64), _input: (u64, u64)) {
-    println!("TODO - part2");
+fn judge_final_count_with_multiples(nb_pairs: u64, input: (u64, u64)) -> u64 {
+    let mut count = 0;
+    let (mut a, mut b) = input;
+    let mut n = 0;
+    while n <= nb_pairs {
+        // Generator A produces next multiple of 4
+        a = (a * FACTOR_A) % DIVIDER;
+        while a % 4 != 0 {
+            a = (a * FACTOR_A) % DIVIDER;
+        }
+
+        // Generator B produces next multiple of 8
+        b = (b * FACTOR_B) % DIVIDER;
+        while b % 8 != 0 {
+            b = (b * FACTOR_B) % DIVIDER;
+        }
+
+        // Found a pair
+        n += 1;
+        if (a & 0xFFFF) == (b & 0xFFFF) {
+            count += 1;
+        }
+    }
+    count
+}
+
+fn day15_part2(example: (u64, u64), input: (u64, u64)) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(judge_final_count_with_multiples(5_000_000, example), 309);
+    println!("Example OK");
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY15 - part 2: OK!");
+    let res = judge_final_count_with_multiples(5_000_000, input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 294);
+    println!("> DAY15 - part 2: OK!");
 }
