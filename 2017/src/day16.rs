@@ -1,4 +1,4 @@
-use std::fs;
+use std::{collections::HashMap, fs};
 
 #[test]
 fn test() {
@@ -95,15 +95,36 @@ fn day16_part1(input: &[Instruction]) {
     println!("> DAY16 - part 1: OK!");
 }
 
-fn day16_part2(_input: &[Instruction]) {
-    println!("TODO - part2");
+fn repeat_dance(nb_repetitions: usize, instructions: &[Instruction], programs: String) -> String {
+    let mut res = programs.clone();
+    let mut visited = HashMap::new();
+    let mut n = 0;
+    let mut nb_repeats = nb_repetitions;
+    while n < nb_repeats {
+        if visited.contains_key(&res) {
+            let moment_seen = visited.get(&res).unwrap();
+            let cycle = n - moment_seen;
+            nb_repeats = n + ((nb_repeats - n) % cycle);
+        }
+        visited.insert(res.clone(), n);
+        res = dance(instructions, res);
+        n += 1;
+    }
+    res
+}
+
+fn day16_part2(input: &[Instruction]) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    let example = vec![
+        Instruction::Spin(1),
+        Instruction::Exchange(3, 4),
+        Instruction::Partner('e', 'b'),
+    ];
+    assert_eq!(repeat_dance(2, &example, "abcde".to_string()), "ceadb");
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY16 - part 2: OK!");
+    let res = repeat_dance(1000000000, input, "abcdefghijklmnop".to_string());
+    println!("Result part 2: {res}");
+    assert_eq!(res, "gfabehpdojkcimnl");
+    println!("> DAY16 - part 2: OK!");
 }
