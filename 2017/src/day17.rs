@@ -16,23 +16,22 @@ fn complete_circuler_buffer(steps: usize, last_value: usize) -> usize {
     let mut current_position = 0;
     for i in 1..=last_value {
         let new_position = (current_position + steps) % (i);
-        buffer.insert(new_position, i);
-        current_position = new_position;
+        buffer.insert(new_position + 1, i);
+        current_position = new_position + 1;
+        // println!("{:?} | current_position: {current_position} | current_position value: {}", buffer, buffer[current_position]);
     }
-    println!("{:?}", buffer);
     buffer[current_position + 1]
 }
 
 fn day17_part1(input: usize) {
     // Exemple tests
-    assert_eq!(complete_circuler_buffer(3, 1), 638);
-    println!("Example OK");
+    assert_eq!(complete_circuler_buffer(3, 2017), 638);
 
     // Solve puzzle
     let res = complete_circuler_buffer(input, 2017);
     println!("Result part 1: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY17 - part 1: OK!");
+    assert_eq!(res, 996);
+    println!("> DAY17 - part 1: OK!");
 }
 
 fn day17_part2(_input: usize) {
@@ -42,7 +41,7 @@ fn day17_part2(_input: usize) {
     // println!("Example OK");
 
     // Solve puzzle
-    // let res = 
+    // let res =
     // println!("Result part 2: {res}");
     // assert_eq!(res, );
     // println!("> DAY17 - part 2: OK!");
