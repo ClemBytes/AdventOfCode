@@ -15,7 +15,7 @@ fn complete_circuler_buffer(steps: usize, last_value: usize, value_after: usize)
     let mut buffer: Vec<usize> = vec![0];
     let mut current_position = 0;
     for i in 1..=last_value {
-        let new_position = (current_position + steps) % (i);
+        let new_position = (current_position + steps) % i;
         buffer.insert(new_position + 1, i);
         current_position = new_position + 1;
         // println!("{:?} | current_position: {current_position} | current_position value: {}", buffer, buffer[current_position]);
@@ -35,10 +35,27 @@ fn day17_part1(input: usize) {
     println!("> DAY17 - part 1: OK!");
 }
 
+fn complete_circuler_buffer_fast(steps: usize, last_value: usize) -> usize {
+    // let mut buffer: Vec<usize> = vec![0];
+    let mut current_position = 0;
+    let mut position_0 = 0;
+    let mut after_0 = None;
+    for i in 1..=last_value {
+        let new_position = (current_position + steps) % i;
+        if new_position == position_0 {
+            after_0 = Some(i);
+        } else if new_position < position_0 {
+            position_0 += 1;
+        }
+        current_position = new_position + 1;
+    }
+    after_0.unwrap()
+}
+
 fn day17_part2(input: usize) {
     // Solve puzzle
-    let res = complete_circuler_buffer(input, 50_000_000, 0);
+    let res = complete_circuler_buffer_fast(input, 50_000_000);
     println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY17 - part 2: OK!");
+    assert_eq!(res, 1898341);
+    println!("> DAY17 - part 2: OK!");
 }
