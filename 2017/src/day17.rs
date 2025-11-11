@@ -36,20 +36,16 @@ fn day17_part1(input: usize) {
 }
 
 fn complete_circuler_buffer_fast(steps: usize, last_value: usize) -> usize {
-    // let mut buffer: Vec<usize> = vec![0];
     let mut current_position = 0;
-    let mut position_0 = 0;
-    let mut after_0 = None;
+    let mut value_after_0 = None;
     for i in 1..=last_value {
         let new_position = (current_position + steps) % i;
-        if new_position == position_0 {
-            after_0 = Some(i);
-        } else if new_position < position_0 {
-            position_0 += 1;
+        if new_position == 0 {
+            value_after_0 = Some(i);
         }
         current_position = new_position + 1;
     }
-    after_0.unwrap()
+    value_after_0.unwrap()
 }
 
 fn day17_part2(input: usize) {
