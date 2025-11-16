@@ -1,4 +1,7 @@
-use std::{collections::{HashMap, VecDeque}, fs};
+use std::{
+    collections::{HashMap, VecDeque},
+    fs,
+};
 
 #[test]
 fn test() {
@@ -26,7 +29,7 @@ enum RegisterOrValue {
 
 #[derive(Debug, Clone)]
 enum Instruction {
-    Snd(char),
+    Snd(RegisterOrValue),
     Set(char, RegisterOrValue),
     Add(char, RegisterOrValue),
     Mul(char, RegisterOrValue),
@@ -53,8 +56,15 @@ fn parse(raw_input: &str) -> (Vec<Instruction>, HashMap<char, i64>) {
         let (kind, infos) = line.split_once(" ").unwrap();
         let ins = match kind {
             "snd" => {
-                let reg = infos.parse::<char>().unwrap();
-                registers.entry(reg).or_insert(0);
+                let reg_int = infos.parse::<i64>();
+                let reg = match reg_int {
+                    Ok(i) => RegisterOrValue::Value(i),
+                    Err(_) => {
+                        let reg = infos.parse::<char>().unwrap();
+                        registers.entry(reg).or_insert(0);
+                        RegisterOrValue::Register(reg)
+                    },
+                };
                 Instruction::Snd(reg)
             }
             "set" => {
@@ -138,9 +148,14 @@ fn first_recover(input: &(Vec<Instruction>, HashMap<char, i64>)) -> i64 {
 
         match ins {
             Instruction::Snd(reg) => {
-                let &freq = registers.get(&reg).unwrap();
-                last_sound_played_frequency = Some(freq);
-                position += 1;
+                match reg {
+                    RegisterOrValue::Register(reg) => {
+                        let &freq = registers.get(&reg).unwrap();
+                        last_sound_played_frequency = Some(freq);
+                        position += 1;
+                    },
+                    RegisterOrValue::Value(_) => unreachable!(),
+                }
             }
             Instruction::Set(reg, reg_or_val) => {
                 let val = match reg_or_val {
@@ -220,6 +235,94 @@ fn day18_part1(
     println!("> DAY18 - part 1: OK!");
 }
 
+fn run_instruction(
+    instruction: Instruction,
+    position: i64,
+    is_waiting: bool,
+    queue: &mut VecDeque<i64>,
+    other_queue: &mut VecDeque<i64>,
+    registers: &mut HashMap<char, i64>,
+) -> (i64, bool, bool) {
+    let mut pos = position;
+    let mut is_wait = is_waiting;
+    let mut sent_something = false;
+    match instruction {
+        Instruction::Snd(reg) => {
+            let freq = match reg {
+                RegisterOrValue::Register(reg) => *registers.get(&reg).unwrap(),
+                RegisterOrValue::Value(i) => i,
+            };
+            other_queue.push_back(freq);
+            pos += 1;
+            sent_something = true;
+        }
+        Instruction::Set(reg, reg_or_val) => {
+            let val = match reg_or_val {
+                RegisterOrValue::Register(r) => *registers.get(&r).unwrap(),
+                RegisterOrValue::Value(v) => v,
+            };
+            registers.insert(reg, val);
+            pos += 1;
+        }
+        Instruction::Add(reg, reg_or_val) => {
+            let mut val = *registers.get(&reg).unwrap();
+            let term = match reg_or_val {
+                RegisterOrValue::Register(r) => *registers.get(&r).unwrap(),
+                RegisterOrValue::Value(v) => v,
+            };
+            val += term;
+            registers.insert(reg, val);
+            pos += 1;
+        }
+        Instruction::Mul(reg, reg_or_val) => {
+            let mut val = *registers.get(&reg).unwrap();
+            let factor = match reg_or_val {
+                RegisterOrValue::Register(r) => *registers.get(&r).unwrap(),
+                RegisterOrValue::Value(v) => v,
+            };
+            val *= factor;
+            registers.insert(reg, val);
+            pos += 1;
+        }
+        Instruction::Mod(reg, reg_or_val) => {
+            let mut val = *registers.get(&reg).unwrap();
+            let divider = match reg_or_val {
+                RegisterOrValue::Register(r) => *registers.get(&r).unwrap(),
+                RegisterOrValue::Value(v) => v,
+            };
+            val %= divider;
+            registers.insert(reg, val);
+            pos += 1;
+        }
+        Instruction::Rcv(reg) => {
+            if queue.len() == 0 {
+                is_wait = true;
+            } else {
+                let val = queue.pop_front().unwrap();
+                registers.insert(reg, val);
+                is_wait = false;
+                pos += 1;
+            }
+        }
+        Instruction::Jgz(check, reg_or_val) => {
+            let check = match check {
+                RegisterOrValue::Register(reg) => *registers.get(&reg).unwrap(),
+                RegisterOrValue::Value(i) => i,
+            };
+            if check == 0 {
+                pos += 1;
+            } else {
+                let val = match reg_or_val {
+                    RegisterOrValue::Register(r) => *registers.get(&r).unwrap(),
+                    RegisterOrValue::Value(v) => v,
+                };
+                pos += val;
+            }
+        }
+    }
+    (pos, is_wait, sent_something)
+}
+
 fn two_programs(input: &(Vec<Instruction>, HashMap<char, i64>)) -> i64 {
     let instructions = input.0.clone();
     let mut registers0 = input.1.clone();
@@ -244,77 +347,16 @@ fn two_programs(input: &(Vec<Instruction>, HashMap<char, i64>)) -> i64 {
             }
 
             let ins = instructions[position0 as usize].clone();
+            println!("0: {ins:?} | position0: {position0}");
 
-            match ins {
-                Instruction::Snd(reg) => {
-                    let &freq = registers0.get(&reg).unwrap();
-                    queue1.push_back(freq);
-                    position0 += 1;
-                }
-                Instruction::Set(reg, reg_or_val) => {
-                    let val = match reg_or_val {
-                        RegisterOrValue::Register(r) => *registers0.get(&r).unwrap(),
-                        RegisterOrValue::Value(v) => v,
-                    };
-                    registers0.insert(reg, val);
-                    position0 += 1;
-                }
-                Instruction::Add(reg, reg_or_val) => {
-                    let mut val = *registers0.get(&reg).unwrap();
-                    let term = match reg_or_val {
-                        RegisterOrValue::Register(r) => *registers0.get(&r).unwrap(),
-                        RegisterOrValue::Value(v) => v,
-                    };
-                    val += term;
-                    registers0.insert(reg, val);
-                    position0 += 1;
-                }
-                Instruction::Mul(reg, reg_or_val) => {
-                    let mut val = *registers0.get(&reg).unwrap();
-                    let factor = match reg_or_val {
-                        RegisterOrValue::Register(r) => *registers0.get(&r).unwrap(),
-                        RegisterOrValue::Value(v) => v,
-                    };
-                    val *= factor;
-                    registers0.insert(reg, val);
-                    position0 += 1;
-                }
-                Instruction::Mod(reg, reg_or_val) => {
-                    let mut val = *registers0.get(&reg).unwrap();
-                    let divider = match reg_or_val {
-                        RegisterOrValue::Register(r) => *registers0.get(&r).unwrap(),
-                        RegisterOrValue::Value(v) => v,
-                    };
-                    val %= divider;
-                    registers0.insert(reg, val);
-                    position0 += 1;
-                }
-                Instruction::Rcv(reg) => {
-                    if queue0.len() == 0 {
-                        is_waiting0 = true;
-                    } else {
-                        let val = queue0.pop_front().unwrap();
-                        registers0.insert(reg, val);
-                        is_waiting0 = false;
-                        position0 += 1;
-                    }
-                }
-                Instruction::Jgz(check, reg_or_val) => {
-                    let check = match check {
-                        RegisterOrValue::Register(reg) => *registers0.get(&reg).unwrap(),
-                        RegisterOrValue::Value(i) => i,
-                    };
-                    if check == 0 {
-                        position0 += 1;
-                    } else {
-                        let val = match reg_or_val {
-                            RegisterOrValue::Register(r) => *registers0.get(&r).unwrap(),
-                            RegisterOrValue::Value(v) => v,
-                        };
-                        position0 += val;
-                    }
-                }
-            }
+            (position0, is_waiting0, _) = run_instruction(
+                ins,
+                position0,
+                is_waiting0,
+                &mut queue0,
+                &mut queue1,
+                &mut registers0,
+            );
         }
 
         if !(is_waiting1 && queue1.len() == 0) {
@@ -323,77 +365,20 @@ fn two_programs(input: &(Vec<Instruction>, HashMap<char, i64>)) -> i64 {
             }
 
             let ins = instructions[position1 as usize].clone();
+            println!("1: {ins:?} | position1: {position1}");
 
-            match ins {
-                Instruction::Snd(reg) => {
-                    let &freq = registers1.get(&reg).unwrap();
-                    queue0.push_back(freq);
-                    nb_send_values1 += 1;
-                    position1 += 1;
-                }
-                Instruction::Set(reg, reg_or_val) => {
-                    let val = match reg_or_val {
-                        RegisterOrValue::Register(r) => *registers1.get(&r).unwrap(),
-                        RegisterOrValue::Value(v) => v,
-                    };
-                    registers1.insert(reg, val);
-                    position1 += 1;
-                }
-                Instruction::Add(reg, reg_or_val) => {
-                    let mut val = *registers1.get(&reg).unwrap();
-                    let term = match reg_or_val {
-                        RegisterOrValue::Register(r) => *registers1.get(&r).unwrap(),
-                        RegisterOrValue::Value(v) => v,
-                    };
-                    val += term;
-                    registers1.insert(reg, val);
-                    position1 += 1;
-                }
-                Instruction::Mul(reg, reg_or_val) => {
-                    let mut val = *registers1.get(&reg).unwrap();
-                    let factor = match reg_or_val {
-                        RegisterOrValue::Register(r) => *registers1.get(&r).unwrap(),
-                        RegisterOrValue::Value(v) => v,
-                    };
-                    val *= factor;
-                    registers1.insert(reg, val);
-                    position1 += 1;
-                }
-                Instruction::Mod(reg, reg_or_val) => {
-                    let mut val = *registers1.get(&reg).unwrap();
-                    let divider = match reg_or_val {
-                        RegisterOrValue::Register(r) => *registers1.get(&r).unwrap(),
-                        RegisterOrValue::Value(v) => v,
-                    };
-                    val %= divider;
-                    registers1.insert(reg, val);
-                    position1 += 1;
-                }
-                Instruction::Rcv(reg) => {
-                    if queue1.len() == 0 {
-                        is_waiting1 = true;
-                    } else {
-                        let val = queue1.pop_front().unwrap();
-                        registers1.insert(reg, val);
-                        is_waiting1 = false;
-                        position1 += 1;
-                    }
-                }
-                Instruction::Jgz(check, reg_or_val) => {
-                    let check = match check {
-                        RegisterOrValue::Register(reg) => *registers1.get(&reg).unwrap(),
-                        RegisterOrValue::Value(i) => i,
-                    };
-                    if check == 0 {
-                        position1 += 1;
-                    } else {
-                        let val = match reg_or_val {
-                            RegisterOrValue::Register(r) => *registers1.get(&r).unwrap(),
-                            RegisterOrValue::Value(v) => v,
-                        };
-                        position1 += val;
-                    }
-                }
+            let sent_something;
+            (position1, is_waiting1, sent_something) = run_instruction(
+                ins,
+                position1,
+                is_waiting1,
+                &mut queue1,
+                &mut queue0,
+                &mut registers1,
+            );
+
+            if sent_something {
+                nb_send_values1 += 1;
             }
         }
     }
