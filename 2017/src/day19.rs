@@ -12,8 +12,7 @@ pub fn run() {
     let input = fs::read_to_string("inputs/input_day19").expect("Unable to read input!");
     let input = parse(&input);
 
-    day19_part1(&example, &input);
-    day19_part2(&example, &input);
+    day19_all(&example, &input);
 }
 
 fn parse(raw_input: &str) -> Vec<Vec<char>> {
@@ -33,8 +32,9 @@ fn find_start_position(grid: &[Vec<char>]) -> usize {
     unreachable!("Start position not found!");
 }
 
-fn find_the_way(grid: &[Vec<char>]) -> String {
+fn find_the_way(grid: &[Vec<char>]) -> (String, i32) {
     let mut letters = String::new();
+    let mut nb_steps = 0;
     // Coordinates: (l = line, c = column)
     //    Up: (-1,  0)
     //  Down: (+1,  0)
@@ -98,31 +98,30 @@ fn find_the_way(grid: &[Vec<char>]) -> String {
                 c = ((c as i32) + direction.1) as usize;
             }
         }
+        nb_steps += 1;
     }
-    letters
+    (letters, nb_steps)
 }
 
-fn day19_part1(example: &[Vec<char>], input: &[Vec<char>]) {
+fn day19_all(example: &[Vec<char>], input: &[Vec<char>]) {
+    // PART 1
     // Exemple tests
     assert_eq!(find_start_position(example), 5);
-    assert_eq!(find_the_way(example), "ABCDEF");
+    let ex = find_the_way(example);
+    assert_eq!(ex.0, "ABCDEF");
 
     // Solve puzzle
     let res = find_the_way(input);
-    println!("Result part 1: {res}");
-    assert_eq!(res, "VTWBPYAQFU");
+    println!("Result part 1: {}", res.0);
+    assert_eq!(res.0, "VTWBPYAQFU");
     println!("> DAY19 - part 1: OK!");
-}
 
-fn day19_part2(_example: &[Vec<char>], _input: &[Vec<char>]) {
-    println!("TODO - part2");
+    // PART 2
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(ex.1, 38);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY19 - part 2: OK!");
+    println!("Result part 2: {}", res.1);
+    assert_eq!(res.1, 17358);
+    println!("> DAY19 - part 2: OK!");
 }
