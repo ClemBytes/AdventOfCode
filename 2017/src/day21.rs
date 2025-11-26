@@ -12,8 +12,10 @@ pub fn run() {
     let input = fs::read_to_string("inputs/input_day21").expect("Unable to read input!");
     let input = parse(&input);
 
-    day21_part1(&example, &input);
-    day21_part2(&example, &input);
+    let start = [[0, 1, 0], [0, 0, 1], [1, 1, 1]];
+
+    day21_part1(&example, &input, &start);
+    day21_part2(&example, &input, &start);
 }
 
 // Idea: represent patterns with powers of 2:
@@ -39,10 +41,14 @@ fn parse(raw_input: &str) -> HashMap<(usize, usize), (usize, usize)> {
                 '#' => {
                     input_pattern += 2_usize.pow(counter);
                     counter += 1;
-                },
-                '.' => {counter += 1;},
-                '/' => {},
-                other => unreachable!("Unknown state: '{other}' in line {line}! Should be '#' or '.''!"),
+                }
+                '.' => {
+                    counter += 1;
+                }
+                '/' => {}
+                other => {
+                    unreachable!("Unknown state: '{other}' in line {line}! Should be '#' or '.''!")
+                }
             };
         }
         let size_in = match counter {
@@ -58,16 +64,22 @@ fn parse(raw_input: &str) -> HashMap<(usize, usize), (usize, usize)> {
                 '#' => {
                     output_pattern += 2_usize.pow(counter);
                     counter += 1;
-                },
-                '.' => {counter += 1;},
-                '/' => {},
-                other => unreachable!("Unknown state: '{other}' in line {line}! Should be '#' or '.''!"),
+                }
+                '.' => {
+                    counter += 1;
+                }
+                '/' => {}
+                other => {
+                    unreachable!("Unknown state: '{other}' in line {line}! Should be '#' or '.''!")
+                }
             };
         }
         let size_out = match counter {
             9 => 3,
             16 => 4,
-            other => unreachable!("Impossible size_out {other} for Rule {line}! Should be 9 or 16!"),
+            other => {
+                unreachable!("Impossible size_out {other} for Rule {line}! Should be 9 or 16!")
+            }
         };
 
         rules.insert((size_in, input_pattern), (size_out, output_pattern));
@@ -75,27 +87,64 @@ fn parse(raw_input: &str) -> HashMap<(usize, usize), (usize, usize)> {
     rules
 }
 
-fn day21_part1(_example: &HashMap<(usize, usize), (usize, usize)>, input: &HashMap<(usize, usize), (usize, usize)>) {
+fn pattern_to_nb(pattern: &Vec<Vec<usize>>) -> (usize, usize) {
+    let size = pattern.len();
+    let mut res = 0;
+    let mut counter = 0;
+    for line in pattern {
+        for &v in line {
+            match v {
+                0 => {},
+                1 => res += 2_usize.pow(counter),
+                other => unreachable!("Should be 0 or 1, not {other}!"),
+            }
+            counter += 1;
+        }
+    }
+    (size, res)
+}
+
+fn nb_to_pattern(input: (usize, usize)) -> Vec<Vec<usize>> {
+    let (size, nb) = input;
+    let mut binary_nb = format!("{nb:04b}");
+    let mut pattern = vec![];
+    for k in (0..size).rev() {
+        for l in (0..size).rev() {
+
+        }
+    }
+    pattern
+}
+
+fn day21_part1(
+    _example: &HashMap<(usize, usize), (usize, usize)>,
+    input: &HashMap<(usize, usize), (usize, usize)>,
+    _start: &[[i32; 3]; 3],
+) {
     println!("{input:?}");
     // Exemple tests
     // assert_eq!(, 0);
     // println!("Example OK");
 
     // Solve puzzle
-    // let res = 
+    // let res =
     // println!("Result part 1: {res}");
     // assert_eq!(res, );
     // println!("> DAY21 - part 1: OK!");
 }
 
-fn day21_part2(_example: &HashMap<(usize, usize), (usize, usize)>, _input: &HashMap<(usize, usize), (usize, usize)>) {
+fn day21_part2(
+    _example: &HashMap<(usize, usize), (usize, usize)>,
+    _input: &HashMap<(usize, usize), (usize, usize)>,
+    _start: &[[i32; 3]; 3],
+) {
     println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);
     // println!("Example OK");
 
     // Solve puzzle
-    // let res = 
+    // let res =
     // println!("Result part 2: {res}");
     // assert_eq!(res, );
     // println!("> DAY21 - part 2: OK!");
