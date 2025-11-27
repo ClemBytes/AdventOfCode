@@ -120,6 +120,48 @@ fn nb_to_pattern(input: (usize, usize)) -> Vec<Vec<usize>> {
     pattern
 }
 
+fn rotate_pattern(pattern: &Vec<Vec<usize>>) -> Vec<Vec<usize>> {
+    let size = pattern.len();
+    let mut output = vec![];
+    
+    // First transpose
+    for i in 0..size {
+        let mut l = vec![];
+        for j in 0..size {
+            l.push(pattern[j][i]);
+        }
+        output.push(l);
+    }
+    
+    // Then reverse each line
+    for i in 0..size {
+        output[i].reverse();
+    }
+
+    output
+}
+
+fn flip_pattern(pattern: &Vec<Vec<usize>>) -> Vec<Vec<usize>> {
+    let mut output = pattern.clone();
+    for i in 0..pattern.len() {
+        output[i].reverse();
+    }
+    output
+}
+
+fn iterate(grid: &Vec<Vec<usize>>, rules: &HashMap<(usize, usize), (usize, usize)>) -> Vec<Vec<usize>> {
+    let size_grid_in = grid.len();
+    let mut size_chunk;
+    if size_grid_in % 2 == 0 {
+        size_chunk = 2;
+    } else if size_grid_in % 3 == 0 {
+        size_chunk = 3;
+    } else {
+        unreachable!("size_grid_in '{size_grid_in}' should be divisible by 2 or 3!");
+    }
+    grid.to_vec()
+}
+
 fn day21_part1(
     _example: &HashMap<(usize, usize), (usize, usize)>,
     input: &HashMap<(usize, usize), (usize, usize)>,
