@@ -94,7 +94,7 @@ fn pattern_to_nb(pattern: &Vec<Vec<usize>>) -> (usize, usize) {
     for line in pattern {
         for &v in line {
             match v {
-                0 => {},
+                0 => {}
                 1 => res += 2_usize.pow(counter),
                 other => unreachable!("Should be 0 or 1, not {other}!"),
             }
@@ -106,13 +106,17 @@ fn pattern_to_nb(pattern: &Vec<Vec<usize>>) -> (usize, usize) {
 
 fn nb_to_pattern(input: (usize, usize)) -> Vec<Vec<usize>> {
     let (size, nb) = input;
-    let mut binary_nb = format!("{nb:04b}");
-    let mut pattern = vec![];
-    for k in (0..size).rev() {
-        for l in (0..size).rev() {
-
-        }
-    }
+    let width = size.pow(2);
+    let binary_nb_string = format!("{nb:0width$b}");
+    let mut binary_nb_vec_reverse: Vec<usize> = binary_nb_string
+        .chars()
+        .map(|x| x.to_digit(10).unwrap() as usize)
+        .collect();
+    binary_nb_vec_reverse.reverse();
+    let pattern = binary_nb_vec_reverse
+        .chunks_exact(size)
+        .map(|c| c.to_vec())
+        .collect();
     pattern
 }
 
