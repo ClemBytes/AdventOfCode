@@ -87,7 +87,7 @@ fn parse(raw_input: &str) -> HashMap<(usize, usize), (usize, usize)> {
     rules
 }
 
-fn pattern_to_nb(pattern: &Vec<Vec<usize>>) -> (usize, usize) {
+fn pattern_to_nb(pattern: &[Vec<usize>]) -> (usize, usize) {
     let size = pattern.len();
     let mut res = 0;
     let mut counter = 0;
@@ -113,45 +113,47 @@ fn nb_to_pattern(input: (usize, usize)) -> Vec<Vec<usize>> {
         .map(|x| x.to_digit(10).unwrap() as usize)
         .collect();
     binary_nb_vec_reverse.reverse();
-    let pattern = binary_nb_vec_reverse
+    binary_nb_vec_reverse
         .chunks_exact(size)
         .map(|c| c.to_vec())
-        .collect();
-    pattern
+        .collect()
 }
 
-fn rotate_pattern(pattern: &Vec<Vec<usize>>) -> Vec<Vec<usize>> {
+fn rotate_pattern(pattern: &[Vec<usize>]) -> Vec<Vec<usize>> {
     let size = pattern.len();
     let mut output = vec![];
-    
+
     // First transpose
     for i in 0..size {
         let mut l = vec![];
-        for j in 0..size {
-            l.push(pattern[j][i]);
+        for pj in pattern.iter().take(size) {
+            l.push(pj[i]);
         }
         output.push(l);
     }
-    
+
     // Then reverse each line
-    for i in 0..size {
-        output[i].reverse();
+    for oi in output.iter_mut().take(size) {
+        oi.reverse();
     }
 
     output
 }
 
-fn flip_pattern(pattern: &Vec<Vec<usize>>) -> Vec<Vec<usize>> {
-    let mut output = pattern.clone();
-    for i in 0..pattern.len() {
-        output[i].reverse();
+fn flip_pattern(pattern: &[Vec<usize>]) -> Vec<Vec<usize>> {
+    let mut output = pattern.to_vec();
+    for oi in output.iter_mut().take(pattern.len()) {
+        oi.reverse();
     }
     output
 }
 
-fn iterate(grid: &Vec<Vec<usize>>, rules: &HashMap<(usize, usize), (usize, usize)>) -> Vec<Vec<usize>> {
+fn iterate(
+    grid: &[Vec<usize>],
+    rules: &HashMap<(usize, usize), (usize, usize)>,
+) -> Vec<Vec<usize>> {
     let size_grid_in = grid.len();
-    let mut size_chunk;
+    let size_chunk;
     if size_grid_in % 2 == 0 {
         size_chunk = 2;
     } else if size_grid_in % 3 == 0 {
@@ -159,30 +161,121 @@ fn iterate(grid: &Vec<Vec<usize>>, rules: &HashMap<(usize, usize), (usize, usize
     } else {
         unreachable!("size_grid_in '{size_grid_in}' should be divisible by 2 or 3!");
     }
-    grid.to_vec()
+    let nb_chunks = size_grid_in / size_chunk;
+
+    // Split grid into cases => list of patterns
+    let mut patterns = vec![];
+    for line_chunck in 0..nb_chunks {
+        for column_chunck in 0..nb_chunks {
+            let mut pattern = vec![];
+            for row in &grid[line_chunck * size_chunk..(line_chunck + 1) * size_chunk] {
+                pattern.push(
+                    row[column_chunck * size_chunk..(column_chunck + 1) * size_chunk].to_vec(),
+                );
+            }
+            patterns.push(pattern);
+        }
+    }
+
+    // Convert each pattern into a number, find corresponding rule. If no, rotate and flip as necessary.
+    let mut patterns_converted_nb = vec![];
+    'main_loop: for pattern in patterns {
+        let n = pattern_to_nb(&pattern);
+        if rules.contains_key(&n) {
+            patterns_converted_nb.push(rules.get(&n).unwrap());
+        } else {
+            let mut rotated_pattern = pattern.to_vec();
+            for _ in 0..3 {
+                rotated_pattern = rotate_pattern(&rotated_pattern);
+                let n = pattern_to_nb(&rotated_pattern);
+                if rules.contains_key(&n) {
+                    patterns_converted_nb.push(rules.get(&n).unwrap());
+                    continue 'main_loop;
+                }
+            }
+
+            let flipped_pattern = flip_pattern(&pattern);
+            let n = pattern_to_nb(&flipped_pattern);
+            if rules.contains_key(&n) {
+                patterns_converted_nb.push(rules.get(&n).unwrap());
+                continue 'main_loop;
+            }
+
+            let mut rotated_flipped_pattern = flipped_pattern.clone();
+            for _ in 0..3 {
+                rotated_flipped_pattern = rotate_pattern(&rotated_flipped_pattern);
+                let n = pattern_to_nb(&rotated_flipped_pattern);
+                if rules.contains_key(&n) {
+                    patterns_converted_nb.push(rules.get(&n).unwrap());
+                    continue 'main_loop;
+                }
+            }
+
+            unreachable!("No rule found for the following pattern:\n{pattern:#?}");
+        }
+    }
+
+    // Now reconstitute next grid
+    let mut next_grid = vec![];
+    let chunk_size = patterns_converted_nb[0].0;
+    for chunk_row in 0..nb_chunks {
+        let start = chunk_row * nb_chunks;
+        let end = start + nb_chunks;
+        let line_patterns: Vec<Vec<Vec<usize>>> = patterns_converted_nb[start..end]
+            .iter()
+            .map(|&&n| nb_to_pattern(n))
+            .collect();
+
+        for i in 0..chunk_size {
+            let mut new_line = vec![];
+            for p in &line_patterns {
+                new_line.extend(&p[i])
+            }
+            next_grid.push(new_line);
+        }
+    }
+
+    next_grid
+}
+
+fn solve_part1(
+    n: usize,
+    rules: &HashMap<(usize, usize), (usize, usize)>,
+    start: &[[usize; 3]; 3],
+) -> usize {
+    let mut grid = vec![];
+    for line in start {
+        grid.push(line.to_vec());
+    }
+
+    // Iterate n times
+    for _ in 0..n {
+        grid = iterate(&grid, rules);
+    }
+
+    // Count nb in 1s
+    grid.iter().map(|row| row.iter().sum::<usize>()).sum()
 }
 
 fn day21_part1(
-    _example: &HashMap<(usize, usize), (usize, usize)>,
+    example: &HashMap<(usize, usize), (usize, usize)>,
     input: &HashMap<(usize, usize), (usize, usize)>,
-    _start: &[[i32; 3]; 3],
+    start: &[[usize; 3]; 3],
 ) {
-    println!("{input:?}");
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(solve_part1(2, example, start), 12);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 1: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY21 - part 1: OK!");
+    let res = solve_part1(5, input, start);
+    println!("Result part 1: {res}");
+    assert_eq!(res, 142);
+    println!("> DAY21 - part 1: OK!");
 }
 
 fn day21_part2(
     _example: &HashMap<(usize, usize), (usize, usize)>,
     _input: &HashMap<(usize, usize), (usize, usize)>,
-    _start: &[[i32; 3]; 3],
+    _start: &[[usize; 3]; 3],
 ) {
     println!("TODO - part2");
     // Exemple tests
