@@ -15,7 +15,7 @@ pub fn run() {
     let start = [[0, 1, 0], [0, 0, 1], [1, 1, 1]];
 
     day21_part1(&example, &input, &start);
-    day21_part2(&example, &input, &start);
+    day21_part2(&input, &start);
 }
 
 // Idea: represent patterns with powers of 2:
@@ -238,7 +238,7 @@ fn iterate(
     next_grid
 }
 
-fn solve_part1(
+fn solve(
     n: usize,
     rules: &HashMap<(usize, usize), (usize, usize)>,
     start: &[[usize; 3]; 3],
@@ -263,28 +263,19 @@ fn day21_part1(
     start: &[[usize; 3]; 3],
 ) {
     // Exemple tests
-    assert_eq!(solve_part1(2, example, start), 12);
+    assert_eq!(solve(2, example, start), 12);
 
     // Solve puzzle
-    let res = solve_part1(5, input, start);
+    let res = solve(5, input, start);
     println!("Result part 1: {res}");
     assert_eq!(res, 142);
     println!("> DAY21 - part 1: OK!");
 }
 
-fn day21_part2(
-    _example: &HashMap<(usize, usize), (usize, usize)>,
-    _input: &HashMap<(usize, usize), (usize, usize)>,
-    _start: &[[usize; 3]; 3],
-) {
-    println!("TODO - part2");
-    // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
-
+fn day21_part2(input: &HashMap<(usize, usize), (usize, usize)>, start: &[[usize; 3]; 3]) {
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY21 - part 2: OK!");
+    let res = solve(18, input, start);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 1879071);
+    println!("> DAY21 - part 2: OK!");
 }
