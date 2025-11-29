@@ -31,7 +31,9 @@ pub fn run() {
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Node {
     Clean,
+    Weakened,
     Infected,
+    Flagged,
 }
 
 impl Node {
@@ -39,6 +41,16 @@ impl Node {
         match self {
             Node::Clean => Node::Infected,
             Node::Infected => Node::Clean,
+            _ => unreachable!("Cannot revert evolving node!"),
+        }
+    }
+
+    fn evolve(&self) -> Self {
+        match self {
+            Node::Clean => Node::Weakened,
+            Node::Weakened => Node::Infected,
+            Node::Infected => Node::Flagged,
+            Node::Flagged => Node::Clean,
         }
     }
 }
@@ -94,6 +106,15 @@ impl Direction {
             Direction::Left => Direction::Up,
         }
     }
+
+    fn reverse(&self) -> Self {
+        match self {
+            Direction::Up => Direction::Down,
+            Direction::Right => Direction::Left,
+            Direction::Down => Direction::Up,
+            Direction::Left => Direction::Right,
+        }
+    }
 }
 
 fn solve_part1(
@@ -113,6 +134,7 @@ fn solve_part1(
         current_direction = match n {
             Node::Clean => current_direction.turn_left(),
             Node::Infected => current_direction.turn_right(),
+            _ => unreachable!("No evolving node in part1!"),
         };
 
         // Infect or clean
@@ -146,20 +168,56 @@ fn day22_part1(
     println!("> DAY22 - part 1: OK!");
 }
 
+fn solve_part2(
+    nb_bursts: i32,
+    start_position: (i32, i32),
+    start_grid: &HashMap<(i32, i32), Node>,
+) -> i32 {
+    let mut current_position = start_position;
+    let mut current_direction = Direction::Up;
+    let mut grid = start_grid.clone();
+    let mut nb_new_infections = 0;
+    for _ in 0..nb_bursts {
+        grid.entry(current_position).or_insert(Node::Clean);
+
+        // Turn left or right
+        let n = grid.get(&current_position).unwrap();
+        current_direction = match n {
+            Node::Clean => current_direction.turn_left(),
+            Node::Weakened => current_direction, // do not turn
+            Node::Infected => current_direction.turn_right(),
+            Node::Flagged => current_direction.reverse(),
+        };
+
+        // Infect or clean
+        let n = n.evolve();
+        if matches!(n, Node::Infected) {
+            nb_new_infections += 1;
+        }
+        grid.insert(current_position, n);
+
+        // Move
+        current_position = current_direction.next_position(current_position);
+    }
+    nb_new_infections
+}
+
 fn day22_part2(
-    _example: &HashMap<(i32, i32), Node>,
-    _example_start_position: (i32, i32),
-    _input: &HashMap<(i32, i32), Node>,
-    _input_start_position: (i32, i32),
+    example: &HashMap<(i32, i32), Node>,
+    example_start_position: (i32, i32),
+    input: &HashMap<(i32, i32), Node>,
+    input_start_position: (i32, i32),
 ) {
-    println!("TODO - part2");
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(solve_part2(100, example_start_position, example), 26);
+    assert_eq!(
+        solve_part2(10_000_000, example_start_position, example),
+        2_511_944
+    );
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY22 - part 2: OK!");
+    let res = solve_part2(10_000_000, input_start_position, input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 2511895);
+    println!("> DAY22 - part 2: OK!");
 }
