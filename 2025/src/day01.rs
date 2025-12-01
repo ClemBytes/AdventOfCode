@@ -48,19 +48,88 @@ impl Rotation {
         }
     }
 
-    fn actual_password(rotations: &[Self], max_dial: i32, start_position: i32) -> i32 {
+    fn bad_password(rotations: &[Self], max_dial: i32, start_position: i32) -> i32 {
         let mut current_position = start_position;
-        let mut nb_zeros = 0;
+        let mut nb_zeros_pointed = 0;
         if current_position == 0 {
-            nb_zeros += 1;
+            nb_zeros_pointed += 1;
         }
         for rotation in rotations {
             current_position = rotation.apply(max_dial, current_position);
             if current_position == 0 {
-                nb_zeros += 1;
+                nb_zeros_pointed += 1;
             }
         }
-        nb_zeros
+        nb_zeros_pointed
+    }
+
+    /* AGROUGROU BOUUUUH
+    fn good_password(rotations: &[Self], max_dial: i32, start_position: i32) -> i32 {
+        let mut current_position = start_position;
+        let mut nb_zeros_clicked = 0;
+        if current_position == 0 {
+            nb_zeros_clicked += 1;
+        }
+        for rotation in rotations {
+            match rotation {
+                Rotation::Left(i) => {
+                    let new_position_without_modulo = current_position - *i;
+                    if new_position_without_modulo <= 0 {
+                        if current_position != 0 {
+                            nb_zeros_clicked += 1;
+                        }
+                        let nb_more_zeros = new_position_without_modulo.abs() / (max_dial + 1);
+                        nb_zeros_clicked += nb_more_zeros;
+                    }
+                },
+                Rotation::Right(i) => {
+                    let new_position_without_modulo = current_position + *i;
+                    if new_position_without_modulo > max_dial {
+                        nb_zeros_clicked += 1;
+                        let nb_more_zeros = (new_position_without_modulo - max_dial) / (max_dial + 1);
+                        nb_zeros_clicked += nb_more_zeros;
+                    }
+                },
+            }
+            let new_position = rotation.apply(max_dial, current_position);
+            // println!("rotation: {rotation:?} | nb_zeros_clicked: {nb_zeros_clicked} | current_position: {current_position} | new_position: {new_position}");
+            current_position = new_position;
+        }
+        nb_zeros_clicked
+    }
+    */
+
+    fn stupid_good_password(rotations: &[Self], max_dial: i32, start_position: i32) -> i32 {
+        let mut current_position = start_position;
+        let mut nb_zeros_clicked = 0;
+        if current_position == 0 {
+            nb_zeros_clicked += 1;
+        }
+        for rotation in rotations {
+            match rotation {
+                Rotation::Left(i) => {
+                    for _ in 0..*i {
+                        current_position -= 1;
+                        if current_position == 0 {
+                            nb_zeros_clicked += 1;
+                        }
+                        if current_position == -1 {
+                            current_position = max_dial;
+                        }
+                    }
+                }
+                Rotation::Right(i) => {
+                    for _ in 0..*i {
+                        current_position += 1;
+                        if current_position == max_dial + 1 {
+                            current_position = 0;
+                            nb_zeros_clicked += 1;
+                        }
+                    }
+                }
+            }
+        }
+        nb_zeros_clicked
     }
 }
 
@@ -72,24 +141,42 @@ fn day01_part1(example: &[Rotation], input: &[Rotation]) {
     assert_eq!(Rotation::Left(1).apply(99, 0), 99);
     assert_eq!(Rotation::Left(10).apply(99, 5), 95);
     assert_eq!(Rotation::Right(5).apply(99, 95), 0);
-    assert_eq!(Rotation::actual_password(example, 99, 50), 3);
+    assert_eq!(Rotation::bad_password(example, 99, 50), 3);
 
     // Solve puzzle
-    let res = Rotation::actual_password(input, 99, 50);
+    let res = Rotation::bad_password(input, 99, 50);
     println!("Result part 1: {res}");
     assert_eq!(res, 1084);
     println!("> DAY01 - part 1: OK!");
 }
 
-fn day01_part2(_example: &[Rotation], _input: &[Rotation]) {
-    println!("TODO - part2");
+fn day01_part2(example: &[Rotation], input: &[Rotation]) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(
+        Rotation::stupid_good_password(&[Rotation::Right(10)], 99, 95),
+        1
+    );
+    assert_eq!(
+        Rotation::stupid_good_password(&[Rotation::Left(10)], 99, 5),
+        1
+    );
+    assert_eq!(
+        Rotation::stupid_good_password(&[Rotation::Right(100)], 99, 0),
+        2
+    );
+    assert_eq!(
+        Rotation::stupid_good_password(&[Rotation::Right(1000)], 99, 50),
+        10
+    );
+    assert_eq!(
+        Rotation::stupid_good_password(&[Rotation::Left(1000)], 99, 50),
+        10
+    );
+    assert_eq!(Rotation::stupid_good_password(example, 99, 50), 6);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY01 - part 2: OK!");
+    let res = Rotation::stupid_good_password(input, 99, 50);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 6475);
+    println!("> DAY01 - part 2: OK!");
 }
