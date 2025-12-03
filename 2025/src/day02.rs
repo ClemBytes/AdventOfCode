@@ -36,12 +36,7 @@ fn is_valid(id: usize) -> bool {
     }
 
     let half_len = len_id / 2;
-    for i in 0..half_len {
-        if str_id[i] != str_id[i + half_len] {
-            return true;
-        }
-    }
-    false
+    str_id[..half_len] != str_id[half_len..]
 }
 
 fn count_invalid_ids_in_range(range: (usize, usize)) -> usize {
@@ -101,15 +96,85 @@ fn day02_part1(example: &[(usize, usize)], input: &[(usize, usize)]) {
     println!("> DAY02 - part 1: OK!");
 }
 
-fn day02_part2(_example: &[(usize, usize)], _input: &[(usize, usize)]) {
-    println!("TODO - part2");
+fn smaller_divisors(n: usize) -> Vec<usize> {
+    let mut divisors = vec![];
+    let mut i = 1;
+    while i * i <= n {
+        if n % i == 0 {
+            if i != 1 {
+                divisors.push(i);
+            }
+            let other = n / i;
+            if i != other {
+                divisors.push(other);
+            }
+        }
+        i += 1;
+    }
+    divisors.sort();
+    divisors
+}
+
+fn is_valid_hard(id: usize) -> bool {
+    let str_id: Vec<char> = format!("{id}").chars().collect();
+    let len_id = str_id.len();
+    let len_divisors = smaller_divisors(len_id);
+
+    'main_loop: for div in len_divisors {
+        let div_len = len_id / div;
+        let base = &str_id[..div_len];
+        for k in 1..div {
+            if *base != str_id[(div_len * k)..(div_len * (k + 1))] {
+                continue 'main_loop;
+            }
+        }
+        return false;
+    }
+    true
+}
+
+fn count_invalid_ids_in_range_hard(range: (usize, usize)) -> usize {
+    let (start, end) = range;
+    let mut nb = 0;
+    for id in start..=end {
+        if !is_valid_hard(id) {
+            nb += 1;
+        }
+    }
+    nb
+}
+
+fn sum_invalid_ids_in_range_hard(range: (usize, usize)) -> usize {
+    let (start, end) = range;
+    let mut nb = 0;
+    for id in start..=end {
+        if !is_valid_hard(id) {
+            nb += id;
+        }
+    }
+    nb
+}
+
+fn solve_part2(ranges: &[(usize, usize)]) -> usize {
+    let mut res = 0;
+    for &range in ranges {
+        res += sum_invalid_ids_in_range_hard(range);
+    }
+    res
+}
+
+fn day02_part2(example: &[(usize, usize)], input: &[(usize, usize)]) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert!(is_valid_hard(110));
+    assert_eq!(count_invalid_ids_in_range_hard((95, 115)), 2);
+    assert_eq!(count_invalid_ids_in_range_hard((1698522, 1698528)), 0);
+    assert!(!is_valid_hard(2121212121));
+    assert_eq!(count_invalid_ids_in_range_hard((2121212118, 2121212124)), 1);
+    assert_eq!(solve_part2(example), 4174379265);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY02 - part 2: OK!");
+    let res = solve_part2(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 43287141963);
+    println!("> DAY02 - part 2: OK!");
 }
