@@ -55,5 +55,5 @@ cargo test --release -- --nocapture dayXX
 
 Progress so far:  
 ⭐⭐⭐☆☆☆☆☆☆☆☆☆   
-⭐⭐☆☆☆☆☆☆☆☆☆☆   
-**5 / 24 stars**
+⭐⭐⭐☆☆☆☆☆☆☆☆☆   
+**6 / 24 stars**

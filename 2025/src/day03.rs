@@ -16,76 +16,93 @@ pub fn run() {
     day03_part2(&example, &input);
 }
 
-fn parse(raw_input: &str) -> Vec<Vec<u32>> {
+fn parse(raw_input: &str) -> Vec<Vec<u64>> {
     let mut banks: Vec<_> = vec![];
     for line in raw_input.lines() {
         let mut bank = vec![];
         for digit in line.chars() {
-            bank.push(digit.to_digit(10).unwrap());
+            bank.push(digit.to_digit(10).unwrap() as u64);
         }
         banks.push(bank);
     }
     banks
 }
 
-fn max_joltage(bank: &[u32]) -> u32 {
+fn max_joltage(n: usize, bank: &[u64]) -> u64 {
     let nb_batteries = bank.len();
-
-    // Find first max of bank, not being the last one
     let mut index = 0;
     let mut max_battery = 0;
-    for (i, &bank_i) in bank.iter().enumerate().take(nb_batteries - 1) {
-        if bank_i > max_battery {
-            index = i;
-            max_battery = bank_i;
+    for k in 1..n + 1 {
+        let mut mb = 0;
+        let to_skip = match k {
+            1 => index,
+            _ => index + 1,
+        };
+        for (i, &bank_i) in bank
+            .iter()
+            .enumerate()
+            .take(nb_batteries - (n - k))
+            .skip(to_skip)
+        {
+            if bank_i > mb {
+                index = i;
+                mb = bank_i;
+            }
+            if mb == 9 {
+                break;
+            }
         }
-        if max_battery == 9 {
-            break;
-        }
+        max_battery += mb * 10_u64.pow(n as u32 - k as u32);
     }
-
-    // Then find second max battery, after the one found
-    let mut second_max_battery = 0;
-    for &bank_i in bank.iter().take(nb_batteries).skip(index + 1) {
-        if bank_i > second_max_battery {
-            second_max_battery = bank_i;
-        }
-        if second_max_battery == 9 {
-            break;
-        }
-    }
-
-    max_battery * 10 + second_max_battery
+    max_battery
 }
 
-fn output_joltage(banks: &[Vec<u32>]) -> u32 {
+fn output_joltage(nb_batteries: usize, banks: &[Vec<u64>]) -> u64 {
     let mut sum = 0;
     for bank in banks {
-        sum += max_joltage(bank);
+        sum += max_joltage(nb_batteries, bank);
     }
     sum
 }
 
-fn day03_part1(example: &[Vec<u32>], input: &[Vec<u32>]) {
+fn day03_part1(example: &[Vec<u64>], input: &[Vec<u64>]) {
     // Exemple tests
-    assert_eq!(output_joltage(example), 357);
+    assert_eq!(output_joltage(2, example), 357);
 
     // Solve puzzle
-    let res = output_joltage(input);
+    let res = output_joltage(2, input);
     println!("Result part 1: {res}");
     assert_eq!(res, 17613);
     println!("> DAY03 - part 1: OK!");
 }
 
-fn day03_part2(_example: &[Vec<u32>], _input: &[Vec<u32>]) {
-    println!("TODO - part2");
+fn day03_part2(example: &[Vec<u64>], input: &[Vec<u64>]) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    let ex: Vec<u64> = "987654321111111"
+        .chars()
+        .map(|x| x.to_digit(10).unwrap() as u64)
+        .collect();
+    assert_eq!(max_joltage(12, &ex), 987654321111);
+    let ex: Vec<u64> = "811111111111119"
+        .chars()
+        .map(|x| x.to_digit(10).unwrap() as u64)
+        .collect();
+    assert_eq!(max_joltage(12, &ex), 811111111119);
+    let ex: Vec<u64> = "234234234234278"
+        .chars()
+        .map(|x| x.to_digit(10).unwrap() as u64)
+        .collect();
+    assert_eq!(max_joltage(12, &ex), 434234234278);
+    let ex: Vec<u64> = "818181911112111"
+        .chars()
+        .map(|x| x.to_digit(10).unwrap() as u64)
+        .collect();
+    assert_eq!(max_joltage(12, &ex), 888911112111);
+    assert_eq!(output_joltage(12, example), 3121910778619);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY03 - part 2: OK!");
+    let res = output_joltage(12, input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 175304218462560);
+    println!("> DAY03 - part 2: OK!");
 }
