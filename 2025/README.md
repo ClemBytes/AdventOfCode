@@ -16,7 +16,8 @@ I plan to do some puzzles also in **Python** and then compare how fast they are.
 
 - Each puzzle is implemented in its own module under `src/`.
 - The corresponding data files are in `inputs/`, but I don't publish them here like [required by the author](https://adventofcode.com/2025/about) (these are my inputs, they are generated differently for each user when logged into AdventOfCode so yours are different, you can't use my results directly).
-- Please note that for some days, I might have applied a change to the input file.
+- Please note that for some days, I might have applied a change to the input file:
+    - In day 02, I deleted the final line break.
 
 ### Debug mode
 Compile and run **all** with:
@@ -53,6 +54,6 @@ cargo test --release -- --nocapture dayXX
 ## 🚧 Status
 
 Progress so far:  
+⭐⭐☆☆☆☆☆☆☆☆☆☆   
 ⭐☆☆☆☆☆☆☆☆☆☆☆   
-⭐☆☆☆☆☆☆☆☆☆☆☆   
-**2 / 24 stars**
+**3 / 24 stars**
