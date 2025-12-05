@@ -1,4 +1,4 @@
-use std::fs;
+use std::{collections::HashSet, fs};
 
 #[test]
 fn test() {
@@ -79,18 +79,59 @@ fn day05_part1(
     println!("> DAY05 - part 1: OK!");
 }
 
+fn count_all_fresh_ids_naive(ranges: &[(usize, usize)]) -> usize {
+    let mut fresh_ids = HashSet::new();
+    for range in ranges {
+        let start = range.0;
+        let end = range.1;
+        for id in start..=end {
+            fresh_ids.insert(id);
+        }
+    }
+    fresh_ids.len()
+}
+
+fn count_all_fresh_ids(ranges: &[(usize, usize)]) -> usize {
+    // Merge ranges
+    // Sort ranges by start points
+    let mut ranges = ranges.to_vec();
+    ranges.sort();
+
+    // Then merge touching of overlapping intervals
+    let mut ranges_unions = vec![];
+    let mut current_range = ranges[0];
+    for (i, next_range) in ranges.iter().enumerate() {
+        if i == 0 {
+            continue;
+        }
+        if next_range.0 <= current_range.1 {
+            current_range.1 = current_range.1.max(next_range.1);
+        } else {
+            ranges_unions.push(current_range);
+            current_range = *next_range;
+        }
+    }
+    ranges_unions.push(current_range);
+
+    // Count fresh ids
+    let mut res = 0;
+    for range in ranges_unions {
+        res += range.1 - range.0 + 1;
+    }
+    res
+}
+
 fn day05_part2(
-    _example: &(Vec<(usize, usize)>, Vec<usize>),
-    _input: &(Vec<(usize, usize)>, Vec<usize>),
+    example: &(Vec<(usize, usize)>, Vec<usize>),
+    input: &(Vec<(usize, usize)>, Vec<usize>),
 ) {
-    println!("TODO - part2");
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(count_all_fresh_ids_naive(&example.0), 14);
+    assert_eq!(count_all_fresh_ids(&example.0), 14);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY05 - part 2: OK!");
+    let res = count_all_fresh_ids(&input.0);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 344306344403172);
+    println!("> DAY05 - part 2: OK!");
 }
