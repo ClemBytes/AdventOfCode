@@ -68,15 +68,92 @@ fn day06_part1(raw_example: String, raw_input: String) {
     println!("> DAY06 - part 1: OK!");
 }
 
-fn day06_part2(_example: String, _input: String) {
-    println!("TODO - part2");
+fn solve_part2(raw_input: String) -> usize {
+    // Firt parse raw_input as a grid
+    let mut grid_input: Vec<Vec<char>> = vec![];
+    for line in raw_input.lines() {
+        grid_input.push(line.chars().collect());
+    }
+
+    // Then directly read and compute
+    let nb_lines = grid_input.len();
+    let last_line_index = nb_lines - 1;
+    let nb_cols = grid_input[0].len();
+    let mut current_op = grid_input[last_line_index][0];
+    let mut res = 0;
+    let mut current_numbers = vec![];
+    for col in 0..nb_cols {
+        // Check if empty column
+        let mut empty_col = true;
+        for grid_input_l in grid_input.iter().take(nb_lines) {
+            if grid_input_l[col] != ' ' {
+                empty_col = false;
+                break;
+            }
+        }
+        // If all empty, compute
+        if empty_col {
+            let mut partial_res = 0;
+            match current_op {
+                '+' => {
+                    for nb in &current_numbers {
+                        partial_res += nb;
+                    }
+                }
+                '*' => {
+                    partial_res = 1;
+                    for nb in &current_numbers {
+                        partial_res *= nb;
+                    }
+                }
+                _ => unreachable!("Unknown operation '{current_op}', should be '+' or '*'!"),
+            }
+            current_numbers.clear();
+            res += partial_res;
+            current_op = grid_input[last_line_index][col + 1];
+            continue;
+        }
+
+        // Else, get current number
+        let mut current_number = String::new();
+        for grid_input_l in grid_input.iter().take(last_line_index) {
+            let c = grid_input_l[col];
+            if c != ' ' {
+                current_number.push(c);
+            }
+        }
+        if !current_number.is_empty() {
+            current_numbers.push(current_number.parse::<usize>().unwrap());
+        }
+    }
+    // Final compute
+    let mut partial_res = 0;
+    match current_op {
+        '+' => {
+            for nb in current_numbers {
+                partial_res += nb;
+            }
+        }
+        '*' => {
+            partial_res = 1;
+            for nb in current_numbers {
+                partial_res *= nb;
+            }
+        }
+        _ => unreachable!("Unknown operation '{current_op}', should be '+' or '*'!"),
+    }
+    res += partial_res;
+
+    res
+}
+
+fn day06_part2(example: String, input: String) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(solve_part2(example), 3263827);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY06 - part 2: OK!");
+    let res = solve_part2(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 9625320374409);
+    println!("> DAY06 - part 2: OK!");
 }
