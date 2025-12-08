@@ -69,7 +69,7 @@ fn solve_part1(
         junctions.insert(id, id);
     }
 
-    // Apply functions
+    // Apply junctions
     for (_, pair) in distances {
         // Get group of the first id, to keep
         let group_to_keep = *junctions.get(&pair.0).unwrap();
@@ -120,18 +120,59 @@ fn day08_part1(example: &HashMap<usize, (i64, i64, i64)>, input: &HashMap<usize,
     println!("> DAY08 - part 1: OK!");
 }
 
-fn day08_part2(
-    _example: &HashMap<usize, (i64, i64, i64)>,
-    _input: &HashMap<usize, (i64, i64, i64)>,
-) {
-    println!("TODO - part2");
+fn solve_part2(boxes: &HashMap<usize, (i64, i64, i64)>) -> i64 {
+    let nb_boxes = boxes.len();
+
+    // Compute all shortest distances
+    let distances = compute_all_distances(boxes);
+
+    // Create hashmap where each box id is alone in its own junction
+    let mut junctions = HashMap::new();
+    for id in 0..nb_boxes {
+        junctions.insert(id, id);
+    }
+
+    // Apply junctions until ont group
+    'main_loop: for (_, pair) in distances {
+        // Get group of the first id, to keep
+        let group_to_keep = *junctions.get(&pair.0).unwrap();
+
+        // Get group of second id, to change
+        let group_to_change = *junctions.get(&pair.1).unwrap();
+
+        // Then change all groups that need to be changed
+        let mut ids_to_change = vec![];
+        for id in 0..nb_boxes {
+            if *junctions.get(&id).unwrap() == group_to_change {
+                ids_to_change.push(id);
+            }
+        }
+        for id in ids_to_change {
+            junctions.insert(id, group_to_keep);
+        }
+
+        // Check if there is only one group
+        let ref_group = *junctions.get(&0).unwrap();
+        for id in 1..nb_boxes {
+            if *junctions.get(&id).unwrap() != ref_group {
+                continue 'main_loop;
+            }
+        }
+        // If we are here, there is only one group!
+        let box1 = *boxes.get(&pair.0).unwrap();
+        let box2 = *boxes.get(&pair.1).unwrap();
+        return box1.0 * box2.0;
+    }
+    unreachable!();
+}
+
+fn day08_part2(example: &HashMap<usize, (i64, i64, i64)>, input: &HashMap<usize, (i64, i64, i64)>) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(solve_part2(example), 25272);
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY08 - part 2: OK!");
+    let res = solve_part2(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 6844224);
+    println!("> DAY08 - part 2: OK!");
 }
