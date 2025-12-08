@@ -25,7 +25,7 @@ fn parse(raw_input: &str) -> Vec<_> {
     yyy
 }
 
-fn dayXX_part1(_example: &Vec<_>, _input: &Vec<_>) {
+fn dayXX_part1(_example: &[_], _input: &[_]) {
     println!("TODO - part1");
     // Exemple tests
     // assert_eq!(, 0);
@@ -38,7 +38,7 @@ fn dayXX_part1(_example: &Vec<_>, _input: &Vec<_>) {
     // println!("> DAYXX - part 1: OK!");
 }
 
-fn dayXX_part2(_example: &Vec<_>, _input: &Vec<_>) {
+fn dayXX_part2(_example: &[_], _input: &[_]) {
     println!("TODO - part2");
     // Exemple tests
     // assert_eq!(, 0);
