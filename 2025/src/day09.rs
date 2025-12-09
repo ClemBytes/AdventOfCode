@@ -1,4 +1,4 @@
-use std::fs;
+use std::{collections::HashSet, fs};
 
 #[test]
 fn test() {
@@ -19,8 +19,8 @@ pub fn run() {
 fn parse(raw_input: &str) -> Vec<(usize, usize)> {
     let mut red_tiles = vec![];
     for line in raw_input.lines() {
-        let (x, y) = line.split_once(",").unwrap();
-        red_tiles.push((x.parse().unwrap(), y.parse().unwrap()));
+        let (j, i) = line.split_once(",").unwrap();
+        red_tiles.push((i.parse().unwrap(), j.parse().unwrap()));
     }
     red_tiles
 }
@@ -62,11 +62,71 @@ fn day09_part1(example: &[(usize, usize)], input: &[(usize, usize)]) {
     println!("> DAY09 - part 1: OK!");
 }
 
-fn day09_part2(_example: &[(usize, usize)], _input: &[(usize, usize)]) {
-    println!("TODO - part2");
+fn get_green_and_red_tiles(red_tiles: &[(usize, usize)]) -> HashSet<(usize, usize)> {
+    // Initiate by adding all red tiles
+    let mut green_and_red_tiles: HashSet<(usize, usize)> = red_tiles.iter().cloned().collect();
+
+    // Then add all green tiles between two red tiles
+    let nb_tiles = red_tiles.len();
+    for i in 0..nb_tiles {
+        let tile1 = red_tiles[i];
+        let tile2 = red_tiles[(i + 1) % nb_tiles];
+        if tile1.0 == tile2.0 {
+            let i = tile1.0;
+            let min_j = tile1.1.min(tile2.1);
+            let max_j = tile1.1.max(tile2.1);
+            for j in min_j + 1..max_j {
+                green_and_red_tiles.insert((i, j));
+            }
+        } else if tile1.1 == tile2.1 {
+            let j = tile1.1;
+            let min_i = tile1.0.min(tile2.0);
+            let max_i = tile1.0.max(tile2.0);
+            for i in min_i + 1..max_i {
+                green_and_red_tiles.insert((i, j));
+            }
+        } else {
+            unreachable!("'{tile1:?}' and '{tile2:?}' should have one common coordinate!");
+        }
+    }
+
+    // Now fill, line by line
+    let max_i = *green_and_red_tiles.iter().map(|(i, _)| i).max().unwrap();
+    let max_j = *green_and_red_tiles.iter().map(|(_, j)| j).max().unwrap();
+    for i in 0..max_i {
+        let mut inside = false;
+        for j in 0..max_j {
+            if green_and_red_tiles.contains(&(i, j)) {
+                inside = !inside;
+            }
+            
+            if inside {
+                green_and_red_tiles.insert((i, j));
+            }
+        }
+
+    }
+
+    green_and_red_tiles
+}
+
+fn day09_part2(example: &[(usize, usize)], _input: &[(usize, usize)]) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    // Check fill with green
+    let raw_example_filled_grid = fs::read_to_string("inputs/example_day09_filled_grid").expect("Unable to read input!");
+    let mut example_green_and_red_tiles = HashSet::new();
+    for (i, line) in raw_example_filled_grid.lines().enumerate() {
+        for (j, c) in line.chars().enumerate() {
+            if c == 'X' || c == '#' {
+                example_green_and_red_tiles.insert((i, j));
+            }
+        }
+    }
+    let res_example = get_green_and_red_tiles(example);
+    println!("diff e-r: {:?}", example_green_and_red_tiles.difference(&res_example));
+    println!("diff r-e: {:?}", res_example.difference(&example_green_and_red_tiles));
+    assert_eq!(res_example, example_green_and_red_tiles);
+    println!("Examples OK");
 
     // Solve puzzle
     // let res =
