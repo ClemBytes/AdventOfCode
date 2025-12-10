@@ -124,20 +124,22 @@ fn get_green_and_red_tiles(red_tiles: &[(usize, usize)]) -> HashSet<(usize, usiz
                     //  | Turns down
                     // Same as above
                     inside = green_and_red_tiles.contains(&(i - 1, j));
-                }  else if down && right && !up && !left {
+                } else if down && right && !up && !left {
                     // x— Turns from down to right
                     // |  Do nothing
                 } else if up && right && !down && !left {
                     // |  Turns from up to right
                     // x— Do nothing
                 } else {
-                    unreachable!("Impossible configuration!\n Up: {up} | Down: {down} | Left: {left} | Right: {right}");
+                    unreachable!(
+                        "Impossible configuration!\n Up: {up} | Down: {down} | Left: {left} | Right: {right}"
+                    );
                 }
-                
+
                 // Do not add to interior
                 continue;
             }
-            
+
             if inside {
                 green_and_red_tiles.insert((i, j));
             }
@@ -145,7 +147,6 @@ fn get_green_and_red_tiles(red_tiles: &[(usize, usize)]) -> HashSet<(usize, usiz
         if centiles != 0 && i % centiles == 0 {
             println!("{} % fill complete!", i / centiles);
         }
-
     }
 
     // Add frontier to tiles
@@ -154,7 +155,11 @@ fn get_green_and_red_tiles(red_tiles: &[(usize, usize)]) -> HashSet<(usize, usiz
     green_and_red_tiles
 }
 
-fn allowed_rectangle(allowed_tiles: &HashSet<(usize, usize)>, tile1: (usize, usize), tile2: (usize, usize)) -> bool {
+fn allowed_rectangle(
+    allowed_tiles: &HashSet<(usize, usize)>,
+    tile1: (usize, usize),
+    tile2: (usize, usize),
+) -> bool {
     let min_i = tile1.0.min(tile2.0);
     let max_i = tile1.0.max(tile2.0);
     let min_j = tile1.1.min(tile2.1);
@@ -188,7 +193,8 @@ fn find_largest_rectangle_area_inside(red_tiles: &[(usize, usize)]) -> usize {
 fn day09_part2(example: &[(usize, usize)], input: &[(usize, usize)]) {
     // Exemple tests
     // Check fill with green
-    let raw_example_filled_grid = fs::read_to_string("inputs/example_day09_filled_grid").expect("Unable to read input!");
+    let raw_example_filled_grid =
+        fs::read_to_string("inputs/example_day09_filled_grid").expect("Unable to read input!");
     let mut example_green_and_red_tiles = HashSet::new();
     for (i, line) in raw_example_filled_grid.lines().enumerate() {
         for (j, c) in line.chars().enumerate() {
