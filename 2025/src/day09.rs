@@ -62,7 +62,6 @@ fn day09_part1(example: &[(usize, usize)], input: &[(usize, usize)]) {
     println!("> DAY09 - part 1: OK!");
 }
 
-// Let's make the asumption that the frontier is "regular", so that for each line we can get inside and outside only once
 fn get_frontier(red_tiles: &[(usize, usize)]) -> HashSet<(usize, usize)> {
     // Initiate by adding all red tiles to frontier
     let mut frontier: HashSet<(usize, usize)> = red_tiles.iter().cloned().collect();
@@ -122,6 +121,16 @@ fn allowed_rectangle(
     let max_i = tile1.0.max(tile2.0);
     let min_j = tile1.1.min(tile2.1);
     let max_j = tile1.1.max(tile2.1);
+
+    // First check if rectangle intersects frontier
+    for &t in frontier {
+        let ti = t.0;
+        let tj = t.1;
+        if min_i < ti && ti < max_i && min_j < tj && tj < max_j {
+            return false;
+        }
+    }
+
     for i in min_i..=max_i {
         for j in min_j..=max_j {
             if !is_tile_inside((i, j), frontier) {
