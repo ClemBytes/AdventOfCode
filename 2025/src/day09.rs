@@ -62,12 +62,10 @@ fn day09_part1(example: &[(usize, usize)], input: &[(usize, usize)]) {
     println!("> DAY09 - part 1: OK!");
 }
 
-fn get_green_and_red_tiles(red_tiles: &[(usize, usize)]) -> HashSet<(usize, usize)> {
+// Let's make the asumption that the frontier is "regular", so that for each line we can get inside and outside only once
+fn get_frontier(red_tiles: &[(usize, usize)]) -> HashSet<(usize, usize)> {
     // Initiate by adding all red tiles to frontier
     let mut frontier: HashSet<(usize, usize)> = red_tiles.iter().cloned().collect();
-
-    // Only contains interior, merge with frontier at the end
-    let mut green_and_red_tiles = HashSet::new();
 
     // Then add all green tiles between two red tiles
     let nb_tiles = red_tiles.len();
@@ -93,70 +91,30 @@ fn get_green_and_red_tiles(red_tiles: &[(usize, usize)]) -> HashSet<(usize, usiz
         }
     }
 
-    // Now fill, line by line
-    let max_i = *frontier.iter().map(|(i, _)| i).max().unwrap();
-    let max_j = *frontier.iter().map(|(_, j)| j).max().unwrap();
-    let centiles = max_i / 100;
-    for i in 0..max_i {
-        let mut inside = false;
-        for j in 0..max_j {
-            if frontier.contains(&(i, j)) {
-                // 6 possibilities, depending on neighbours
-                let up = frontier.contains(&(i - 1, j));
-                let down = frontier.contains(&(i + 1, j));
-                let left = frontier.contains(&(i, j - 1));
-                let right = frontier.contains(&(i, j + 1));
-                if up && down && !left && !right {
-                    // |
-                    // x Vertical frontier
-                    // |
-                    inside = !inside;
-                } else if !up && !down && left && right {
-                    // —x— Horizontal frontier
-                    // Do nothing
-                } else if left && up && !right && !down {
-                    //  |
-                    // —x Turns up
-                    // Same as above right
-                    inside = green_and_red_tiles.contains(&(i - 1, j + 1));
-                } else if left && down && !right && !up {
-                    // —x
-                    //  | Turns down
-                    // Same as above
-                    inside = green_and_red_tiles.contains(&(i - 1, j));
-                } else if down && right && !up && !left {
-                    // x— Turns from down to right
-                    // |  Do nothing
-                } else if up && right && !down && !left {
-                    // |  Turns from up to right
-                    // x— Do nothing
-                } else {
-                    unreachable!(
-                        "Impossible configuration!\n Up: {up} | Down: {down} | Left: {left} | Right: {right}"
-                    );
-                }
+    frontier
+}
 
-                // Do not add to interior
-                continue;
+fn is_tile_inside(tile: (usize, usize), frontier: &HashSet<(usize, usize)>) -> bool {
+    if frontier.contains(&tile) {
+        return true;
+    }
+    let mut before = false;
+    let mut after = false;
+    for t in frontier {
+        if t.0 == tile.0 {
+            // Same line
+            if t.1 < tile.1 {
+                before = true;
+            } else if t.1 > tile.1 {
+                after = true;
             }
-
-            if inside {
-                green_and_red_tiles.insert((i, j));
-            }
-        }
-        if centiles != 0 && i % centiles == 0 {
-            println!("{} % fill complete!", i / centiles);
         }
     }
-
-    // Add frontier to tiles
-    green_and_red_tiles.extend(frontier.drain());
-
-    green_and_red_tiles
+    before && after
 }
 
 fn allowed_rectangle(
-    allowed_tiles: &HashSet<(usize, usize)>,
+    frontier: &HashSet<(usize, usize)>,
     tile1: (usize, usize),
     tile2: (usize, usize),
 ) -> bool {
@@ -166,7 +124,7 @@ fn allowed_rectangle(
     let max_j = tile1.1.max(tile2.1);
     for i in min_i..=max_i {
         for j in min_j..=max_j {
-            if !allowed_tiles.contains(&(i, j)) {
+            if !is_tile_inside((i, j), frontier) {
                 return false;
             }
         }
@@ -176,7 +134,10 @@ fn allowed_rectangle(
 
 fn find_largest_rectangle_area_inside(red_tiles: &[(usize, usize)]) -> usize {
     let mut max_area = 0;
-    let allowed_tiles = get_green_and_red_tiles(red_tiles);
+    let allowed_tiles = get_frontier(red_tiles);
+    let nb_tiles = red_tiles.len();
+    let nb_rectangles = nb_tiles * (nb_tiles - 1) / 2;
+    let mut nb_tested_rectangles = 0;
     for (i, &tile1) in red_tiles.iter().enumerate() {
         for &tile2 in red_tiles[i + 1..].iter() {
             if allowed_rectangle(&allowed_tiles, tile1, tile2) {
@@ -185,6 +146,8 @@ fn find_largest_rectangle_area_inside(red_tiles: &[(usize, usize)]) -> usize {
                     max_area = area;
                 }
             }
+            nb_tested_rectangles += 1;
+            println!("{nb_tested_rectangles} / {nb_rectangles}");
         }
     }
     max_area
@@ -194,7 +157,7 @@ fn day09_part2(example: &[(usize, usize)], input: &[(usize, usize)]) {
     // Exemple tests
     // Check fill with green
     let raw_example_filled_grid =
-        fs::read_to_string("inputs/example_day09_filled_grid").expect("Unable to read input!");
+        fs::read_to_string("inputs/example_day09_frontier").expect("Unable to read input!");
     let mut example_green_and_red_tiles = HashSet::new();
     for (i, line) in raw_example_filled_grid.lines().enumerate() {
         for (j, c) in line.chars().enumerate() {
@@ -203,7 +166,7 @@ fn day09_part2(example: &[(usize, usize)], input: &[(usize, usize)]) {
             }
         }
     }
-    let res_example = get_green_and_red_tiles(example);
+    let res_example = get_frontier(example);
     assert_eq!(res_example, example_green_and_red_tiles);
     assert_eq!(find_largest_rectangle_area_inside(example), 24);
     println!("Examples OK");
