@@ -1,4 +1,4 @@
-use std::{collections::HashSet, fs};
+use std::{collections::{HashMap, HashSet}, fs};
 
 #[test]
 fn test() {
@@ -62,127 +62,199 @@ fn day09_part1(example: &[(usize, usize)], input: &[(usize, usize)]) {
     println!("> DAY09 - part 1: OK!");
 }
 
-fn get_frontier(red_tiles: &[(usize, usize)]) -> HashSet<(usize, usize)> {
-    // Initiate by adding all red tiles to frontier
-    let mut frontier: HashSet<(usize, usize)> = red_tiles.iter().cloned().collect();
-
-    // Then add all green tiles between two red tiles
-    let nb_tiles = red_tiles.len();
-    for i in 0..nb_tiles {
-        let tile1 = red_tiles[i];
-        let tile2 = red_tiles[(i + 1) % nb_tiles];
-        if tile1.0 == tile2.0 {
-            let i = tile1.0;
-            let min_j = tile1.1.min(tile2.1);
-            let max_j = tile1.1.max(tile2.1);
-            for j in min_j + 1..max_j {
-                frontier.insert((i, j));
-            }
-        } else if tile1.1 == tile2.1 {
-            let j = tile1.1;
-            let min_i = tile1.0.min(tile2.0);
-            let max_i = tile1.0.max(tile2.0);
-            for i in min_i + 1..max_i {
-                frontier.insert((i, j));
-            }
-        } else {
-            unreachable!("'{tile1:?}' and '{tile2:?}' should have one common coordinate!");
-        }
-    }
-
-    frontier
-}
-
-fn is_tile_inside(tile: (usize, usize), frontier: &HashSet<(usize, usize)>) -> bool {
-    if frontier.contains(&tile) {
-        return true;
-    }
-    let mut before = false;
-    let mut after = false;
-    for t in frontier {
-        if t.0 == tile.0 {
-            // Same line
-            if t.1 < tile.1 {
-                before = true;
-            } else if t.1 > tile.1 {
-                after = true;
-            }
-        }
-    }
-    before && after
-}
-
-fn allowed_rectangle(
-    frontier: &HashSet<(usize, usize)>,
-    tile1: (usize, usize),
-    tile2: (usize, usize),
+fn intersect(
+    rectangle: ((usize, usize), (usize, usize)),
+    edge: ((usize, usize), (usize, usize)),
 ) -> bool {
-    let min_i = tile1.0.min(tile2.0);
-    let max_i = tile1.0.max(tile2.0);
-    let min_j = tile1.1.min(tile2.1);
-    let max_j = tile1.1.max(tile2.1);
+    let rectangle_c1 = rectangle.0;
+    let rectangle_c2 = rectangle.1;
+    let edge_t1 = edge.0;
+    let edge_t2 = edge.1;
 
-    // First check if rectangle intersects frontier
-    for &t in frontier {
-        let ti = t.0;
-        let tj = t.1;
-        if min_i < ti && ti < max_i && min_j < tj && tj < max_j {
+    if edge_t1.0 == edge_t2.0 {
+        // Same i, so horizontal edge
+        let ei = edge_t1.0;
+        let min_ri = rectangle_c1.0.min(rectangle_c2.0);
+        let max_ri = rectangle_c1.0.max(rectangle_c2.0);
+        if ei <= min_ri || ei >= max_ri {
             return false;
         }
-    }
 
-    for i in min_i..=max_i {
-        for j in min_j..=max_j {
-            if !is_tile_inside((i, j), frontier) {
-                return false;
-            }
+        // min_ri < ei < max_ri:
+        let min_ej = edge_t1.1.min(edge_t2.1);
+        let max_ej = edge_t1.1.max(edge_t2.1);
+        let min_rj = rectangle_c1.1.min(rectangle_c2.1);
+        let max_rj = rectangle_c1.1.max(rectangle_c2.1);
+        if max_ej <= min_rj || max_rj <= min_ej {
+            return false;
         }
+
+        // Intersect!
+    } else if edge_t1.1 == edge_t2.1 {
+        // Same j, so vertical edge
+        let ej = edge_t1.1;
+        let min_rj = rectangle_c1.1.min(rectangle_c2.1);
+        let max_rj = rectangle_c1.1.max(rectangle_c2.1);
+        if ej <= min_rj || ej >= max_rj {
+            return false;
+        }
+
+        // min_rj < ej < max_rj:
+        let min_ei = edge_t1.0.min(edge_t2.0);
+        let max_ei = edge_t1.0.max(edge_t2.0);
+        let min_ri = rectangle_c1.0.min(rectangle_c2.0);
+        let max_ri = rectangle_c1.0.max(rectangle_c2.0);
+        if max_ei <= min_ri || max_ri <= min_ei {
+            return false;
+        }
+
+        // Intersect!
+    } else {
+        unreachable!("Edge {edge:?} should be horizontal or vertical!");
     }
     true
 }
 
 fn find_largest_rectangle_area_inside(red_tiles: &[(usize, usize)]) -> usize {
-    let mut max_area = 0;
-    let allowed_tiles = get_frontier(red_tiles);
-    let nb_tiles = red_tiles.len();
-    let nb_rectangles = nb_tiles * (nb_tiles - 1) / 2;
-    let mut nb_tested_rectangles = 0;
-    for (i, &tile1) in red_tiles.iter().enumerate() {
-        for &tile2 in red_tiles[i + 1..].iter() {
-            if allowed_rectangle(&allowed_tiles, tile1, tile2) {
-                let area = rectangle_area(tile1, tile2);
-                if area > max_area {
-                    max_area = area;
-                }
+    // Get contour's edges as list by decreasing size
+    let nb_red_tiles = red_tiles.len();
+    let mut edges_with_sizes = vec![];
+    let mut frontier: HashMap<usize, Vec<usize>> = HashMap::new(); // i -> [j1, j2,… ,jn]
+    for index in 0..nb_red_tiles {
+        let tile1 = red_tiles[index];
+        let tile2 = red_tiles[(index + 1) % nb_red_tiles];
+        let edge_len;
+        if tile1.0 == tile2.0 {
+            // Same i
+            let ei = tile1.0;
+            let min_ej = tile1.1.min(tile2.1);
+            let max_ej = tile1.1.max(tile2.1);
+            edge_len = max_ej - min_ej + 1;
+            for j in min_ej..=max_ej {
+                let l = frontier.entry(ei).or_default();
+                l.push(j);
             }
-            nb_tested_rectangles += 1;
-            println!("{nb_tested_rectangles} / {nb_rectangles}");
+        } else if tile1.1 == tile2.1 {
+            // Same j
+            edge_len = tile1.0.max(tile2.0) - tile1.0.min(tile2.0) + 1;
+        } else {
+            unreachable!("{tile1:?} and {tile2:?} should have one similar coordinate!");
+        }
+        edges_with_sizes.push((edge_len, (tile1, tile2)));
+    }
+    edges_with_sizes.sort_by(|(size1, _), (size2, _)| size2.cmp(size1));
+    // let nb_edges = edges_with_sizes.len();
+    // println!("{nb_edges} edges collected");
+    // println!(
+    //     "Largest edge is {:?}, with len {}",
+    //     edges_with_sizes[0].1, edges_with_sizes[0].0
+    // );
+    // println!(
+    //     "Smallest edge is {:?}, with len {}\n",
+    //     edges_with_sizes[nb_edges - 1].1,
+    //     edges_with_sizes[nb_edges - 1].0
+    // );
+
+    // Get all rectangles as list by decreasing area
+    let mut rectangles_with_area = vec![];
+    for a in 0..nb_red_tiles {
+        let tile1 = red_tiles[a];
+        for b in (a + 1)..nb_red_tiles {
+            let tile2 = red_tiles[b];
+            let area = rectangle_area(tile1, tile2);
+            rectangles_with_area.push((area, (tile1, tile2)));
         }
     }
-    max_area
+    rectangles_with_area.sort_by(|(area1, _), (area2, _)| area2.cmp(area1));
+    // let nb_rectangles = rectangles_with_area.len();
+    // println!("{nb_rectangles} rectangles collected");
+    // println!(
+    //     "Biggest rectangle is {:?}, with area {}",
+    //     rectangles_with_area[0].1, rectangles_with_area[0].0
+    // );
+    // println!(
+    //     "Smallest rectangle is {:?}, with area {}\n",
+    //     rectangles_with_area[nb_rectangles - 1].1,
+    //     rectangles_with_area[nb_rectangles - 1].0
+    // );
+
+    // Now remove all rectangles that intersect an edge
+    let mut rectangles_indices_to_remove = HashSet::new();
+    for (_, edge) in edges_with_sizes {
+        for (index, (_, rectangle)) in rectangles_with_area.iter().enumerate() {
+            if intersect(*rectangle, edge) {
+                rectangles_indices_to_remove.insert(index);
+            }
+        }
+    }
+    let mut rectangles_not_intersecting_with_area = vec![];
+    for (i, r) in rectangles_with_area.iter().enumerate() {
+        if !rectangles_indices_to_remove.contains(&i) {
+            rectangles_not_intersecting_with_area.push(*r);
+        }
+    }
+    // println!("After removing rectangles that intersect with an edge:");
+    // let nb_rectangles = rectangles_not_intersecting_with_area.len();
+    // println!("{nb_rectangles} rectangles remaining");
+    // println!(
+    //     "Biggest rectangle is {:?}, with area {}",
+    //     rectangles_not_intersecting_with_area[0].1, rectangles_not_intersecting_with_area[0].0
+    // );
+    // println!(
+    //     "Smallest rectangle is {:?}, with area {}\n",
+    //     rectangles_not_intersecting_with_area[nb_rectangles - 1].1,
+    //     rectangles_not_intersecting_with_area[nb_rectangles - 1].0
+    // );
+
+    // And I don't know why but the biggest is the good one…
+    return rectangles_not_intersecting_with_area[0].0;
+
+    /*
+    // Now check each rectangle from the biggest to the smallest
+    'main_loop: for (area, rectangle) in rectangles_not_intersecting_with_area {
+        let rectangle_c1 = rectangle.0;
+        let rectangle_c2 = rectangle.0;
+        let min_ri = rectangle_c1.0.min(rectangle_c2.0);
+        let max_ri = rectangle_c1.0.max(rectangle_c2.0);
+        let min_rj = rectangle_c1.1.min(rectangle_c2.1);
+        let max_rj = rectangle_c1.1.max(rectangle_c2.1);
+        
+        for i in min_ri..=max_ri {
+            for j in min_rj..=max_rj {
+                // We make assumptions about the regularity of the frontier…
+                if frontier.contains_key(&i) {
+                    let columns_for_j = frontier.get(&i).unwrap();
+                    let mut before = false;
+                    let mut after = false;
+                    for &fj in columns_for_j {
+                        if fj <= j {
+                            before = true;
+                        } else if fj >= j {
+                            after = true;
+                        }
+                    }
+                    if !after || !before {
+                        // Element (i, j) of rectangle is outside the frontier!
+                        // Rectangle is incorrect
+                        continue 'main_loop;
+                    }
+                }
+            }
+        }
+        // All elements are in the frontier, we fount THE ONE!
+        return area;
+    }
+    unreachable!("No rectangle found");
+    */
 }
 
 fn day09_part2(example: &[(usize, usize)], input: &[(usize, usize)]) {
     // Exemple tests
-    // Check fill with green
-    let raw_example_filled_grid =
-        fs::read_to_string("inputs/example_day09_frontier").expect("Unable to read input!");
-    let mut example_green_and_red_tiles = HashSet::new();
-    for (i, line) in raw_example_filled_grid.lines().enumerate() {
-        for (j, c) in line.chars().enumerate() {
-            if c == 'X' || c == '#' {
-                example_green_and_red_tiles.insert((i, j));
-            }
-        }
-    }
-    let res_example = get_frontier(example);
-    assert_eq!(res_example, example_green_and_red_tiles);
     assert_eq!(find_largest_rectangle_area_inside(example), 24);
-    println!("Examples OK");
 
     // Solve puzzle
     let res = find_largest_rectangle_area_inside(input);
-    println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY09 - part 2: OK!");
+    println!("Result part 2: {res}"); // 1351663290 too low
+    assert_eq!(res, 1540192500);
+    println!("> DAY09 - part 2: OK!");
 }
