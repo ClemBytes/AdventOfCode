@@ -1,4 +1,7 @@
-use std::{collections::{HashMap, HashSet}, fs};
+use std::{
+    collections::{HashMap, HashSet},
+    fs,
+};
 
 #[test]
 fn test() {
@@ -159,8 +162,7 @@ fn find_largest_rectangle_area_inside(red_tiles: &[(usize, usize)]) -> usize {
     let mut rectangles_with_area = vec![];
     for a in 0..nb_red_tiles {
         let tile1 = red_tiles[a];
-        for b in (a + 1)..nb_red_tiles {
-            let tile2 = red_tiles[b];
+        for &tile2 in red_tiles.iter().take(nb_red_tiles).skip(a + 1) {
             let area = rectangle_area(tile1, tile2);
             rectangles_with_area.push((area, (tile1, tile2)));
         }
@@ -207,7 +209,7 @@ fn find_largest_rectangle_area_inside(red_tiles: &[(usize, usize)]) -> usize {
     // );
 
     // And I don't know why but the biggest is the good one…
-    return rectangles_not_intersecting_with_area[0].0;
+    rectangles_not_intersecting_with_area[0].0
 
     /*
     // Now check each rectangle from the biggest to the smallest
@@ -218,7 +220,7 @@ fn find_largest_rectangle_area_inside(red_tiles: &[(usize, usize)]) -> usize {
         let max_ri = rectangle_c1.0.max(rectangle_c2.0);
         let min_rj = rectangle_c1.1.min(rectangle_c2.1);
         let max_rj = rectangle_c1.1.max(rectangle_c2.1);
-        
+
         for i in min_ri..=max_ri {
             for j in min_rj..=max_rj {
                 // We make assumptions about the regularity of the frontier…
