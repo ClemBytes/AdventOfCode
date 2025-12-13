@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use std::fs;
+use std::{collections::{HashSet, VecDeque}, fs};
 
 #[test]
 fn test() {
@@ -21,7 +21,7 @@ pub fn run() {
 struct Machine {
     light_diagram: Vec<bool>,
     wiring_schematics: Vec<Vec<usize>>,
-    _joltage_requirements: Vec<usize>,
+    joltage_requirements: Vec<usize>,
 }
 
 impl Machine {
@@ -66,7 +66,7 @@ impl Machine {
             machines.push(Machine {
                 light_diagram,
                 wiring_schematics,
-                _joltage_requirements: joltage_requirements,
+                joltage_requirements,
             });
         }
         machines
@@ -124,15 +124,71 @@ fn day10_part1(example: &[Machine], input: &[Machine]) {
     println!("> DAY10 - part 1: OK!");
 }
 
-fn day10_part2(_example: &[Machine], _input: &[Machine]) {
-    println!("TODO - part2");
+#[derive(Debug, Clone)]
+struct State {
+    nb_presses: usize,
+    joltage_config: Vec<usize>,
+}
+
+fn apply_wiring_joltage(current_state: &[usize], wiring: &[usize]) -> Vec<usize> {
+    let mut new_state = current_state.to_vec();
+    for &w in wiring {
+        new_state[w] += 1;
+    }
+    new_state
+}
+
+fn configure_machine(machine: &Machine) -> usize {
+    let objective = machine.joltage_requirements.clone();
+    let nb_lights = objective.len();
+    let wirings = machine.wiring_schematics.clone();
+    let start_state = State{
+        nb_presses: 0,
+        joltage_config: vec![0; nb_lights],
+    };
+    let mut states_to_explore = VecDeque::new();
+    states_to_explore.push_back(start_state);
+    let mut seen_configs: HashSet<Vec<usize>> = HashSet::new();
+    seen_configs.insert(vec![0; nb_lights]);
+    while let Some(state) = states_to_explore.pop_front() {
+        if state.joltage_config == objective {
+            return state.nb_presses;
+        }
+
+        for wiring in wirings.clone() {
+            let new_config = apply_wiring_joltage(&state.joltage_config, &wiring);
+            if seen_configs.contains(&new_config) {
+                continue;
+            }
+            seen_configs.insert(new_config.clone());
+
+            states_to_explore.push_back(State {
+                nb_presses: state.nb_presses + 1,
+                joltage_config: new_config,
+            });
+        }
+    }
+    unreachable!("Didn't find the correct number of buttons!")
+}
+
+fn solve_part2(machines: &[Machine]) -> usize {
+    let mut nb_total_presses = 0;
+    let nb_machines = machines.len();
+    for (i, machine) in machines.iter().enumerate() {
+        nb_total_presses += configure_machine(machine);
+        println!("{i} / {nb_machines} machines configured!");
+    }
+    nb_total_presses
+}
+
+fn day10_part2(example: &[Machine], input: &[Machine]) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(solve_part2(example), 33);
+    println!("Example OK");
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
+    let res = solve_part2(input);
+    println!("Result part 2: {res}");
     // assert_eq!(res, );
     // println!("> DAY10 - part 2: OK!");
 }
