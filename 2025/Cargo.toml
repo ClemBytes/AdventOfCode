@@ -5,4 +5,6 @@ edition = "2024"
 
 [dependencies]
 itertools = "0.14.0"
+ndarray = "0.17.1"
+ndarray-linalg = { version = "0.18.0", features = ["netlib"] }
 regex = "1.12.2"

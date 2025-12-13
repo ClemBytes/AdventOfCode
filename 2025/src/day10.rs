@@ -1,5 +1,7 @@
 use itertools::Itertools;
-use std::{collections::{HashSet, VecDeque}, fs};
+use ndarray::{Array1, Array2};
+use std::fs;
+use ndarray_linalg::LeastSquaresSvd;
 
 #[test]
 fn test() {
@@ -124,51 +126,58 @@ fn day10_part1(example: &[Machine], input: &[Machine]) {
     println!("> DAY10 - part 1: OK!");
 }
 
-#[derive(Debug, Clone)]
-struct State {
-    nb_presses: usize,
-    joltage_config: Vec<usize>,
-}
-
-fn apply_wiring_joltage(current_state: &[usize], wiring: &[usize]) -> Vec<usize> {
-    let mut new_state = current_state.to_vec();
-    for &w in wiring {
-        new_state[w] += 1;
-    }
-    new_state
-}
-
 fn configure_machine(machine: &Machine) -> usize {
+    // We want to solve an equation system. Let's take the first example:
+    // Wirings: (3) (1,3) (2) (2,3) (0,2) (0,1)
+    // Joltage requirements: {3,5,4,7}
+    // I want to find N = N0 + N1 + N2 + … + N5  such that:
+    // N1×(3) N2×(1,3) N3×(2) N4×(2,3) N5×(0,2) N6×(0,1) gives {3,5,4,7}
+    // So I want:
+    // N5 + N6 = 3
+    // N2 + N6 = 5
+    // N3 + N4 + N5 = 4
+    // N1 + N2 + N4 = 7
+    // Or as a matrix
+    //                 |N1| 
+    // |0 0 0 0 1 1|   |N2|   |3|
+    // |0 1 0 0 0 1| × |N3| = |5|
+    // |0 0 1 1 1 0|   |N4|   |4|
+    // |1 1 0 1 0 0|   |N5|   |7|
+    //                 |N6|
+
+    // Solution should be: (1, 3, 0, 3, 1, 2)
+
     let objective = machine.joltage_requirements.clone();
+    let objective_f64: Vec<f64> = objective.iter().map(|&x| x as f64).collect();
+    let b = Array1::from_vec(objective_f64.clone());
     let nb_lights = objective.len();
     let wirings = machine.wiring_schematics.clone();
-    let start_state = State{
-        nb_presses: 0,
-        joltage_config: vec![0; nb_lights],
-    };
-    let mut states_to_explore = VecDeque::new();
-    states_to_explore.push_back(start_state);
-    let mut seen_configs: HashSet<Vec<usize>> = HashSet::new();
-    seen_configs.insert(vec![0; nb_lights]);
-    while let Some(state) = states_to_explore.pop_front() {
-        if state.joltage_config == objective {
-            return state.nb_presses;
-        }
+    let nb_wirings = wirings.len();
 
-        for wiring in wirings.clone() {
-            let new_config = apply_wiring_joltage(&state.joltage_config, &wiring);
-            if seen_configs.contains(&new_config) {
-                continue;
+    // Create matrix:
+    let mut matrix = vec![];
+    for l in 0..nb_lights {
+        for w in &wirings {
+            if w.contains(&l) {
+                matrix.push(1.);
+            } else {
+                matrix.push(0.);
             }
-            seen_configs.insert(new_config.clone());
-
-            states_to_explore.push_back(State {
-                nb_presses: state.nb_presses + 1,
-                joltage_config: new_config,
-            });
         }
     }
-    unreachable!("Didn't find the correct number of buttons!")
+    println!("matrix:\n{matrix:?}");
+    let a = Array2::from_shape_vec((nb_lights, nb_wirings), matrix).unwrap();
+    println!("a:\n{a:?}");
+    println!("b: {b:?}");
+
+    // Now solve
+    let x = a.least_squares(&b).unwrap().solution;
+
+    println!("x: {x:?}");
+    let x_int: Vec<usize> = x.iter().map(|v| v.round() as usize).collect();
+    println!("x_int: {x_int:?}");
+
+    x_int.iter().sum()
 }
 
 fn solve_part2(machines: &[Machine]) -> usize {
@@ -176,13 +185,16 @@ fn solve_part2(machines: &[Machine]) -> usize {
     let nb_machines = machines.len();
     for (i, machine) in machines.iter().enumerate() {
         nb_total_presses += configure_machine(machine);
-        println!("{i} / {nb_machines} machines configured!");
+        println!("{} / {nb_machines} machines configured!", i + 1);
     }
     nb_total_presses
 }
 
 fn day10_part2(example: &[Machine], input: &[Machine]) {
     // Exemple tests
+    assert_eq!(configure_machine(&example[0]), 10);
+    assert_eq!(configure_machine(&example[1]), 12);
+    assert_eq!(configure_machine(&example[2]), 11);
     assert_eq!(solve_part2(example), 33);
     println!("Example OK");
 
