@@ -1,7 +1,6 @@
+use good_lp::{ProblemVariables, Solution, SolverModel, default_solver, variable, Expression};
 use itertools::Itertools;
-use ndarray::{Array1, Array2};
 use std::fs;
-use ndarray_linalg::LeastSquaresSvd;
 
 #[test]
 fn test() {
@@ -146,46 +145,50 @@ fn configure_machine(machine: &Machine) -> usize {
     //                 |N6|
 
     // Solution should be: (1, 3, 0, 3, 1, 2)
-
+    
     let objective = machine.joltage_requirements.clone();
-    let objective_f64: Vec<f64> = objective.iter().map(|&x| x as f64).collect();
-    let b = Array1::from_vec(objective_f64.clone());
-    let nb_lights = objective.len();
     let wirings = machine.wiring_schematics.clone();
     let nb_wirings = wirings.len();
 
-    // Create matrix:
-    let mut matrix = vec![];
-    for l in 0..nb_lights {
-        for w in &wirings {
-            if w.contains(&l) {
-                matrix.push(1.);
-            } else {
-                matrix.push(0.);
+    // Create problem
+    let mut problem = ProblemVariables::new();
+    let mut vars = vec![];
+
+    // Add variables
+    for _ in 0..nb_wirings {
+        let n = problem.add(variable().min(0).integer());
+        vars.push(n);
+    }
+
+    // Define constraints
+    let mut constraints = vec![];
+    for (l, obj) in objective.iter().enumerate() {
+        let mut expr = vars[0] * 0;
+        for (w, wiring) in wirings.iter().enumerate() {
+            if wiring.contains(&(l as usize)) {
+                expr += vars[w];
             }
         }
+        constraints.push(expr.eq(*obj as i32));
     }
-    println!("matrix:\n{matrix:?}");
-    let a = Array2::from_shape_vec((nb_lights, nb_wirings), matrix).unwrap();
-    println!("a:\n{a:?}");
-    println!("b: {b:?}");
 
-    // Now solve
-    let x = a.least_squares(&b).unwrap().solution;
+    // Linear problem
+    let objective_expr: Expression = vars.iter().copied().sum();
+    let mut lp = problem.minimise(objective_expr).using(default_solver);
+    for c in constraints {
+        lp = lp.with(c);
+    }
 
-    println!("x: {x:?}");
-    let x_int: Vec<usize> = x.iter().map(|v| v.round() as usize).collect();
-    println!("x_int: {x_int:?}");
-
-    x_int.iter().sum()
+    // Solve
+    let solution = lp.solve().unwrap();
+    let total: usize = vars.iter().map(|v| solution.value(*v) as usize).sum();
+    total
 }
 
 fn solve_part2(machines: &[Machine]) -> usize {
     let mut nb_total_presses = 0;
-    let nb_machines = machines.len();
-    for (i, machine) in machines.iter().enumerate() {
+    for machine in machines {
         nb_total_presses += configure_machine(machine);
-        println!("{} / {nb_machines} machines configured!", i + 1);
     }
     nb_total_presses
 }
@@ -196,11 +199,10 @@ fn day10_part2(example: &[Machine], input: &[Machine]) {
     assert_eq!(configure_machine(&example[1]), 12);
     assert_eq!(configure_machine(&example[2]), 11);
     assert_eq!(solve_part2(example), 33);
-    println!("Example OK");
 
     // Solve puzzle
     let res = solve_part2(input);
     println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY10 - part 2: OK!");
+    assert_eq!(res, 18273);
+    println!("> DAY10 - part 2: OK!");
 }
