@@ -1,4 +1,4 @@
-use good_lp::{ProblemVariables, Solution, SolverModel, default_solver, variable, Expression};
+use good_lp::{Expression, ProblemVariables, Solution, SolverModel, default_solver, variable};
 use itertools::Itertools;
 use std::fs;
 
@@ -137,7 +137,7 @@ fn configure_machine(machine: &Machine) -> usize {
     // N3 + N4 + N5 = 4
     // N1 + N2 + N4 = 7
     // Or as a matrix
-    //                 |N1| 
+    //                 |N1|
     // |0 0 0 0 1 1|   |N2|   |3|
     // |0 1 0 0 0 1| × |N3| = |5|
     // |0 0 1 1 1 0|   |N4|   |4|
@@ -145,7 +145,7 @@ fn configure_machine(machine: &Machine) -> usize {
     //                 |N6|
 
     // Solution should be: (1, 3, 0, 3, 1, 2)
-    
+
     let objective = machine.joltage_requirements.clone();
     let wirings = machine.wiring_schematics.clone();
     let nb_wirings = wirings.len();
@@ -165,7 +165,7 @@ fn configure_machine(machine: &Machine) -> usize {
     for (l, obj) in objective.iter().enumerate() {
         let mut expr = vars[0] * 0;
         for (w, wiring) in wirings.iter().enumerate() {
-            if wiring.contains(&(l as usize)) {
+            if wiring.contains(&l) {
                 expr += vars[w];
             }
         }
