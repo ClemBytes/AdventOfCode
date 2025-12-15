@@ -58,7 +58,7 @@ All problems solved! 🎯 (But I might refactor some problems later.)
 Final progress:  
 ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐  
 ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐  
-**50 / 50 stars — Advent of Code 2015 completed! 🚀**
+**50 / 50 stars — Advent of Code 2016 completed! 🚀**
 
 ## ⚡ Performance
 

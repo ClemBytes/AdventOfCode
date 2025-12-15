@@ -53,7 +53,22 @@ cargo test --release -- --nocapture dayXX
 
 ## 🚧 Status
 
-Progress so far:  
-⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆   
-⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐☆   
-**22 / 24 stars**
+All problems solved! 🎯 (But I might refactor some problems later.)
+
+Final progress:  
+⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐   
+⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐   
+**24 / 24 stars — Advent of Code 2025 completed! 🚀**
+
+According to my personnal stats, I've spent a total of **18h 19min** on AOC 2025 so approximately **1h 32min by day**.
+
+## ⚡ Performance
+
+Here is a screenshot from my terminal showing the total runtime for all 12 days (compiled in release mode) on my machine, the full solutions for all 12 days execute in about **0.58 seconds**:
+
+![Running of 12 days on release mode](./total_running_release_time.jpg)
+
+
+And here is the screenshot excluding day 10 because the solver creates to many prints that cannot be easily silenced):
+
+![Running of 11 days (without day 11) on release mode](./total_running_release_time_without_11.jpg)
