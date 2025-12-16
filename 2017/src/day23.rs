@@ -137,15 +137,9 @@ fn day23_part1(input: &[Instruction]) {
 
 fn solve_part2() -> i64 {
     let mut h = 0;
-    let mut a = 1;
-    let mut b = 79;
-    let mut c = 79;
-    while b != 0 {
-        if a != 0 {
-            b *= 100;
-            b -= 100_000;
-            c = b - 17_000;
-        }
+    let mut b = 79 * 100 - 100_000; // -92_100
+    let c = b - 17_000; // -109_100
+    loop {
         let mut f = 1;
         let mut d = 2;
         let mut e = 2;
@@ -154,8 +148,7 @@ fn solve_part2() -> i64 {
             e = 2;
             g = d * e - b;
             while g != 0 {
-                g = d * e - b;
-                if g == 0 {
+                if d * e - b == 0 {
                     f = 0;
                 }
                 e -= 1;
@@ -165,7 +158,7 @@ fn solve_part2() -> i64 {
             d -= 1;
             g = d - b;
         }
-
+        // g == 0
         if f == 0 {
             h -= 1;
         }
@@ -173,9 +166,8 @@ fn solve_part2() -> i64 {
         if g == 0 {
             return h;
         }
-        // else back again…
+        b -= 17;
     }
-    h
 }
 
 fn day23_part2(_input: &[Instruction]) {
