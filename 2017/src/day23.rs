@@ -137,43 +137,29 @@ fn day23_part1(input: &[Instruction]) {
 
 fn solve_part2() -> i64 {
     let mut h = 0;
-    let mut b = 79 * 100 - 100_000; // -92_100
-    let c = b - 17_000; // -109_100
-    loop {
-        let mut f = 1;
+    let mut b = 79 * 100 + 100_000; // 107_900
+    let c = b + 17_000;
+    // c is never modified, b is only decremented 17 by 17 until b == c
+    // So we just repeat 1_000 times as c = b + 17_000
+    while b <= c {
+        // This is just counting b that are not prime
         let mut d = 2;
-        let mut e = 2;
-        let mut g = d * e - b;
-        while g != 0 {
-            e = 2;
-            g = d * e - b;
-            while g != 0 {
-                if d * e - b == 0 {
-                    f = 0;
-                }
-                e -= 1;
-                g = e - b;
+        while d != b {
+            if b % d == 0 {
+                h += 1;
+                break;
             }
-            // g == 0
-            d -= 1;
-            g = d - b;
+            d += 1;
         }
-        // g == 0
-        if f == 0 {
-            h -= 1;
-        }
-        g = b - c;
-        if g == 0 {
-            return h;
-        }
-        b -= 17;
+        b += 17;
     }
+    h
 }
 
 fn day23_part2(_input: &[Instruction]) {
     // Solve puzzle
     let res = solve_part2();
     println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY23 - part 2: OK!");
+    assert_eq!(res, 907);
+    println!("> DAY23 - part 2: OK!");
 }
