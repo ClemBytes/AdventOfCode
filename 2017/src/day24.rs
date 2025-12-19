@@ -60,15 +60,38 @@ fn day24_part1(example: &HashSet<(usize, usize)>, input: &HashSet<(usize, usize)
     println!("> DAY24 - part 1: OK!");
 }
 
-fn day24_part2(_example: &HashSet<(usize, usize)>, _input: &HashSet<(usize, usize)>) {
-    println!("TODO - part2");
+fn longest_and_strongest_bridge(
+    components: HashSet<(usize, usize)>,
+    current_port: usize,
+) -> (usize, usize) {
+    let mut best = 0;
+    let mut longest = 0;
+    for component in components.clone() {
+        let (a, b) = component;
+        if a == current_port {
+            let mut new_components = components.clone();
+            new_components.remove(&component);
+            let (l, be) = longest_and_strongest_bridge(new_components.clone(), b);
+            (longest, best) = (longest, best).max((l + 1, be + a + b));
+        }
+
+        if b == current_port {
+            let mut new_components = components.clone();
+            new_components.remove(&component);
+            let (l, be) = longest_and_strongest_bridge(new_components.clone(), a);
+            (longest, best) = (longest, best).max((l + 1, be + a + b));
+        }
+    }
+    (longest, best)
+}
+
+fn day24_part2(example: &HashSet<(usize, usize)>, input: &HashSet<(usize, usize)>) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(longest_and_strongest_bridge(example.clone(), 0), (4, 19));
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY24 - part 2: OK!");
+    let res = longest_and_strongest_bridge(input.clone(), 0);
+    println!("Result part 2: length = {} | strength = {}", res.0, res.1);
+    assert_eq!(res.1, 1799);
+    println!("> DAY24 - part 2: OK!");
 }
