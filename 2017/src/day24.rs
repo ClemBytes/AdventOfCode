@@ -30,92 +30,34 @@ fn parse(raw_input: &str) -> HashSet<(usize, usize)> {
     components
 }
 
-fn next_possible_components(
-    bridge: &[(usize, usize)],
-    components: &HashSet<(usize, usize)>,
-) -> Vec<(usize, usize)> {
-    let mut possible_components = vec![];
-    let current = bridge[bridge.len() - 1];
-    // Always use identity if possible:
-    let identity0 = (current.0, current.0);
-    if components.contains(&identity0) && !bridge.contains(&identity0) {
-        possible_components.push(identity0);
-        return possible_components;
-    }
-    let identity1 = (current.1, current.1);
-    if components.contains(&identity1) && !bridge.contains(&identity1) {
-        possible_components.push(identity1);
-        return possible_components;
-    }
-
-    for &next in components {
-        if (!bridge.contains(&next))
-            && (next.0 != 0 && next.1 != 0)
-            && (current.0 == next.0
-                || current.0 == next.1
-                || current.1 == next.0
-                || current.1 == next.1)
-        {
-            possible_components.push(next);
-        }
-    }
-    possible_components
-}
-
-fn compute_strength(bridge: &[(usize, usize)]) -> usize {
-    let mut strength = 0;
-    for &component in bridge {
-        strength += component.0 + component.1;
-    }
-    strength
-}
-
-// Theorically OK, but too long…
-fn find_strongest_bridge(components: &HashSet<(usize, usize)>) -> usize {
-    let mut max_strength = 0;
-    let mut pile = vec![];
-    for &comp in components {
-        if comp.0 == 0 {
-            pile.push(vec![comp]);
-        }
-    }
-    // println!("Start pile: {pile:?}");
-
-    while let Some(current_bridge) = pile.pop() {
-        // println!("{current_bridge:?}");
-        let possible_components = next_possible_components(&current_bridge, components);
-        // println!("possible_components: {possible_components:?}");
-        if possible_components.is_empty() {
-            let strength = compute_strength(&current_bridge);
-            // println!("Bridge: {current_bridge:?}");
-            // println!("Strength: {strength}\n");
-            if strength > max_strength {
-                max_strength = strength;
-            }
-            continue;
+fn strongest_bridge(components: HashSet<(usize, usize)>, current_port: usize) -> usize {
+    let mut best = 0;
+    for component in components.clone() {
+        let (a, b) = component;
+        if a == current_port {
+            let mut new_components = components.clone();
+            new_components.remove(&component);
+            best = best.max(strongest_bridge(new_components.clone(), b) + a + b);
         }
 
-        // Else (we can add other components)
-        for next_component in possible_components {
-            let mut next_bridge = current_bridge.clone();
-            next_bridge.push(next_component);
-            pile.push(next_bridge);
+        if b == current_port {
+            let mut new_components = components.clone();
+            new_components.remove(&component);
+            best = best.max(strongest_bridge(new_components.clone(), a) + a + b);
         }
     }
-
-    max_strength
+    best
 }
 
 fn day24_part1(example: &HashSet<(usize, usize)>, input: &HashSet<(usize, usize)>) {
     // Exemple tests
-    assert_eq!(find_strongest_bridge(example), 31);
-    println!("Example OK");
+    assert_eq!(strongest_bridge(example.clone(), 0), 31);
 
     // Solve puzzle
-    let res = find_strongest_bridge(input);
+    let res = strongest_bridge(input.clone(), 0);
     println!("Result part 1: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY24 - part 1: OK!");
+    assert_eq!(res, 1859);
+    println!("> DAY24 - part 1: OK!");
 }
 
 fn day24_part2(_example: &HashSet<(usize, usize)>, _input: &HashSet<(usize, usize)>) {
