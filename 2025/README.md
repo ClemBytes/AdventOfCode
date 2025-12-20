@@ -1,6 +1,6 @@
 # 🎄 Advent of Code 2025 🎄
 
-This repository contains my solutions to [Advent of Code 2025](https://adventofcode.com/2025), a series of daily programming puzzles published in December 2015.
+This repository contains my solutions to [Advent of Code 2025](https://adventofcode.com/2025), a series of daily programming puzzles published in December 2025.
 
 ## ✨ About
 

@@ -1,6 +1,6 @@
 # 🎄 Advent of Code 2017 🎄
 
-This repository contains my solutions to [Advent of Code 2017](https://adventofcode.com/2017), a series of daily programming puzzles published in December 2015.
+This repository contains my solutions to [Advent of Code 2017](https://adventofcode.com/2017), a series of daily programming puzzles published in December 2017.
 
 ## ✨ About
 
@@ -53,7 +53,17 @@ cargo test --release -- --nocapture dayXX
 
 ## 🚧 Status
 
-Progress so far:  
+All problems solved! 🎯 (But I might refactor some problems later.)
+
+Final progress:  
 ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐   
 ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐   
-**50 / 50 stars**
+**50 / 50 stars — Advent of Code 2017 completed! 🚀**
+
+According to my personnal stats, I've spent a total of **32h 20min** on AOC 2025 so approximately **1h 18min by day**.
+
+## ⚡ Performance
+
+Here is a screenshot from my terminal showing the total runtime for all 25 days (compiled in release mode) on my machine, the full solutions for all 25 days execute in about **1.75 seconds**:
+
+![Running of 25 days on release mode](./total_running_release_time.jpg)
