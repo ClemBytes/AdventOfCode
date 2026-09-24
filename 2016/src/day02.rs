@@ -7,7 +7,7 @@ fn test() {
 
 pub fn run() {
     println!("------- DAY02 -------");
-    let example = fs::read_to_string("inputs/example_day02").expect("Unable to read input!");
+    let example = fs::read_to_string("inputs/example_day02_part1").expect("Unable to read input!");
     let example = Instruction::parse(&example);
     let input = fs::read_to_string("inputs/input_day02").expect("Unable to read input!");
     let input = Instruction::parse(&input);

@@ -8,13 +8,15 @@ fn test() {
 
 pub fn run() {
     println!("------- DAY02 -------");
-    let example = fs::read_to_string("inputs/example_day02").expect("Unable to read input!");
-    let example = parse(&example);
+    let example1 = fs::read_to_string("inputs/example_day02_part1").expect("Unable to read input!");
+    let example1 = parse(&example1);
+    let example2 = fs::read_to_string("inputs/example_day02_part2").expect("Unable to read input!");
+    let example2 = parse(&example2);
     let input = fs::read_to_string("inputs/input_day02").expect("Unable to read input!");
     let input = parse(&input);
 
-    day02_part1(&example, &input);
-    // day02_part2(&example, &input);
+    day02_part1(&example1, &input);
+    day02_part2(&example2, &input);
 }
 
 fn parse(raw_input: &str) -> Vec<&str> {
@@ -80,15 +82,49 @@ fn day02_part1(example: &Vec<&str>, input: &Vec<&str>) {
     println!("> DAY02 - part 1: OK!");
 }
 
-// fn day02_part2(_example: &Vec<&str>, _input: &Vec<&str>) {
-//     println!("TODO - part2");
-//     // Exemple tests
-//     // assert_eq!(, 0);
-//     // println!("Example OK");
-//
-//     // Solve puzzle
-//     // let res =
-//     // println!("Result part 2: {res}");
-//     // assert_eq!(res, );
-//     // println!("> DAY02 - part 2: OK!");
-// }
+fn distance(id1: &str, id2: &str) -> u8 {
+    assert_eq!(id1.len(), id2.len());
+    let id1_chars = id1.chars();
+    let id2_chars: Vec<char> = id2.chars().collect::<Vec<char>>();
+    let mut dist = 0;
+    for (i, l1) in id1_chars.enumerate() {
+        if l1 != id2_chars[i] {
+            dist += 1;
+        }
+    }
+    dist
+}
+
+fn correct_id(boxes: &[&str]) -> String {
+    let nb_boxes = boxes.len();
+    for i in 0..nb_boxes {
+        for j in i + 1..nb_boxes {
+            if distance(boxes[i], boxes[j]) == 1 {
+                let mut res = String::new();
+                let id1_chars = boxes[i].chars();
+                let id2_chars: Vec<char> = boxes[j].chars().collect::<Vec<char>>();
+                for (i, l1) in id1_chars.enumerate() {
+                    if l1 == id2_chars[i] {
+                        res += &l1.to_string();
+                    }
+                }
+                return res;
+            }
+        }
+    }
+    unreachable!();
+}
+
+fn day02_part2(example: &Vec<&str>, input: &Vec<&str>) {
+    // Exemple tests
+    assert_eq!(distance(example[0], example[5]), 2);
+    assert_eq!(distance(example[1], example[4]), 1);
+    assert_eq!(correct_id(example), "fgij".to_string());
+    println!("Example OK");
+
+    // Solve puzzle
+    let res = correct_id(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, "krdmtuqjgwfoevnaboxglzjph".to_string());
+    println!("> DAY02 - part 2: OK!");
+}
