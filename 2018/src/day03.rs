@@ -20,7 +20,7 @@ pub fn run() {
 
 #[derive(Debug, Clone)]
 struct Claim {
-    _id: u32,
+    id: u32,
     left_edge: u32,
     top_edge: u32,
     width: u32,
@@ -34,7 +34,7 @@ impl Claim {
         for line in raw_input.lines() {
             let matches = r.captures(line).unwrap();
             let claim = Self {
-                _id: matches[1].parse().unwrap(),
+                id: matches[1].parse().unwrap(),
                 left_edge: matches[2].parse().unwrap(),
                 top_edge: matches[3].parse().unwrap(),
                 width: matches[4].parse().unwrap(),
@@ -46,15 +46,15 @@ impl Claim {
     }
 }
 
-fn count_claimed_squares(claims: &[Claim]) -> HashMap<(u32, u32), u32> {
+fn count_claimed_squares(claims: &[Claim]) -> HashMap<(u32, u32), Vec<u32>> {
     let mut claimed_squares = HashMap::new();
     for claim in claims {
         for i in 0..claim.width {
             for j in 0..claim.height {
-                let count = claimed_squares
+                let list = claimed_squares
                     .entry((claim.left_edge + i, claim.top_edge + j))
-                    .or_insert(0);
-                *count += 1;
+                    .or_insert(vec![]);
+                list.push(claim.id);
             }
         }
     }
@@ -64,8 +64,8 @@ fn count_claimed_squares(claims: &[Claim]) -> HashMap<(u32, u32), u32> {
 fn solve_part1(claims: &[Claim]) -> u32 {
     let claimed_squares = count_claimed_squares(claims);
     let mut nb = 0;
-    for nb_times_claimed in claimed_squares.values() {
-        if *nb_times_claimed > 1 {
+    for ids_list in claimed_squares.values() {
+        if ids_list.len() > 1 {
             nb += 1;
         }
     }
