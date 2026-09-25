@@ -46,7 +46,7 @@ impl Claim {
     }
 }
 
-fn solve_part1(claims: &[Claim]) -> u32 {
+fn count_claimed_squares(claims: &[Claim]) -> HashMap<(u32, u32), u32> {
     let mut claimed_squares = HashMap::new();
     for claim in claims {
         for i in 0..claim.width {
@@ -58,6 +58,11 @@ fn solve_part1(claims: &[Claim]) -> u32 {
             }
         }
     }
+    claimed_squares
+}
+
+fn solve_part1(claims: &[Claim]) -> u32 {
+    let claimed_squares = count_claimed_squares(claims);
     let mut nb = 0;
     for nb_times_claimed in claimed_squares.values() {
         if *nb_times_claimed > 1 {
