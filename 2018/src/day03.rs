@@ -72,6 +72,27 @@ fn solve_part1(claims: &[Claim]) -> u32 {
     nb
 }
 
+fn solve_part2(claims: &[Claim]) -> u32 {
+    let claimed_squares = count_claimed_squares(claims);
+    let mut ids = HashMap::new();
+    for claim in claims {
+        ids.insert(claim.id, true);
+    }
+    for ids_list in claimed_squares.values() {
+        if ids_list.len() > 1 {
+            for id in ids_list {
+                ids.insert(*id, false);
+            }
+        }
+    }
+    for (id, is_unique) in ids {
+        if is_unique {
+            return id;
+        }
+    }
+    unreachable!();
+}
+
 fn day03_part1(example: &[Claim], input: &[Claim]) {
     // Exemple tests
     assert_eq!(solve_part1(example), 4);
@@ -84,15 +105,14 @@ fn day03_part1(example: &[Claim], input: &[Claim]) {
     println!("> DAY03 - part 1: OK!");
 }
 
-fn day03_part2(_example: &[Claim], _input: &[Claim]) {
-    println!("TODO - part2");
+fn day03_part2(example: &[Claim], input: &[Claim]) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(solve_part2(example), 3);
+    println!("Example OK");
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY03 - part 2: OK!");
+    let res = solve_part2(input);
+    println!("Result part 2: {res}"); // 1215 is too low
+    assert_eq!(res, 1260);
+    println!("> DAY03 - part 2: OK!");
 }
