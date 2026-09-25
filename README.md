@@ -13,7 +13,7 @@ I use Advent of Code as both a fun challenge and a way to explore different prog
 | [2015](https://github.com/ClemBytes/AdventOfCode/tree/main/2015) | Rust 🦀           | 50 ⭐ /  50  | ![](https://progress-bar.xyz/100/) |
 | [2016](https://github.com/ClemBytes/AdventOfCode/tree/main/2016) | Rust 🦀           | 50 ⭐ /  50  | ![](https://progress-bar.xyz/100/) |
 | [2017](https://github.com/ClemBytes/AdventOfCode/tree/main/2017) | Rust 🦀           | 50 ⭐ /  50  | ![](https://progress-bar.xyz/100/) |
-| [2018](https://github.com/ClemBytes/AdventOfCode/tree/main/2018) | Rust 🦀           | *6 ⭐ /  50* | ![](https://progress-bar.xyz/12/)  |
+| [2018](https://github.com/ClemBytes/AdventOfCode/tree/main/2018) | Rust 🦀           |  6 ⭐ /  50  | ![](https://progress-bar.xyz/12/)  |
 |                              *2019*                              | *Not done yet* ❌ | *0 ⭐ /  50* |  ![](https://progress-bar.xyz/0/)  |
 | [2020](https://github.com/ClemBytes/AdventOfCode/tree/main/2020) | Python 🐍         | 30 ⭐ /  50  | ![](https://progress-bar.xyz/60/)  |
 | [2021](https://github.com/ClemBytes/AdventOfCode/tree/main/2021) | Python 🐍         | 20 ⭐ /  50  | ![](https://progress-bar.xyz/40/)  |

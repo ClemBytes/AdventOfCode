@@ -11,11 +11,18 @@ pub fn run() {
     println!("------- DAY03 -------");
     let example = fs::read_to_string("inputs/example_day03").expect("Unable to read input!");
     let example = Claim::parse(&example);
+    let example_claimed_squares = count_claimed_squares(&example);
     let input = fs::read_to_string("inputs/input_day03").expect("Unable to read input!");
     let input = Claim::parse(&input);
+    let input_claimed_squares = count_claimed_squares(&input);
 
-    day03_part1(&example, &input);
-    day03_part2(&example, &input);
+    day03_part1(&example_claimed_squares, &input_claimed_squares);
+    day03_part2(
+        &example,
+        &example_claimed_squares,
+        &input,
+        &input_claimed_squares,
+    );
 }
 
 #[derive(Debug, Clone)]
@@ -61,8 +68,7 @@ fn count_claimed_squares(claims: &[Claim]) -> HashMap<(u32, u32), Vec<u32>> {
     claimed_squares
 }
 
-fn solve_part1(claims: &[Claim]) -> u32 {
-    let claimed_squares = count_claimed_squares(claims);
+fn solve_part1(claimed_squares: &HashMap<(u32, u32), Vec<u32>>) -> u32 {
     let mut nb = 0;
     for ids_list in claimed_squares.values() {
         if ids_list.len() > 1 {
@@ -72,8 +78,7 @@ fn solve_part1(claims: &[Claim]) -> u32 {
     nb
 }
 
-fn solve_part2(claims: &[Claim]) -> u32 {
-    let claimed_squares = count_claimed_squares(claims);
+fn solve_part2(claims: &[Claim], claimed_squares: &HashMap<(u32, u32), Vec<u32>>) -> u32 {
     let mut ids = HashMap::new();
     for claim in claims {
         ids.insert(claim.id, true);
@@ -93,25 +98,33 @@ fn solve_part2(claims: &[Claim]) -> u32 {
     unreachable!();
 }
 
-fn day03_part1(example: &[Claim], input: &[Claim]) {
+fn day03_part1(
+    example_claimed_squares: &HashMap<(u32, u32), Vec<u32>>,
+    input_claimed_squares: &HashMap<(u32, u32), Vec<u32>>,
+) {
     // Exemple tests
-    assert_eq!(solve_part1(example), 4);
+    assert_eq!(solve_part1(example_claimed_squares), 4);
     println!("Example OK");
 
     // Solve puzzle
-    let res = solve_part1(input);
+    let res = solve_part1(input_claimed_squares);
     println!("Result part 1: {res}");
     assert_eq!(res, 116489);
     println!("> DAY03 - part 1: OK!");
 }
 
-fn day03_part2(example: &[Claim], input: &[Claim]) {
+fn day03_part2(
+    example: &[Claim],
+    example_claimed_squares: &HashMap<(u32, u32), Vec<u32>>,
+    input: &[Claim],
+    input_claimed_squares: &HashMap<(u32, u32), Vec<u32>>,
+) {
     // Exemple tests
-    assert_eq!(solve_part2(example), 3);
+    assert_eq!(solve_part2(example, example_claimed_squares), 3);
     println!("Example OK");
 
     // Solve puzzle
-    let res = solve_part2(input);
+    let res = solve_part2(input, input_claimed_squares);
     println!("Result part 2: {res}"); // 1215 is too low
     assert_eq!(res, 1260);
     println!("> DAY03 - part 2: OK!");
