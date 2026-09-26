@@ -146,7 +146,7 @@ fn find_guard_most_minutes_asleep(
     winner
 }
 
-fn find_most_slept_minute(day_minutes_asleep: &HashSet<(NaiveDate, NaiveTime)>) -> u32 {
+fn find_most_slept_minute(day_minutes_asleep: &HashSet<(NaiveDate, NaiveTime)>) -> (u32, u32) {
     let mut count_minutes: HashMap<u32, u32> = HashMap::new();
     for (_, time) in day_minutes_asleep {
         let count = count_minutes.entry(time.minute()).or_insert(0);
@@ -161,14 +161,14 @@ fn find_most_slept_minute(day_minutes_asleep: &HashSet<(NaiveDate, NaiveTime)>) 
             max_count = *v;
         }
     }
-    winner
+    (winner, max_count)
 }
 
 fn strategy1(records: &[Record]) -> u32 {
     let minutes_asleep = minutes_asleep_by_guard(records);
     let guard_id = find_guard_most_minutes_asleep(&minutes_asleep);
     let most_slept_minute = find_most_slept_minute(minutes_asleep.get(&guard_id).unwrap());
-    guard_id * most_slept_minute
+    guard_id * most_slept_minute.0
 }
 
 fn day04_part1(example: &[Record], input: &[Record]) {
@@ -179,11 +179,11 @@ fn day04_part1(example: &[Record], input: &[Record]) {
     assert_eq!(guard_most_asleep_id_example, 10);
     assert_eq!(
         find_most_slept_minute(minutes_asleep_by_guard_example.get(&10).unwrap()),
-        24
+        (24, 2)
     );
     assert_eq!(
         find_most_slept_minute(minutes_asleep_by_guard_example.get(&99).unwrap()),
-        45
+        (45, 3)
     );
     assert_eq!(strategy1(example), 240);
     println!("Example OK");
@@ -195,15 +195,31 @@ fn day04_part1(example: &[Record], input: &[Record]) {
     println!("> DAY04 - part 1: OK!");
 }
 
-fn day04_part2(_example: &[Record], _input: &[Record]) {
-    println!("TODO - part2");
+fn strategy2(records: &[Record]) -> u32 {
+    // Very questionable variable names yeah…
+    let minutes_asleep = minutes_asleep_by_guard(records);
+    let mut max_max_count = 0;
+    let mut winner_guard_id = 0;
+    let mut winner_minute = 100;
+    for (guard_id, minutes_set) in minutes_asleep {
+        let (minute_winner, max_count) = find_most_slept_minute(&minutes_set);
+        if max_count > max_max_count {
+            winner_guard_id = guard_id;
+            max_max_count = max_count;
+            winner_minute = minute_winner;
+        }
+    }
+    winner_minute * winner_guard_id
+}
+
+fn day04_part2(example: &[Record], input: &[Record]) {
     // Exemple tests
-    // assert_eq!(, 0);
-    // println!("Example OK");
+    assert_eq!(strategy2(example), 4455);
+    println!("Example OK");
 
     // Solve puzzle
-    // let res =
-    // println!("Result part 2: {res}");
-    // assert_eq!(res, );
-    // println!("> DAY04 - part 2: OK!");
+    let res = strategy2(input);
+    println!("Result part 2: {res}");
+    assert_eq!(res, 71976);
+    println!("> DAY04 - part 2: OK!");
 }
